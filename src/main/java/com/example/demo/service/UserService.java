@@ -2,23 +2,25 @@ package com.example.demo.service;
 
 import java.util.List;
 
-
-
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
 
 @Service // definir que é uma regra de negocio
 public class UserService {
+    private final JwtService jtwService;
     private final UserRepository repository;
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(); // comparar hash de senha
 
     //No Spring, injeção de dependência é o que permite que você “use” um objeto sem precisar instanciá-lo com new, deixando o próprio Spring cuidar da criação e do ciclo de vida dele.
     // injeção do repository
-    public UserService(UserRepository repository) {
+    public UserService(UserRepository repository, JwtService jtwService) {
         this.repository = repository;
+        this.jtwService = jtwService;
     }
 
     // retorna uma lista de obejtos User
@@ -62,18 +64,22 @@ public class UserService {
     }
 
 
-    public boolean login(String email, String senha){
+    public String login(String email, String senha){
         // buscar usuario pelo email
         User user = repository.findByEmail(email);
 
         // caso não exista o email
         if (user == null) {
-            return false;
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
         }
 
         // compara a senha digitada com a senha criptografada
-        // mathces retorna um boleano
-        return encoder.matches(senha, user.getSenha());
+        if (!encoder.matches(senha, user.getSenha())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Senha inválida");
+        }   
+        
+        // gerar o token com o email existente
+        return jtwService.gerarToken(user.getEmail());
     }
 
 
