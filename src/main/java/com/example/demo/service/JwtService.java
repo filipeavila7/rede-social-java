@@ -11,17 +11,28 @@ import io.jsonwebtoken.security.Keys;
 
 @Service
 public class JwtService {
-    // chave secreta para assinar o token
-    private final SecretKey key = Keys.hmacShaKeyFor("minha-chave-super-secreta-com-mais-de-32-caracteres-123".getBytes());
+    // Secret key usada para assinar e validar o JWT.
+    // Em producao, essa chave deve vir de variavel de ambiente.
+    private final SecretKey key = Keys
+            .hmacShaKeyFor("minha-chave-super-secreta-com-mais-de-32-caracteres-123".getBytes());
 
+    public String extrairEmail(String token) {
+        // Valida a assinatura e le o "subject" do token (aqui usamos o email).
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject();
+    }
 
-
-    public String gerarToken(String email){
-        return Jwts.builder() // criar token
-        .subject(email) // assunto
-        .issuedAt(new Date()) // data de criação
-        .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1h, duração do token
-        .signWith(key) // o token é assinado com sua chave secreta, para segurança e conseguir validar depois
-        .compact(); // compactar tudo para string
+    public String gerarToken(String email) {
+        // Cria um token com o email no subject e expira em 1 hora.
+        return Jwts.builder()
+                .subject(email)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1h
+                .signWith(key)
+                .compact();
     }
 }

@@ -78,7 +78,7 @@ public class UserController {
 
     // editar
     @PutMapping("/{id}")// receber id e objeto json dos dados atualizados
-    public ResponseEntity<User> putMethodName(@PathVariable Long id, @RequestBody User user) {
+    public ResponseEntity<User> uptadeUser(@PathVariable Long id, @RequestBody User user) {
 
         User usuarioAtualizado = service.uptadeUser(id, user); // usar o metodo de editar passand o id da url e o conteudo  atualizaDO
       

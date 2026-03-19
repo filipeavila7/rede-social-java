@@ -13,7 +13,7 @@ import jakarta.persistence.UniqueConstraint;
 @Table(
     name = "likes",
     // evitar duplicação de curtidas
-    uniqueConstraints = @UniqueConstraint(columnNames = {"users_id", "post_id"})
+    uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "post_id"})
 )
 public class Like {
     @Id // delcarar que sera um id no banco

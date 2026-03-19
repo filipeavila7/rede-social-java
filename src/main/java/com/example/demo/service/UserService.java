@@ -30,8 +30,6 @@ public class UserService {
 
     // criar usuario, retorna User e recebe um objeto User
     public User createUser(User user){
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-
         // criptografa a senha
         String senhaHash = encoder.encode(user.getSenha());
 
@@ -45,10 +43,14 @@ public class UserService {
     // excluir usuario
     // retorna void pois o delete não precisa retornar nada na controller apenas 204
     public void deleteUser(Long id){
+        if (!repository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
+        }
         repository.deleteById(id);
     }
 
 
+    // editar
     public User uptadeUser(Long id, User userAtualizado){ // recebr id e o objetodo usuario atulzado
         User user = repository.findById(id) // buscar o usuario pelo id passado pra ter a instacia exata dele
         .orElseThrow(() -> new RuntimeException("Usuário não encontrado")); // caso não ache, retorna uua nova execao
@@ -56,7 +58,10 @@ public class UserService {
         // passar valores usando set da instancia buscada pelo id usando o get 
         user.setNome(userAtualizado.getNome());
         user.setEmail(userAtualizado.getEmail());
-        user.setSenha(userAtualizado.getSenha());
+        // gera o hash de novo
+        if (userAtualizado.getSenha() != null && !userAtualizado.getSenha().isBlank()) {
+            user.setSenha(encoder.encode(userAtualizado.getSenha()));
+        }
 
 
         return repository.save(user); // salva no banco
