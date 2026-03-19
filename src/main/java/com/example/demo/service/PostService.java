@@ -17,50 +17,45 @@ public class PostService {
     // repository de user e post
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-    
+
     // injetar no construtor
     public PostService(PostRepository postRepository, UserRepository userRepository) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
     }
 
-
-    //listar todos os posts
-    public List<Post> getAllPosts(){
+    // listar todos os posts
+    public List<Post> getAllPosts() {
         return postRepository.findAll();
     }
 
-
     // criar um post
     public Post createPost(Post post) {
-    // pega o email do usuário autenticado
-    String email = (String) SecurityContextHolder.getContext()
-        .getAuthentication()
-        .getPrincipal();
+        // pega o email do usuário autenticado
+        String email = (String) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
 
-    User user = userRepository.findByEmail(email);
-    if (user == null) {
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não encontrado");
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não encontrado");
+        }
+        // fk key
+        post.setUser(user);
+        return postRepository.save(post);
     }
-    // fk key 
-    post.setUser(user);
-    return postRepository.save(post);
-}
-
-
 
     // buscar post pelo id
-    public Post getPostById(Long id){
+    public Post getPostById(Long id) {
         return postRepository.findById(id)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post não encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post não encontrado"));
     }
 
-
     // editar um post
-    public Post updatePost(Long id, Post postAtualizado){
+    public Post updatePost(Long id, Post postAtualizado) {
         // busca o post pelo o id passado
         Post post = postRepository.findById(id)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post não encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post não encontrado"));
 
         // substitui os valores
         post.setContent(postAtualizado.getContent());
@@ -71,9 +66,8 @@ public class PostService {
 
     }
 
-
     // deletar um post
-    public void deletePost(Long id){
+    public void deletePost(Long id) {
         if (!postRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post não encontrado");
         }
@@ -81,8 +75,18 @@ public class PostService {
         postRepository.deleteById(id);
     }
 
+    // buscar posts do usuario logado
+    public List<Post> getMyPosts() {
+        String email = (String) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+        User user = userRepository.findByEmail(email);
+        return postRepository.findByUserId(user.getId());
 
+    }
 
-    
-    
+    // buscar posts de outros usuarios pelo email
+    public List<Post> getPostsByUserEmail(String email) {
+        return postRepository.findByUserEmail(email);
+    }
+
 }

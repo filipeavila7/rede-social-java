@@ -37,6 +37,7 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @JsonIgnore
     @Column(nullable = false)
     private String senha;
 
@@ -98,6 +99,7 @@ public class User {
 
     // um usuario so pode ter um perfil
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
     private Profile profile;
 
     

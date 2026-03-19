@@ -1,0 +1,67 @@
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.demo.entity.Post;
+import com.example.demo.service.PostService;
+
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+
+@RestController
+@RequestMapping("/posts")
+public class PostController {
+
+    public final PostService service;
+
+    // injetar a service no construtor
+    public PostController(PostService service) {
+        this.service = service;
+    }
+
+    // ROTAS GET
+    // /posts
+    @GetMapping()
+    public ResponseEntity<List<Post>> getAllPosts() {
+        return ResponseEntity.ok(service.getAllPosts());
+    }
+
+    // /posts/user/me
+    // retornar todos os posts do usuario logado
+    @GetMapping("/user/me")
+    public ResponseEntity<List<Post>> getPostByUser() {
+        return ResponseEntity.ok(service.getMyPosts());
+    }
+
+    // /posts/user?email=usuario@email.com
+    // retornar os post de um outro usuario pelo email
+    // quando uma rota get recebe um parametro, ele vai na url, no caso o email
+    @GetMapping("/user")
+    public ResponseEntity<List<Post>> getPostsByUserEmail(@RequestParam String email) {
+        return ResponseEntity.ok(service.getPostsByUserEmail(email));
+    }
+
+
+    // POST
+    @PostMapping
+    public ResponseEntity<Post> createPost(@RequestBody Post post) {
+        Post createdPost = service.createPost(post);
+        
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdPost);
+    }
+    
+
+
+
+
+
+}
