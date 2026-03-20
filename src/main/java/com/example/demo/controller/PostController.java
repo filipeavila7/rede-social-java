@@ -7,6 +7,7 @@ import com.example.demo.entity.Post;
 import com.example.demo.service.PostService;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
-
-
 
 @RestController
 @RequestMapping("/posts")
@@ -54,34 +53,34 @@ public class PostController {
     }
 
 
+    // retorna todos os likes e comentarios de um post pelo seu id
+    @GetMapping("/{postId}/stats")
+    public ResponseEntity<Map<String, Long>> getPostStats(@PathVariable Long postId) {
+        return ResponseEntity.ok(service.getPostStats(postId));
+    }
+
     // POST
     // criar post
     @PostMapping
     public ResponseEntity<Post> createPost(@RequestBody Post post) {
         Post createdPost = service.createPost(post);
-        
+
         return ResponseEntity.status(HttpStatus.CREATED).body(createdPost);
     }
-    
 
     // DELETE
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePost(@PathVariable Long id){
+    public ResponseEntity<Void> deletePost(@PathVariable Long id) {
         service.deletePost(id);
         return ResponseEntity.noContent().build();
     }
-
 
     // Put
     @PutMapping("/{id}")
     public ResponseEntity<Post> updatePost(@PathVariable Long id, @RequestBody Post post) {
         Post updatedPost = service.updatePost(id, post);
-        
+
         return ResponseEntity.ok(updatedPost);
     }
-
-
-
-
 
 }

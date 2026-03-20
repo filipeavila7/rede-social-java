@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.entity.Like;
@@ -11,6 +12,7 @@ import com.example.demo.repository.LikeRepository;
 import com.example.demo.repository.PostRepository;
 import com.example.demo.repository.UserRepository;
 
+@Service
 public class LikeService {
     public final LikeRepository likeRepository;
     public final UserRepository userRepository;

@@ -96,7 +96,7 @@ public class User {
     // um usuario tem varios comentarios
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<CommentUser> comments;
+    private List<Commente> comments;
 
 
     // um usuario so pode ter um perfil
@@ -142,7 +142,7 @@ public class User {
     }
 
 
-    public List<CommentUser> getComments() {
+    public List<Commente> getComments() {
         return comments;
     }
 
@@ -173,7 +173,7 @@ public class User {
     }
 
 
-    public void setComments(List<CommentUser> comments) {
+    public void setComments(List<Commente> comments) {
         this.comments = comments;
     }
 

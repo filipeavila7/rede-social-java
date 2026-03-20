@@ -1,6 +1,8 @@
 package com.example.demo.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -9,6 +11,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.entity.Post;
 import com.example.demo.entity.User;
+import com.example.demo.repository.CommentRepository;
+import com.example.demo.repository.LikeRepository;
 import com.example.demo.repository.PostRepository;
 import com.example.demo.repository.UserRepository;
 
@@ -17,11 +21,16 @@ public class PostService {
     // repository de user e post
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final LikeRepository likeRepository;
+    private final CommentRepository commentRepository;
 
     // injetar no construtor
-    public PostService(PostRepository postRepository, UserRepository userRepository) {
+    public PostService(PostRepository postRepository, UserRepository userRepository, LikeRepository likeRepository,
+            CommentRepository commentRepository) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
+        this.likeRepository = likeRepository;
+        this.commentRepository = commentRepository;
     }
 
     // listar todos os posts
@@ -58,7 +67,7 @@ public class PostService {
         // busca o post pelo o id passado
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post não encontrado"));
-        
+
         // pegar email do usuario logado
         String email = (String) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
@@ -110,6 +119,19 @@ public class PostService {
     // buscar posts de outros usuarios pelo email
     public List<Post> getPostsByUserEmail(String email) {
         return postRepository.findByUserEmail(email);
+    }
+
+    // calcular total de curtidas de um post pelo seu id
+    public Map<String, Long> getPostStats(Long postId) {
+        // likes
+        long likes = likeRepository.countByPostId(postId);
+        // comentarios
+        long comments = commentRepository.countByPostId(postId);
+
+        Map<String, Long> stats = new HashMap<>();
+        stats.put("likes", likes);
+        stats.put("comments", comments);
+        return stats;
     }
 
 }

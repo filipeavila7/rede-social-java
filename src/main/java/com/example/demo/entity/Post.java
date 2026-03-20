@@ -49,7 +49,7 @@ public class Post {
     // UM POST TEM VÁRIOS COMENTÁRIOS
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<CommentUser> comments;
+    private List<Commente> comments;
 
 
     public Post() {
@@ -104,7 +104,7 @@ public class Post {
 
 
 
-    public List<CommentUser> getComments() {
+    public List<Commente> getComments() {
         return comments;
     }
 

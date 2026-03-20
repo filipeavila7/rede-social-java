@@ -26,10 +26,6 @@ public class LikeController {
 
     
 
-
-
-
-
     // POST
     // /posts/{postId}/likes
     @PostMapping("/{postId}/likes")
@@ -39,9 +35,10 @@ public class LikeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(likedPost);
     }
 
-    @DeleteMapping
-    public ResponseEntity<Void> unlikePost(@){
-
+    @DeleteMapping("/{postId}/likes")
+    public ResponseEntity<Void> unlikePost(@PathVariable Long postId){
+        service.unlikePost(postId);
+        return ResponseEntity.noContent().build();
     }
     
 

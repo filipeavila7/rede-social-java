@@ -11,7 +11,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "comments")
-public class CommentUser {
+public class Commente {
 
     @Id // delcarar que sera um id no banco
     @GeneratedValue(strategy = GenerationType.IDENTITY) 
@@ -31,11 +31,11 @@ public class CommentUser {
     User user;
 
 
-    public CommentUser() {
+    public Commente() {
     }
 
 
-    public CommentUser(String content, Post post, User user) {
+    public Commente(String content, Post post, User user) {
         this.content = content;
         this.post = post;
         this.user = user;
