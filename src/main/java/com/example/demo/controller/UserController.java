@@ -39,7 +39,7 @@ public class UserController {
 
     // metodos http
 
-    // GEt
+    // GET
     @GetMapping // ResponseEntity para retornar uma resposta http completa
     public ResponseEntity<List <User>> getAllUsers(){ // <List<User>> indica que o corpo da resposta vai ser uma lista de objetos User
         List<User> users = service.getAllUsers(); // declarar que essa lista é igual ao metodo da servic de retornar uma lista de usuarios

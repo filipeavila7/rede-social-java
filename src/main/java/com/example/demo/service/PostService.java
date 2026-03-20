@@ -29,18 +29,20 @@ public class PostService {
         return postRepository.findAll();
     }
 
-    // criar um post
+    // criar um post usando o email do usuario logado
     public Post createPost(Post post) {
         // pega o email do usuário autenticado
         String email = (String) SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getPrincipal();
 
+        // adciona o email pego do user logado no find para encontrar ele no banco
         User user = userRepository.findByEmail(email);
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não encontrado");
         }
         // fk key
+        // salvar usuario dono do post campo user_id fk key
         post.setUser(user);
         return postRepository.save(post);
     }
@@ -56,6 +58,15 @@ public class PostService {
         // busca o post pelo o id passado
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post não encontrado"));
+        
+        // pegar email do usuario logado
+        String email = (String) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+
+        // verifica se ele é o dono daquele post
+        if (!post.getUser().getEmail().equals(email)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não pode editar este post");
+        }
 
         // substitui os valores
         post.setContent(postAtualizado.getContent());
@@ -68,10 +79,22 @@ public class PostService {
 
     // deletar um post
     public void deletePost(Long id) {
-        if (!postRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post não encontrado");
+        // referencia do post encontrado pelo id passado na url da requisição
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post não encontrado"));
+
+        // pegar email do usario logado no momento, para garantir que ele so apague os
+        // posts dele
+        String email = (String) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+
+        // se email daquele usuario logado não pertencer ao usuario dono do post, ele
+        // não deixa apagar
+        if (!post.getUser().getEmail().equals(email)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não pode apagar este post");
         }
 
+        // caso o email seja o mesmo ele apaga
         postRepository.deleteById(id);
     }
 

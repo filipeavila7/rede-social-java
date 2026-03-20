@@ -3,6 +3,7 @@ package com.example.demo.entity;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.*;
 
@@ -37,8 +38,9 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @JsonIgnore
+    
     @Column(nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String senha;
 
 

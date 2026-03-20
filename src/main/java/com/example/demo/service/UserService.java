@@ -7,6 +7,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.example.demo.entity.Profile;
 import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
 
@@ -35,6 +36,13 @@ public class UserService {
 
         // substitui a senha normal pela criptografada
         user.setSenha(senhaHash);
+
+        // criar perfil pro usuario
+        Profile profile = new Profile("", null, user);
+        
+        // set pro lado inverso da relação
+        user.setProfile(profile);
+        
         
         return repository.save(user); // salva o objeto recebido
     }
