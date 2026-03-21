@@ -3,6 +3,7 @@ package com.example.demo.entity;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -43,7 +44,7 @@ public class Post {
     // o JPA busca na tabela Like usando post_id
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     @JsonIgnore // evita loop infinito na API
-    private List<Like> likes;
+    private List<Like> likes; // lista de likes, jpa ja retorna todos os registros de likes que estão associados a fk de post, ou seja todos os likes que tem o id desse post
 
 
     // UM POST TEM VÁRIOS COMENTÁRIOS
@@ -51,6 +52,8 @@ public class Post {
     @JsonIgnore
     private List<Commente> comments;
 
+
+    
 
     public Post() {
     }
@@ -60,6 +63,18 @@ public class Post {
         this.content = content;
         this.imageUrl = imageUrl;
         this.user = user;
+    }
+
+
+    // mostrar no json o total de curtidas e comentáario contando o tamanho da lista  
+    @JsonProperty("likesCount")
+    public int getLikesCount() {
+        return likes == null ? 0 : likes.size();
+    }
+
+    @JsonProperty("commentsCount")
+    public int getCommentsCount() {
+        return comments == null ? 0 : comments.size();
     }
 
 

@@ -44,6 +44,19 @@ public class ProfileService {
         return profile;
     }
 
+    // buscar perfol de usuarios pelo email
+    public Profile getProfileByEmail(String email) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
+        }
+        Profile profile = user.getProfile();
+        if (profile == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Perfil não encontrado");
+        }
+        return profile;
+    }
+
     // atualizar perfil do usuario logado
     public Profile updateMyProfile(Profile profileAtualizado) {
         Profile profile = getMyProfile();

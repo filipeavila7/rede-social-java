@@ -103,8 +103,15 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
     private Profile profile;
-
     
+
+    // um usuario pode ter varios seguidores
+    @OneToMany(mappedBy = "followed")
+    private List<Follow> followers;
+
+    // um usuario pode seguir varios usuarios
+    @OneToMany(mappedBy =  "follower")
+    private List<Follow> following;
     
     
     public Long getId() {
