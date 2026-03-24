@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "profile")
@@ -24,6 +25,12 @@ public class Profile {
     @Column
     private String imageUrlProfile;
 
+    @Column
+    private String messageStatus;
+
+    @Column
+    private LocalDateTime messageStatusCreatedAt;
+
 
     @OneToOne
     @JoinColumn(name = "user_id", unique = true, nullable = false)
@@ -35,9 +42,12 @@ public class Profile {
     }
 
 
-    public Profile(String bio, String imageUrlProfile, User user) {
+
+
+    public Profile(String bio, String imageUrlProfile, String messageStatus, User user) {
         this.bio = bio;
         this.imageUrlProfile = imageUrlProfile;
+        this.messageStatus = messageStatus;
         this.user = user;
     }
 
@@ -75,6 +85,25 @@ public class Profile {
     public void setUser(User user) {
         this.user = user;
     }
+
+
+    public String getMessageStatus() {
+        return messageStatus;
+    }
+
+
+    public void setMessageStatus(String messageStatus) {
+        this.messageStatus = messageStatus;
+    }
+
+    public LocalDateTime getMessageStatusCreatedAt() {
+        return messageStatusCreatedAt;
+    }
+
+    public void setMessageStatusCreatedAt(LocalDateTime messageStatusCreatedAt) {
+        this.messageStatusCreatedAt = messageStatusCreatedAt;
+    }
+
 
 
     

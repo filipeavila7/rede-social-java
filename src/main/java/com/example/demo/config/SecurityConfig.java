@@ -23,7 +23,20 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**").permitAll()
+                .requestMatchers(
+                    "/auth/**",
+                    "/",
+                    "/index.html",
+                    "/login.html",
+                    "/feed.html",
+                    "/profile.html",
+                    "/followers.html",
+                    "/chat.html",
+                    "/users.html",
+                    "/css/**",
+                    "/js/**",
+                    "/favicon.ico"
+                ).permitAll()
                 .anyRequest().authenticated()
             )
             // registra o filtro antes do filtro padrão do Spring

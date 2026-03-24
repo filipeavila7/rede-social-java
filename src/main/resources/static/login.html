@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Login</title>
+    <link rel="stylesheet" href="/css/app.css" />
+  </head>
+  <body>
+    <header>
+      <div class="row">
+        <strong>Rede Social</strong>
+        <span class="muted">Login</span>
+      </div>
+    </header>
+
+    <main class="grid grid-2">
+      <section class="card">
+        <h2>Entrar</h2>
+        <form id="login-form" class="grid">
+          <div>
+            <label>Email</label>
+            <input id="login-email" type="email" required />
+          </div>
+          <div>
+            <label>Senha</label>
+            <input id="login-senha" type="password" required />
+          </div>
+          <button type="submit">Entrar</button>
+          <div id="login-msg" class="muted"></div>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>Criar Conta</h2>
+        <form id="register-form" class="grid">
+          <div>
+            <label>Nome</label>
+            <input id="reg-nome" required />
+          </div>
+          <div>
+            <label>Email</label>
+            <input id="reg-email" type="email" required />
+          </div>
+          <div>
+            <label>Senha</label>
+            <input id="reg-senha" type="password" required />
+          </div>
+          <button type="submit">Criar</button>
+          <div id="register-msg" class="muted"></div>
+        </form>
+      </section>
+    </main>
+
+    <script src="/js/app.js"></script>
+    <script src="/js/login.js"></script>
+  </body>
+</html>

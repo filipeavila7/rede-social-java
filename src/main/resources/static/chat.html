@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chat</title>
+    <link rel="stylesheet" href="/css/app.css" />
+  </head>
+  <body>
+    <header>
+      <div class="row">
+        <strong>Painel Social</strong>
+        <div class="row" style="width:auto;">
+          <span id="logged-user" class="muted"></span>
+          <button id="logout-btn" class="secondary">Sair</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="shell">
+      <aside class="sidebar">
+        <nav>
+          <a href="/feed.html">Feed</a>
+          <a href="/profile.html">Perfil</a>
+          <a href="/followers.html">Seguidores</a>
+          <a href="/chat.html">Chat</a>
+          <a href="/users.html">Usuários</a>
+        </nav>
+      </aside>
+
+      <main class="content grid grid-2">
+        <section class="card">
+          <h2>Conversas</h2>
+          <div id="conversations" class="list"></div>
+        </section>
+
+        <section class="card">
+          <h2>Mensagens</h2>
+          <div id="messages" class="list"></div>
+          <form id="send-form" class="grid" style="margin-top:12px;">
+            <div>
+              <label>Conversation ID (para enviar na conversa aberta)</label>
+              <input id="conversation-id" />
+            </div>
+            <div>
+              <label>Enviar para User ID (criar conversa se não existir)</label>
+              <input id="receiver-id" />
+            </div>
+            <div>
+              <label>Mensagem</label>
+              <textarea id="message-content" required></textarea>
+            </div>
+            <button type="submit">Enviar</button>
+            <div id="chat-msg" class="muted"></div>
+          </form>
+        </section>
+      </main>
+    </div>
+
+    <script src="/js/app.js"></script>
+    <script src="/js/chat.js"></script>
+  </body>
+</html>

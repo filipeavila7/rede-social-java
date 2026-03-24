@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Seguidores</title>
+    <link rel="stylesheet" href="/css/app.css" />
+  </head>
+  <body>
+    <header>
+      <div class="row">
+        <strong>Painel Social</strong>
+        <div class="row" style="width:auto;">
+          <span id="logged-user" class="muted"></span>
+          <button id="logout-btn" class="secondary">Sair</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="shell">
+      <aside class="sidebar">
+        <nav>
+          <a href="/feed.html">Feed</a>
+          <a href="/profile.html">Perfil</a>
+          <a href="/followers.html">Seguidores</a>
+          <a href="/chat.html">Chat</a>
+          <a href="/users.html">Usuários</a>
+        </nav>
+      </aside>
+
+      <main class="content grid grid-2">
+        <section class="card">
+          <h2>Seguir / Deixar de seguir</h2>
+          <form id="follow-form" class="grid">
+            <div>
+              <label>User ID</label>
+              <input id="follow-user-id" type="number" required />
+            </div>
+            <div class="row">
+              <button type="submit">Seguir</button>
+              <button id="unfollow-btn" type="button" class="secondary">Desseguir</button>
+            </div>
+            <div id="follow-msg" class="muted"></div>
+          </form>
+        </section>
+
+        <section class="card">
+          <h2>Meus Seguidores</h2>
+          <div id="my-followers" class="list"></div>
+        </section>
+
+        <section class="card">
+          <h2>Estou Seguindo</h2>
+          <div id="my-following" class="list"></div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/js/app.js"></script>
+    <script src="/js/followers.js"></script>
+  </body>
+</html>

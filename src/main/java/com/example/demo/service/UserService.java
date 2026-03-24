@@ -38,7 +38,7 @@ public class UserService {
         user.setSenha(senhaHash);
 
         // criar perfil pro usuario
-        Profile profile = new Profile("", null, user);
+        Profile profile = new Profile("", null, null, user);
         
         // set pro lado inverso da relação
         user.setProfile(profile);

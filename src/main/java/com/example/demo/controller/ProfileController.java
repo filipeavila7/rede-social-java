@@ -1,9 +1,12 @@
 package com.example.demo.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.FollowingProfileResponse;
 import com.example.demo.entity.Post;
 import com.example.demo.entity.Profile;
 import com.example.demo.service.ProfileService;
@@ -35,6 +38,12 @@ public class ProfileController {
     @GetMapping("/user")
     public ResponseEntity<Profile> getProfileByEmail(@RequestParam String email) {
         return ResponseEntity.ok(service.getProfileByEmail(email));
+    }
+
+    // GET /profiles/following
+    @GetMapping("/following")
+    public ResponseEntity<List<FollowingProfileResponse>> getFollowingProfiles() {
+        return ResponseEntity.ok(service.getFollowingProfiles());
     }
 
     // PUT

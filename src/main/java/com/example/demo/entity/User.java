@@ -103,6 +103,10 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
     private Profile profile;
+
+
+
+    
     
 
     // um usuario pode ter varios seguidores
