@@ -62,11 +62,11 @@ public class ProfileService {
     public Profile getProfileByEmail(String email) {
         User user = userRepository.findByEmail(email);
         if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "UsuÃ¡rio nÃ£o encontrado");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario nÃo encontrado");
         }
         Profile profile = user.getProfile();
         if (profile == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Perfil nÃ£o encontrado");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Perfil nÃo encontrado");
         }
         clearExpiredStatus(profile);
         return profile;
@@ -77,9 +77,11 @@ public class ProfileService {
     public Profile updateMyProfile(Profile profileAtualizado) {
         Profile profile = getMyProfile();
 
+        // atualiza a bio e foto de perfil
         profile.setBio(profileAtualizado.getBio());
         profile.setImageUrlProfile(profileAtualizado.getImageUrlProfile());
 
+        // atualiza o status 
         String status = profileAtualizado.getMessageStatus();
         if (status != null && !status.isBlank()) {
             profile.setMessageStatus(status);

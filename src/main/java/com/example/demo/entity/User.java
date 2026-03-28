@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 
 
 /* 
@@ -32,13 +34,17 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincremente 1,2,3,4...
     private Long id;
 
+    @NotBlank
     @Column(nullable = false)
     private String nome;
 
+    @NotBlank
+    @Email
     @Column(nullable = false, unique = true)
     private String email;
 
     
+    @NotBlank
     @Column(nullable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String senha;

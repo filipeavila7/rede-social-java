@@ -9,20 +9,35 @@ async function loadMyProfile() {
   }
   showMsg(info, "Perfil carregado.", true);
   document.getElementById("profile-bio").value = res.data.bio || "";
-  document.getElementById("profile-img").value = res.data.imageUrlProfile || "";
+  document.getElementById("profile-status").value = res.data.messageStatus || "";
+  const avatar = document.getElementById("profile-avatar");
+  avatar.src = res.data.imageUrlProfile || "https://via.placeholder.com/64";
+  document.getElementById("profile-status-preview").textContent =
+    res.data.messageStatus ? res.data.messageStatus : "";
 }
 
 async function saveProfile(e) {
   e.preventDefault();
-  const bio = document.getElementById("profile-bio").value.trim();
-  const imageUrlProfile = document.getElementById("profile-img").value.trim();
+  const bioEl = document.getElementById("profile-bio");
+  const avatarEl = document.getElementById("profile-avatar");
+  const statusEl = document.getElementById("profile-status");
   const msg = document.getElementById("profile-msg");
+  if (!bioEl || !avatarEl || !statusEl) {
+    showMsg(msg, "Erro: elementos do perfil nÃ£o encontrados.", false);
+    return;
+  }
+  const bio = bioEl.value.trim();
+  const imageUrlProfile = avatarEl.src;
+  const messageStatus = statusEl.value.trim();
   showMsg(msg, "Salvando...", true);
   const res = await apiFetch("/profiles/me", {
     method: "PUT",
-    body: JSON.stringify({ bio, imageUrlProfile }),
+    body: JSON.stringify({ bio, imageUrlProfile, messageStatus }),
   });
   showMsg(msg, res.ok ? "Salvo!" : "Erro ao salvar.", res.ok);
+  if (res.ok) {
+    await loadMyProfile();
+  }
 }
 
 async function searchProfile(e) {
@@ -40,6 +55,7 @@ async function searchProfile(e) {
       <div><strong>${email}</strong></div>
       <div>${res.data.bio || ""}</div>
       <div class="muted">${res.data.imageUrlProfile || ""}</div>
+      <div class="muted">${res.data.messageStatus || ""}</div>
     </div>
   `;
 }
@@ -79,7 +95,35 @@ async function loadCounts() {
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("profile-form").addEventListener("submit", saveProfile);
   document.getElementById("search-profile").addEventListener("submit", searchProfile);
+  document.getElementById("profile-file").addEventListener("change", uploadProfileImage);
   loadMyProfile();
   loadMyPosts();
   loadCounts();
 });
+
+async function uploadProfileImage(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  const msg = document.getElementById("profile-msg");
+  showMsg(msg, "Enviando imagem...", true);
+
+  const form = new FormData();
+  form.append("file", file);
+
+  const res = await fetch("/files/upload", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    },
+    body: form
+  });
+
+  if (!res.ok) {
+    showMsg(msg, "Erro ao enviar imagem.", false);
+    return;
+  }
+
+  const data = await res.json();
+  document.getElementById("profile-avatar").src = data.url;
+  showMsg(msg, "Imagem enviada. Clique em Salvar para aplicar.", true);
+}

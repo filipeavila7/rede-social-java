@@ -48,7 +48,7 @@ public class UserController {
 
     // post
     @PostMapping // O corpo dessa resposta vai ser do tipo User
-    public ResponseEntity<User> createUser(@RequestBody User user){ // converter o objeto json em objeto User, usa o jackson para criar a instacia na classe usando o set para cada campo
+    public ResponseEntity<User> createUser(@Valid @RequestBody User user){ // converter o objeto json em objeto User, usa o jackson para criar a instacia na classe usando o set para cada campo
         User createdUser = service.createUser(user); // criar uma variavel do tipo User é igual ao meotdo de createUser, passando o json convertido como parametro
         // jackson pega o objeto e trnaforma em json usando os getter para cada atributo e retorna um json como corpo e com status
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser); //retornar o corpo da resposta (created user) e o status da requisição
@@ -94,3 +94,5 @@ public class UserController {
 
 
 }
+
+

@@ -21,6 +21,7 @@ public class SecurityConfig {
 
         http
             .csrf(csrf -> csrf.disable())
+            .cors(cors -> {})
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
@@ -35,8 +36,12 @@ public class SecurityConfig {
                     "/users.html",
                     "/css/**",
                     "/js/**",
-                    "/favicon.ico"
+                    "/favicon.ico",
+                    // libera acesso publico aos arquivos enviados
+                    "/uploads/**"
                 ).permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.POST, "/users").permitAll()
                 .anyRequest().authenticated()
             )
             // registra o filtro antes do filtro padrão do Spring

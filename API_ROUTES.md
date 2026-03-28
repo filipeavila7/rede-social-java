@@ -59,6 +59,7 @@ Controller: `ProfileController` (`/profiles`)
 | --- | --- | --- | --- |
 | GET | `/profiles/me` | Retorna perfil do usuário logado. | JWT |
 | GET | `/profiles/user?email=...` | Retorna perfil de outro usuário pelo email. | JWT |
+| GET | `/profiles/following` | Lista foto/nome/status dos perfis que o logado segue. | JWT |
 | PUT | `/profiles/me` | Atualiza perfil do usuário logado. | JWT |
 
 **Follows / Seguidores**  
@@ -90,6 +91,13 @@ Controller: `MessageController` (`/messages`)
 | --- | --- | --- | --- |
 | POST | `/messages/{receiverId}` | Envia mensagem para um usuário. | JWT |
 | GET | `/messages/conversation/{conversationId}` | Lista mensagens de uma conversa. | JWT |
+
+**Uploads de Arquivos**  
+Controller: `UploadController` (`/files`)
+
+| Método | Rota | Descrição | Auth |
+| --- | --- | --- | --- |
+| POST | `/files/upload` | Faz upload e retorna URL pública do arquivo. | JWT |
 
 **Notas**
 1. Todas as rotas acima exigem JWT, exceto `/auth/login` e as páginas estáticas liberadas no `SecurityConfig`.

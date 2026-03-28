@@ -54,7 +54,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         try {
             email = jwtService.extrairEmail(token);
         } catch (Exception ex) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            // token inválido: segue sem autenticar (rotas públicas continuam funcionando)
+            filterChain.doFilter(request, response);
             return;
         }
 
