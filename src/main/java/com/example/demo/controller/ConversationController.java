@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.demo.dto.ConversationResponse;
 import com.example.demo.entity.Conversation;
 import com.example.demo.service.ConversationService;
 
@@ -20,7 +21,7 @@ public class ConversationController {
 
     // GET /conversations/me
     @GetMapping("/me")
-    public ResponseEntity<List<Conversation>> getMyConversations() {
-        return ResponseEntity.ok(service.getMyConversations());
-    }
+    public ResponseEntity<List<ConversationResponse>> getMyContacts() {
+    return ResponseEntity.ok(service.getMyContacts());
+}
 }

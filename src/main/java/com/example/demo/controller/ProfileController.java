@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.FollowingProfileResponse;
 import com.example.demo.entity.Post;
+import com.example.demo.dto.ProfileResponse;
 import com.example.demo.entity.Profile;
 import com.example.demo.service.ProfileService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,14 +30,14 @@ public class ProfileController {
     // GET
     // /profiles/me perfil do usuario logado
     @GetMapping("/me")
-    public ResponseEntity<Profile> getMyProfile() {
+    public ResponseEntity<ProfileResponse> getMyProfile() {
         // retronar os dados da profile do usuario em json
         return ResponseEntity.ok(service.getMyProfile());
     }
 
     // GET /profiles/user?email=usuario@email.com
     @GetMapping("/user")
-    public ResponseEntity<Profile> getProfileByEmail(@RequestParam String email) {
+    public ResponseEntity<ProfileResponse> getProfileByEmail(@RequestParam String email) {
         return ResponseEntity.ok(service.getProfileByEmail(email));
     }
 

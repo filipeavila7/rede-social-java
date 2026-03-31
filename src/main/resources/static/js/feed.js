@@ -21,7 +21,7 @@ async function loadPosts() {
     item.innerHTML = `
       <div><strong>${author}</strong></div>
       <div>${p.content}</div>
-      ${p.imageUrl ? `<div class="muted">img: ${p.imageUrl}</div>` : ""}
+      ${p.imageUrl ? `<img src="${(window.API_BASE || '') + p.imageUrl}" alt="post" style="max-width:100%;border-radius:10px;margin-top:8px;border:1px solid var(--border);" />` : ""}
       <div class="actions">
         <button data-like="${p.id}">Curtir</button>
         <button data-unlike="${p.id}" class="secondary">Descurtir</button>
@@ -38,9 +38,29 @@ async function loadPosts() {
 async function createPost(e) {
   e.preventDefault();
   const content = document.getElementById("post-content").value.trim();
-  const imageUrl = document.getElementById("post-image").value.trim();
+  const fileInput = document.getElementById("post-file");
+  const file = fileInput && fileInput.files ? fileInput.files[0] : null;
+  let imageUrl = "";
   const msg = document.getElementById("post-msg");
   showMsg(msg, "Publicando...", true);
+
+  if (file) {
+    const form = new FormData();
+    form.append("file", file);
+    const uploadRes = await fetch("/files/upload", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      },
+      body: form
+    });
+    if (!uploadRes.ok) {
+      showMsg(msg, "Erro ao enviar imagem.", false);
+      return;
+    }
+    const data = await uploadRes.json();
+    imageUrl = data.url || "";
+  }
 
   const res = await apiFetch("/posts", {
     method: "POST",
