@@ -37,8 +37,9 @@ public class SecurityConfig {
                     "/css/**",
                     "/js/**",
                     "/favicon.ico",
-                    // libera acesso publico aos arquivos enviados
-                    "/uploads/**"
+                    "/uploads/**",
+                    "/files/**"
+        
                 ).permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/users").permitAll()

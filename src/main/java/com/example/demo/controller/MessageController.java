@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.demo.dto.MessageResponse;
 import com.example.demo.entity.Message;
 import com.example.demo.service.MessageService;
 
@@ -22,18 +23,18 @@ public class MessageController {
     // POST /messages/{receiverId}
     // enviar mensagem
     @PostMapping("/{receiverId}")
-    public ResponseEntity<Message> sendMessage(
+    public ResponseEntity<MessageResponse> sendMessage(
         @PathVariable Long receiverId,
         @RequestBody Message body
     ) {
-        Message created = service.sendMessage(receiverId, body.getContent());
+        MessageResponse created = service.sendMessage(receiverId, body.getContent());
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     // GET /messages/conversation/{conversationId}
     // listar todas as mensagens de uma conversa
     @GetMapping("/conversation/{conversationId}")
-    public ResponseEntity<List<Message>> getMessages(@PathVariable Long conversationId) {
+    public ResponseEntity<List<MessageResponse>> getMessages(@PathVariable Long conversationId) {
         return ResponseEntity.ok(service.getMessages(conversationId));
     }
 }

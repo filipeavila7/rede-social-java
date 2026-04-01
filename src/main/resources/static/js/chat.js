@@ -4,23 +4,20 @@ async function loadConversations() {
   const box = document.getElementById("conversations");
   box.textContent = "Carregando...";
   const res = await apiFetch("/conversations/me");
-  if (!res.ok) {
+  if (!res.ok || !Array.isArray(res.data)) {
     box.textContent = "Sem conversas ou rota não disponível.";
     return;
   }
   box.innerHTML = "";
-  const me = await getCurrentUser();
   res.data.forEach((c) => {
-    const other =
-      me && c.userA && c.userA.id === me.id ? c.userB : c.userA;
-    const label = other ? (other.nome || other.email || other.id) : c.id;
+    const label = c.otherUserName || c.otherUserId || c.conversationId;
     const item = document.createElement("div");
     item.className = "item";
     item.innerHTML = `
       <div><strong>${label}</strong></div>
-      <small>Conversation ID: ${c.id}</small>
+      <small>Conversation ID: ${c.conversationId}</small>
       <div class="actions">
-        <button data-open="${c.id}">Abrir</button>
+        <button data-open="${c.conversationId}">Abrir</button>
       </div>
     `;
     box.appendChild(item);
@@ -28,6 +25,7 @@ async function loadConversations() {
 }
 
 async function openConversation(id) {
+  if (!id) return;
   const box = document.getElementById("messages");
   document.getElementById("conversation-id").value = id;
   box.textContent = "Carregando...";
@@ -40,8 +38,8 @@ async function openConversation(id) {
   res.data.forEach((m) => {
     const item = document.createElement("div");
     item.className = "item";
-    const sender = m.sender ? (m.sender.nome || m.sender.email) : "desconhecido";
-    item.innerHTML = `<strong>${sender}</strong><div>${m.content}</div>`;
+    const sender = m.senderName || "desconhecido";
+    item.innerHTML = `<strong>${sender}</strong><div>${m.content || ""}</div>`;
     box.appendChild(item);
   });
 }
@@ -75,9 +73,14 @@ async function sendMessage(e) {
 
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("conversations").addEventListener("click", (e) => {
-    const id = e.target.getAttribute("data-open");
+    const btn = e.target.closest("button[data-open]");
+    if (!btn) return;
+    const id = btn.getAttribute("data-open");
     if (id) openConversation(id);
   });
   document.getElementById("send-form").addEventListener("submit", sendMessage);
   loadConversations();
 });
+
+
+

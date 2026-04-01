@@ -29,6 +29,15 @@ public class UserService {
         return repository.findAll();
     }
 
+    // retorna o usuario logado pelo email do token
+    public User getMe(String email) {
+        User user = repository.findByEmail(email);
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
+        }
+        return user;
+    }
+
     // criar usuario, retorna User e recebe um objeto User
     public User createUser(User user){
         // criptografa a senha

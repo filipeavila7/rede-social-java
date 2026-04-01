@@ -24,4 +24,10 @@ public class ConversationController {
     public ResponseEntity<List<ConversationResponse>> getMyContacts() {
     return ResponseEntity.ok(service.getMyContacts());
 }
+
+    // GET /conversations/contacts (alias para /me)
+    @GetMapping("/contacts")
+    public ResponseEntity<List<ConversationResponse>> getMyContactsAlias() {
+        return ResponseEntity.ok(service.getMyContacts());
+    }
 }

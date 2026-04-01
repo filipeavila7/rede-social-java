@@ -33,6 +33,19 @@ public class UploadController {
                     .body(Map.of("error", "Arquivo vazio"));
         }
 
+        // valida tamanho (2MB)
+        if (file.getSize() > 2 * 1024 * 1024) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Arquivo maior que 2MB"));
+        }
+
+        // valida tipo, aceitar somente png e jpeg
+        String type = file.getContentType();
+        if (type == null || !(type.equals("image/jpeg") || type.equals("image/png"))) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Somente PNG ou JPG"));
+        }
+
         // Salva o arquivo e devolve a URL publica.
         String url = storageService.save(file);
         return ResponseEntity.ok(Map.of("url", url));

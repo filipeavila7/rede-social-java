@@ -68,11 +68,11 @@ public class ConversationService {
 
     for (Conversation c : conversations) {
         // descobrir o outro usuario
-        User other;
-        if (c.getUserA().getId().equals(me.getId())) {
+        User other; // outro usuario
+        if (c.getUserA().getId().equals(me.getId())) { // se o id do user A for igual ao do logado, então o outro é o b
             other = c.getUserB();
         } else {
-            other = c.getUserA();
+            other = c.getUserA(); // caso o id do user logado não for igual o do user A, ent o outro é o B
         }
 
         // pegar foto do perfil do outro usuario

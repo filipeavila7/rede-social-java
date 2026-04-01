@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import javax.crypto.SecretKey;
@@ -13,8 +14,14 @@ import io.jsonwebtoken.security.Keys;
 public class JwtService {
     // Secret key usada para assinar e validar o JWT.
     // Em producao, essa chave deve vir de variavel de ambiente.
-    private final SecretKey key = Keys
-            .hmacShaKeyFor("minha-chave-super-secreta-com-mais-de-32-caracteres-123".getBytes());
+    // Lê a chave de uma variável de ambiente
+    private final String secret = System.getenv("JWT_SECRET");
+
+    // cria a chave, caso seja null, usa uma padrão para desenvolvimento
+    private final SecretKey key = Keys.hmacShaKeyFor(
+        (secret != null ? secret : "fallback-dev-secret-com-mais-de-32-caracteres-123")
+            .getBytes(StandardCharsets.UTF_8)
+    );
 
     public String extrairEmail(String token) {
         // Valida a assinatura e le o "subject" do token (aqui usamos o email).

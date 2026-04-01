@@ -7,8 +7,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.example.demo.dto.MessageResponse;
 import com.example.demo.entity.Conversation;
 import com.example.demo.entity.Message;
+import com.example.demo.entity.Profile;
 import com.example.demo.entity.User;
 import com.example.demo.repository.ConversationRepository;
 import com.example.demo.repository.MessageRepository;
@@ -50,7 +52,7 @@ public class MessageService {
 
     // Enviar mensagem (cria conversa se nao existir)
     // enviar mensagem para usuario passando o id e o content
-    public Message sendMessage(Long receiverId, String content) {
+    public MessageResponse sendMessage(Long receiverId, String content) {
         User sender = getLoggedUser(); // define que quem mandou é o usuario logado
 
 
@@ -73,11 +75,12 @@ public class MessageService {
         }
         // criar nova mensagem e salvar no banco
         Message message = new Message(conversation, sender, content);
-        return messageRepository.save(message);
+        Message saved = messageRepository.save(message);
+        return toResponse(saved);
     }
 
     // Buscar mensagens por conversationId (somente participantes)
-    public List<Message> getMessages(Long conversationId) {
+    public List<MessageResponse> getMessages(Long conversationId) {
         User me = getLoggedUser(); // pegar user logado
 
         // buscar a conversa no banco pelo id da conversa
@@ -87,7 +90,28 @@ public class MessageService {
         if (!belongsToConversation(conversation, me)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não pertence a essa conversa");
         }
-        // retrona todas as msgs do chat de acordo com a data de criação
-        return messageRepository.findByConversationIdOrderByCreatedAtAsc(conversationId);
+        // retorna todas as msgs do chat de acordo com a data de criação
+        return messageRepository.findByConversationIdOrderByCreatedAtAsc(conversationId)
+            .stream()
+            .map(this::toResponse)
+            .toList();
+    }
+
+    // Converte Message para DTO com foto do perfil do remetente
+    private MessageResponse toResponse(Message message) {
+        User sender = message.getSender();
+        Profile profile = sender.getProfile();
+        String photo = profile != null ? profile.getImageUrlProfile() : null;
+        String createdAt = message.getCreatedAt() != null ? message.getCreatedAt().toString() : null;
+
+        return new MessageResponse(
+            message.getId(),
+            message.getConversation().getId(),
+            sender.getId(),
+            sender.getNome(),
+            photo,
+            message.getContent(),
+            createdAt
+        );
     }
 }

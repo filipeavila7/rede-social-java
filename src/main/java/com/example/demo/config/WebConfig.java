@@ -17,5 +17,8 @@ public class WebConfig implements WebMvcConfigurer {
         String location = "file:" + uploadDir.toString() + "/";
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations(location);
+        // Mapeia /files/** para a mesma pasta de uploads.
+        registry.addResourceHandler("/files/**")
+                .addResourceLocations(location);
     }
 }

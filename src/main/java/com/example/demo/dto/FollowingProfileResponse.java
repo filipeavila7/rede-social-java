@@ -1,5 +1,6 @@
 package com.example.demo.dto;
 
+// dados do perfil dos usuarios seguidos 
 public class FollowingProfileResponse {
     private Long userId;
     private String nome;

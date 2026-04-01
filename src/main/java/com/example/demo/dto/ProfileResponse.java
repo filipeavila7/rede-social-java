@@ -1,5 +1,6 @@
 package com.example.demo.dto;
 
+// dados do perfil do usuario logado
 public class ProfileResponse {
     private String nome;
     private String bio;
