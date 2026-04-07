@@ -16,5 +16,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     //“me traga todos os Post cujo campo user.id é esse valor”.
     List<Post> findByUserId(Long userId); // retona os post de um usuario especifico
     List<Post> findByUserEmail(String email); // retorna o email correspondente do usuario do post
+    long countByUserId(Long userId); // retorna a quantidade de posts de um usuario
     
 }

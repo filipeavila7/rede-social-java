@@ -30,6 +30,7 @@ Controller: `PostController` (`/posts`)
 | GET | `/posts` | Lista todos os posts. | JWT |
 | GET | `/posts/user/me` | Lista posts do usuário logado. | JWT |
 | GET | `/posts/user?email=...` | Lista posts de um usuário pelo email. | JWT |
+| GET | `/posts/user/{userId}/count` | Retorna quantidade total de posts do usuário. | JWT |
 | GET | `/posts/{postId}/stats` | Retorna contagem de likes e comentários do post. | JWT |
 | POST | `/posts` | Cria post com usuário logado. | JWT |
 | PUT | `/posts/{id}` | Edita post por id. | JWT |
@@ -83,6 +84,7 @@ Controller: `ConversationController` (`/conversations`)
 | Método | Rota | Descrição | Auth |
 | --- | --- | --- | --- |
 | GET | `/conversations/me` | Lista todas as conversas do usuário logado. | JWT |
+| GET | `/conversations/contacts` | Alias de `/conversations/me` (mesmo retorno). | JWT |
 
 **Mensagens (Chat)**  
 Controller: `MessageController` (`/messages`)

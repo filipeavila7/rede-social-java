@@ -53,6 +53,9 @@ public class MessageService {
     // Enviar mensagem (cria conversa se nao existir)
     // enviar mensagem para usuario passando o id e o content
     public MessageResponse sendMessage(Long receiverId, String content) {
+        if (content == null || content.trim().isEmpty() ) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Conteúdo vazio");
+        }
         User sender = getLoggedUser(); // define que quem mandou é o usuario logado
 
 

@@ -52,6 +52,13 @@ public class PostController {
         return ResponseEntity.ok(service.getPostsByUserEmail(email));
     }
 
+    // /posts/user/{userId}/count
+    // retorna a quantidade total de posts de um usuario pelo id
+    @GetMapping("/user/{userId}/count")
+    public ResponseEntity<Long> getPostsCountByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(service.getPostsCountByUserId(userId));
+    }
+
 
     // retorna todos os likes e comentarios de um post pelo seu id
     @GetMapping("/{postId}/stats")

@@ -121,6 +121,11 @@ public class PostService {
         return postRepository.findByUserEmail(email);
     }
 
+    // contar total de posts de um usuario pelo id
+    public long getPostsCountByUserId(Long userId) {
+        return postRepository.countByUserId(userId);
+    }
+
     // calcular total de curtidas de um post pelo seu id
     public Map<String, Long> getPostStats(Long postId) {
         // likes
