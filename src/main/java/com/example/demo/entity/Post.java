@@ -1,7 +1,9 @@
 package com.example.demo.entity;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import com.example.demo.util.FileUrlUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -28,6 +30,9 @@ public class Post {
 
     @Column(nullable = false)
     private String imageUrl;
+
+    @Column
+    private LocalDateTime createdAt;
 
 
     // muitos post pra um usuario
@@ -63,6 +68,7 @@ public class Post {
         this.content = content;
         this.imageUrl = imageUrl;
         this.user = user;
+        this.createdAt = LocalDateTime.now();
     }
 
 
@@ -94,12 +100,12 @@ public class Post {
 
 
     public String getImageUrl() {
-        return imageUrl;
+        return FileUrlUtils.toPublicUrl(imageUrl);
     }
 
 
     public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+        this.imageUrl = FileUrlUtils.normalizeStoredPath(imageUrl);
     }
 
 
@@ -110,6 +116,16 @@ public class Post {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
 
@@ -126,7 +142,7 @@ public class Post {
 
     @Override
     public String toString() {
-        return "Post [id=" + id + ", content=" + content + ", imageUrl=" + imageUrl + "]";
+        return "Post [id=" + id + ", content=" + content + ", imageUrl=" + imageUrl + ", createdAt=" + createdAt + "]";
     }
 
 

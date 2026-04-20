@@ -1,6 +1,7 @@
 package com.example.demo.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.example.demo.util.FileUrlUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -34,7 +35,6 @@ public class Profile {
 
     @OneToOne
     @JoinColumn(name = "user_id", unique = true, nullable = false)
-    @JsonIgnore
     private User user;
 
 
@@ -68,12 +68,12 @@ public class Profile {
 
 
     public String getImageUrlProfile() {
-        return imageUrlProfile;
+        return FileUrlUtils.toPublicUrl(imageUrlProfile);
     }
 
 
     public void setImageUrlProfile(String imageUrlProfile) {
-        this.imageUrlProfile = imageUrlProfile;
+        this.imageUrlProfile = FileUrlUtils.normalizeStoredPath(imageUrlProfile);
     }
 
 

@@ -15,6 +15,7 @@ import com.example.demo.entity.User;
 import com.example.demo.repository.FollowRepository;
 import com.example.demo.repository.ProfileRepository;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.util.FileUrlUtils;
 
 @Service
 public class ProfileService {
@@ -87,9 +88,17 @@ public class ProfileService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Perfil nao encontrado");
         }
 
-        // atualiza a bio e foto de perfil
+        // atualiza a bio
         profile.setBio(profileAtualizado.getBio());
-        profile.setImageUrlProfile(profileAtualizado.getImageUrlProfile());
+
+        // só atualiza a foto quando vier uma URL persistível; preview blob do navegador não deve ir para o banco
+        String imageUrlProfile = profileAtualizado.getImageUrlProfile();
+        if (imageUrlProfile != null) {
+            String normalizedImageUrl = FileUrlUtils.normalizeStoredPath(imageUrlProfile);
+            if (normalizedImageUrl != null && !normalizedImageUrl.contains("blob:")) {
+                profile.setImageUrlProfile(normalizedImageUrl);
+            }
+        }
 
         // atualiza o status
         String status = profileAtualizado.getMessageStatus();
@@ -119,6 +128,29 @@ public class ProfileService {
                 .stream()
                 .map(f -> {
                     User u = f.getFollowed();
+                    Profile p = u.getProfile();
+                    String img = p != null ? p.getImageUrlProfile() : null;
+                    String status = p != null ? getActiveStatus(p) : null;
+                    return new FollowingProfileResponse(u.getId(), u.getNome(), img, status);
+                })
+                .toList();
+    }
+
+    // Lista perfis dos usuarios que seguem o logado.
+    // Reaproveita o mesmo DTO usado no following.
+    public List<FollowingProfileResponse> getFollowersProfiles() {
+        String email = (String) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+
+        User me = userRepository.findByEmail(email);
+        if (me == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario nao encontrado");
+        }
+
+        return followRepository.findByFollowedId(me.getId())
+                .stream()
+                .map(f -> {
+                    User u = f.getFollower();
                     Profile p = u.getProfile();
                     String img = p != null ? p.getImageUrlProfile() : null;
                     String status = p != null ? getActiveStatus(p) : null;

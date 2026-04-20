@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.PostResponse;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,8 +34,14 @@ public class PostController {
     // ROTAS GET
     // /posts
     @GetMapping()
-    public ResponseEntity<List<Post>> getAllPosts() {
+    public ResponseEntity<List<PostResponse>> getAllPosts() {
         return ResponseEntity.ok(service.getAllPosts());
+    }
+
+    // /posts/{postId}
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostResponse> getPostById(@PathVariable Long postId){
+        return ResponseEntity.ok(service.getPostById(postId));
     }
 
     // /posts/user/me

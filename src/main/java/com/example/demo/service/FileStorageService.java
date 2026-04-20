@@ -36,7 +36,7 @@ public class FileStorageService {
         // Salva o arquivo fisico no disco.
         Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
 
-        // Retorna a URL publica completa para salvar no banco.
-        return "http://localhost:8080/files" + filename;
+        // Retorna a URL publica para salvar no banco.
+        return "/files/" + filename;
     }
 }

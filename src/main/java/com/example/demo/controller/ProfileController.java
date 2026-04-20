@@ -47,6 +47,12 @@ public class ProfileController {
         return ResponseEntity.ok(service.getFollowingProfiles());
     }
 
+    // GET /profiles/followers
+    @GetMapping("/followers")
+    public ResponseEntity<List<FollowingProfileResponse>> getFollowersProfiles() {
+        return ResponseEntity.ok(service.getFollowersProfiles());
+    }
+
     // PUT
     @PutMapping("me")
     public ResponseEntity<Profile> uptadeMyProfile(@RequestBody Profile profile) {

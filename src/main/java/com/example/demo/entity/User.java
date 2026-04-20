@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Setter;
 
 
 /* 
@@ -44,6 +45,7 @@ public class User {
     private String email;
 
     
+    @Setter
     @NotBlank
     @Column(nullable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -52,11 +54,6 @@ public class User {
 
     public String getSenha() {
         return senha;
-    }
-
-
-    public void setSenha(String senha) {
-        this.senha = senha;
     }
 
 
@@ -88,6 +85,7 @@ public class User {
     // mappedBy = "user" → significa que o controle da relação está na classe Post
     // (lá existe o atributo "user")
     // signfica que a chave estrangeira ficara no post, curtida e like
+    @Setter
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Post> posts;
@@ -177,11 +175,6 @@ public class User {
     public String toString() {
         return "User [id=" + id + ", nome=" + nome + ", email=" + email + ", senha=" + senha + ", posts=" + posts
                 + ", likes=" + likes + ", comments=" + comments + ", profile=" + profile + "]";
-    }
-
-
-    public void setPosts(List<Post> posts) {
-        this.posts = posts;
     }
 
 

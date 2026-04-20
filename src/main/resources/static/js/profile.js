@@ -1,5 +1,29 @@
 requireAuth();
 
+function normalizeStoredImageUrl(url) {
+  if (!url) return "";
+  if (url.includes("via.placeholder.com")) return "";
+  if (url.startsWith(window.API_BASE + "/")) {
+    return url.substring(window.API_BASE.length);
+  }
+  if (url.startsWith("http://localhost:8080/files") && !url.startsWith("http://localhost:8080/files/")) {
+    return url.replace("http://localhost:8080/files", "/files/");
+  }
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+  return url.startsWith("/") ? url : `/${url}`;
+}
+
+function resolveImageUrl(url) {
+  const normalized = normalizeStoredImageUrl(url);
+  if (!normalized) return "https://via.placeholder.com/64";
+  if (normalized.startsWith("http://") || normalized.startsWith("https://")) {
+    return normalized;
+  }
+  return `${window.API_BASE || ""}${normalized}`;
+}
+
 async function loadMyProfile() {
   const info = document.getElementById("profile-info");
   const res = await apiFetch("/profiles/me");
@@ -11,7 +35,8 @@ async function loadMyProfile() {
   document.getElementById("profile-bio").value = res.data.bio || "";
   document.getElementById("profile-status").value = res.data.messageStatus || "";
   const avatar = document.getElementById("profile-avatar");
-  avatar.src = res.data.imageUrlProfile || "https://via.placeholder.com/64";
+  avatar.dataset.imageUrl = normalizeStoredImageUrl(res.data.imageUrlProfile);
+  avatar.src = resolveImageUrl(avatar.dataset.imageUrl);
   document.getElementById("profile-status-preview").textContent =
     res.data.messageStatus ? res.data.messageStatus : "";
 }
@@ -27,7 +52,7 @@ async function saveProfile(e) {
     return;
   }
   const bio = bioEl.value.trim();
-  const imageUrlProfile = avatarEl.src;
+  const imageUrlProfile = avatarEl.dataset.imageUrl || "";
   const messageStatus = statusEl.value.trim();
   showMsg(msg, "Salvando...", true);
   const res = await apiFetch("/profiles/me", {
@@ -124,6 +149,8 @@ async function uploadProfileImage(e) {
   }
 
   const data = await res.json();
-  document.getElementById("profile-avatar").src = data.url;
+  const avatar = document.getElementById("profile-avatar");
+  avatar.dataset.imageUrl = normalizeStoredImageUrl(data.url);
+  avatar.src = resolveImageUrl(avatar.dataset.imageUrl);
   showMsg(msg, "Imagem enviada. Clique em Salvar para aplicar.", true);
 }

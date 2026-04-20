@@ -72,9 +72,15 @@ public class UserService {
         User user = repository.findById(id) // buscar o usuario pelo id passado pra ter a instacia exata dele
         .orElseThrow(() -> new RuntimeException("Usuário não encontrado")); // caso não ache, retorna uua nova execao
 
-        // passar valores usando set da instancia buscada pelo id usando o get 
-        user.setNome(userAtualizado.getNome());
-        user.setEmail(userAtualizado.getEmail());
+        // atualiza apenas os campos enviados para não sobrescrever com null
+        if (userAtualizado.getNome() != null && !userAtualizado.getNome().isBlank()) {
+            user.setNome(userAtualizado.getNome());
+        }
+
+        if (userAtualizado.getEmail() != null && !userAtualizado.getEmail().isBlank()) {
+            user.setEmail(userAtualizado.getEmail());
+        }
+
         // gera o hash de novo
         if (userAtualizado.getSenha() != null && !userAtualizado.getSenha().isBlank()) {
             user.setSenha(encoder.encode(userAtualizado.getSenha()));

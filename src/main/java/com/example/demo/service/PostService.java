@@ -1,9 +1,12 @@
 package com.example.demo.service;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.example.demo.dto.PostResponse;
+import com.example.demo.dto.UserResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -34,8 +37,11 @@ public class PostService {
     }
 
     // listar todos os posts
-    public List<Post> getAllPosts() {
-        return postRepository.findAll();
+    public List<PostResponse> getAllPosts() {
+        return postRepository.findAll()
+                .stream()
+                .map(this::toPostResponse)
+                .toList();
     }
 
     // criar um post usando o email do usuario logado
@@ -53,13 +59,16 @@ public class PostService {
         // fk key
         // salvar usuario dono do post campo user_id fk key
         post.setUser(user);
+        post.setCreatedAt(LocalDateTime.now());
         return postRepository.save(post);
     }
 
     // buscar post pelo id
-    public Post getPostById(Long id) {
-        return postRepository.findById(id)
+    public PostResponse getPostById(Long id) {
+        Post post = postRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post não encontrado"));
+
+        return toPostResponse(post);
     }
 
     // editar um post
@@ -112,13 +121,13 @@ public class PostService {
         String email = (String) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
         User user = userRepository.findByEmail(email);
-        return postRepository.findByUserId(user.getId());
+        return postRepository.findByUserIdOrderByCreatedAtDescIdDesc(user.getId());
 
     }
 
     // buscar posts de outros usuarios pelo email
     public List<Post> getPostsByUserEmail(String email) {
-        return postRepository.findByUserEmail(email);
+        return postRepository.findByUserEmailOrderByCreatedAtDescIdDesc(email);
     }
 
     // contar total de posts de um usuario pelo id
@@ -137,6 +146,23 @@ public class PostService {
         stats.put("likes", likes);
         stats.put("comments", comments);
         return stats;
+    }
+
+    public PostResponse toPostResponse(Post post) {
+        return new PostResponse(
+                post.getId(),
+                post.getContent(),
+                post.getImageUrl(),
+                new UserResponse(
+                        post.getUser().getId(),
+                        post.getUser().getNome(),
+                        post.getUser().getEmail(),
+                        post.getUser().getProfile().getImageUrlProfile()
+                ),
+                post.getCreatedAt(),
+                post.getLikes().size(),
+                post.getComments().size()
+        );
     }
 
 }
