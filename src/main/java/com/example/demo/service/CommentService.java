@@ -2,6 +2,9 @@ package com.example.demo.service;
 
 import java.util.List;
 
+import com.example.demo.dto.CommentResponse;
+import com.example.demo.dto.PostSummaryResponse;
+import com.example.demo.dto.UserResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -52,8 +55,11 @@ public class CommentService {
     }
 
     // listar todos os comentarios de um post passando o id dele
-    public List<Commente> getAllPostCommentes(Long postId) {
-        return commentRepository.findByPostId(postId);
+    public List<CommentResponse> getAllPostCommentes(Long postId) {
+        return commentRepository.findByPostId(postId)
+                .stream()
+                .map(this::toCommentResponse)
+                .toList();
 
     }
 
@@ -76,5 +82,26 @@ public class CommentService {
         commentRepository.delete(comment);
 
 
+    }
+
+    public CommentResponse toCommentResponse(Commente comment) {
+        return new CommentResponse(
+                comment.getId(),
+                comment.getContent(),
+                comment.getCreatedAt(),
+                new UserResponse(
+                        comment.getUser().getId(),
+                        comment.getUser().getNome(),
+                        comment.getUser().getEmail(),
+                        comment.getUser().getProfile() != null
+                                ? comment.getUser().getProfile().getImageUrlProfile()
+                                : null
+                ),
+                new PostSummaryResponse(
+                        comment.getPost().getId(),
+                        comment.getPost().getContent(),
+                        comment.getPost().getImageUrl()
+                )
+        );
     }
 }

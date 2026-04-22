@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.CommentResponse;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -41,11 +42,12 @@ public class CommenteController {
 
 
     //GET
-    // /{postId}/comments
+    // /posts/{postId}/comments
     // retorna todos os comentarios de um post pelo id dele
     @GetMapping("/{postId}/comments")
-    public ResponseEntity<List<Commente>> getAllComments(@PathVariable Long postId) {
+    public ResponseEntity<List<CommentResponse>> getAllComments(@PathVariable Long postId) {
         return ResponseEntity.ok(service.getAllPostCommentes(postId));
+
     }
 
 
