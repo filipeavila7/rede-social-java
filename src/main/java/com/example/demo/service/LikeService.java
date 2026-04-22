@@ -75,6 +75,21 @@ public class LikeService {
         likeRepository.delete(like);
     }
 
+    // true ou false
+    public boolean hasUserLikedPost(Long postId) {
+
+        String email = (String) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não encontrado");
+        }
+
+        // verifica se existe like
+        return likeRepository.existsByUserIdAndPostId(user.getId(), postId);
+    }
+
 
 
     

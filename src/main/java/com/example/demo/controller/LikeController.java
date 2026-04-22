@@ -1,17 +1,12 @@
 package com.example.demo.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.entity.Like;
 import com.example.demo.service.LikeService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController
@@ -39,6 +34,12 @@ public class LikeController {
     public ResponseEntity<Void> unlikePost(@PathVariable Long postId){
         service.unlikePost(postId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{postId}/liked")
+    public ResponseEntity<Boolean> hasLiked(@PathVariable Long postId) {
+        boolean liked = service.hasUserLikedPost(postId);
+        return ResponseEntity.ok(liked);
     }
     
 
