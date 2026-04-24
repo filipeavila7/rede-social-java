@@ -3,6 +3,7 @@ package com.example.demo.service;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -69,8 +70,13 @@ public class UserService {
 
     // editar
     public User uptadeUser(Long id, User userAtualizado){ // recebr id e o objetodo usuario atulzado
-        User user = repository.findById(id) // buscar o usuario pelo id passado pra ter a instacia exata dele
-        .orElseThrow(() -> new RuntimeException("Usuário não encontrado")); // caso não ache, retorna uua nova execao
+        String email = (String) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+        User user = repository.findByEmail(email);
+
+        if (!user.getId().equals(id)){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não pode editar outro usuário");
+        }
 
         // atualiza apenas os campos enviados para não sobrescrever com null
         if (userAtualizado.getNome() != null && !userAtualizado.getNome().isBlank()) {
@@ -79,6 +85,10 @@ public class UserService {
 
         if (userAtualizado.getEmail() != null && !userAtualizado.getEmail().isBlank()) {
             user.setEmail(userAtualizado.getEmail());
+        }
+
+        if (userAtualizado.getUserName() != null && !userAtualizado.getUserName().isBlank()) {
+            user.setUserName(userAtualizado.getUserName());
         }
 
         // gera o hash de novo

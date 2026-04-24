@@ -37,8 +37,8 @@ public class ProfileController {
 
     // GET /profiles/user?email=usuario@email.com
     @GetMapping("/user")
-    public ResponseEntity<ProfileResponse> getProfileByEmail(@RequestParam String email) {
-        return ResponseEntity.ok(service.getProfileByEmail(email));
+    public ResponseEntity<ProfileResponse> getProfileByUserName(@RequestParam String userName) {
+        return ResponseEntity.ok(service.getProfileByUserName(userName));
     }
 
     // GET /profiles/following

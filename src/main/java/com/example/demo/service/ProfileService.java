@@ -61,11 +61,12 @@ public class ProfileService {
 
     // Busca o perfil de outro usuario pelo email.
     // Aplica a mesma regra de expirar o status.
-    public ProfileResponse getProfileByEmail(String email) {
-        User user = userRepository.findByEmail(email);
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario nao encontrado");
-        }
+    public ProfileResponse getProfileByUserName(String userName) {
+
+        User user = userRepository.findByuserName(userName).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "Usuario nao encontrado"
+        ));
+
         Profile profile = user.getProfile();
         if (profile == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Perfil nao encontrado");
@@ -164,7 +165,8 @@ public class ProfileService {
                 user.getNome(),
                 profile.getBio(),
                 profile.getImageUrlProfile(),
-                getActiveStatus(profile)
+                getActiveStatus(profile),
+                user.getUserName()
         );
     }
 

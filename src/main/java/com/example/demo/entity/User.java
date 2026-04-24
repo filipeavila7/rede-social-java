@@ -40,7 +40,12 @@ public class User {
     private String nome;
 
     @NotBlank
+    @Column(nullable = false, unique = true)
+    private String userName;
+
+    @NotBlank
     @Email
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(nullable = false, unique = true)
     private String email;
 
@@ -187,10 +192,11 @@ public class User {
         this.comments = comments;
     }
 
-    
+    public String getUserName() {
+        return userName;
+    }
 
-
-    
-    
-
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 }

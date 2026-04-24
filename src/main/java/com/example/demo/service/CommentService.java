@@ -56,7 +56,7 @@ public class CommentService {
 
     // listar todos os comentarios de um post passando o id dele
     public List<CommentResponse> getAllPostCommentes(Long postId) {
-        return commentRepository.findByPostId(postId)
+        return commentRepository.findByPostIdOrderByCreatedAtDesc(postId)
                 .stream()
                 .map(this::toCommentResponse)
                 .toList();

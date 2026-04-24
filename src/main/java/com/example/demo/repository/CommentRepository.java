@@ -10,6 +10,7 @@ import com.example.demo.entity.Commente;
 
 public interface CommentRepository extends JpaRepository<Commente, Long>  {
     List<Commente> findByPostId(Long postId); // retorna todos os comentarios de um post
-    long countByPostId(Long postId); // contar quantos comentarios um post tem 
+    long countByPostId(Long postId); // contar quantos comentarios um post tem
+    List<Commente> findByPostIdOrderByCreatedAtDesc(Long postId); // por data mais recente
 } 
 
