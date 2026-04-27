@@ -1,9 +1,11 @@
 package com.example.demo.config;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -14,17 +16,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.Collections;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
-    // Fluxo geral:
-    // 1) Le o header Authorization.
-    // 2) Extrai o email do token.
-    // 3) Coloca autenticacao no contexto do Spring.
-    //OncePerRequestFilter é um filtro do Spring que executa apenas uma vez por requisição.
-    // Esse filtro vai interceptar todas as requisições HTTP antes de chegar aos controllers.
-    // Objetivo: verificar se existe um JWT válido e colocar a autenticação no contexto do Spring Security.
 
     private final JwtService jwtService;
 
@@ -34,14 +28,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(
-        HttpServletRequest request,
-        HttpServletResponse response,
-        FilterChain filterChain
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
     ) throws ServletException, IOException {
 
         String auth = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        // se não tem token, segue sem autenticar
         if (auth == null || !auth.toLowerCase().startsWith("bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -49,20 +42,25 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String token = auth.substring(7).trim();
 
-        // extrair email do token
         String email;
+        String role;
+
         try {
             email = jwtService.extrairEmail(token);
+            role = jwtService.extrairRole(token);
         } catch (Exception ex) {
-            // token inválido: segue sem autenticar (rotas públicas continuam funcionando)
             filterChain.doFilter(request, response);
             return;
         }
 
         if (email != null) {
-            // aqui autenticamos o usuário no contexto
+
             UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(email, null, Collections.emptyList());
+                    new UsernamePasswordAuthenticationToken(
+                            email,
+                            null,
+                            List.of(new SimpleGrantedAuthority("ROLE_" + role))
+                    );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }

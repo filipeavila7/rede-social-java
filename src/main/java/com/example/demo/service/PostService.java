@@ -89,6 +89,7 @@ public class PostService {
         // substitui os valores
         post.setContent(postAtualizado.getContent());
         post.setImageUrl(postAtualizado.getImageUrl());
+        post.setDescription(postAtualizado.getDescription());
 
         // salvar alterações
         return postRepository.save(post);
@@ -160,6 +161,7 @@ public class PostService {
                         post.getUser().getProfile().getImageUrlProfile()
                 ),
                 post.getCreatedAt(),
+                post.getDescription(),
                 post.getLikes().size(),
                 post.getComments().size()
         );

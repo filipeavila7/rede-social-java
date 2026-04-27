@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Setter;
 
 
@@ -37,14 +38,21 @@ public class User {
 
     @NotBlank
     @Column(nullable = false)
+    @Size(max = 20)
     private String nome;
 
     @NotBlank
     @Column(nullable = false, unique = true)
+    @Size(max = 20)
     private String userName;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role = Role.USER;
 
     @NotBlank
     @Email
+    @Size(max = 100)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(nullable = false, unique = true)
     private String email;
@@ -53,6 +61,7 @@ public class User {
     @Setter
     @NotBlank
     @Column(nullable = false)
+    @Size(min = 8, max = 64)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String senha;
 
@@ -175,6 +184,13 @@ public class User {
     this.profile = profile;
     }
 
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
 
     @Override
     public String toString() {

@@ -8,6 +8,7 @@ public record PostResponse(
         String imageUrl,
         UserResponse user,
         LocalDateTime createdAt,
+        String description,
         int likesCount,
         int commentsCount
 ) {

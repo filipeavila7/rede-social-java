@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.CommentResponse;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,7 +36,7 @@ public class CommenteController {
     // /{postId}/comments
     // recebe o objeto do comentario e o id do post para comentar
     @PostMapping("/{postId}/comments")
-    public ResponseEntity<Commente> createCommente(@PathVariable Long postId, @RequestBody Commente commente) {
+    public ResponseEntity<Commente> createCommente(@PathVariable Long postId, @Valid @RequestBody Commente commente) {
         Commente created = service.createCommente(postId, commente);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }

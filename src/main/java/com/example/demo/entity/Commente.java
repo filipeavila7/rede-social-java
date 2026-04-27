@@ -1,6 +1,8 @@
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 
@@ -12,6 +14,8 @@ public class Commente {
     @GeneratedValue(strategy = GenerationType.IDENTITY) 
     private Long id;
 
+    @NotBlank
+    @Size(max = 400)
     @Column(nullable = false)
     private String content;
 

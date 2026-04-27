@@ -11,6 +11,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "messages")
@@ -31,6 +32,7 @@ public class Message {
     private User sender;
 
     @NotBlank
+    @Size(max = 1000)
     @Column(nullable = false, length = 1000)
     private String content;
 

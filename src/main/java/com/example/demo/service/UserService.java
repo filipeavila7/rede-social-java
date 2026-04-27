@@ -2,6 +2,8 @@ package com.example.demo.service;
 
 import java.util.List;
 
+import com.example.demo.dto.UserDto;
+import com.example.demo.entity.Role;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -40,27 +42,42 @@ public class UserService {
     }
 
     // criar usuario, retorna User e recebe um objeto User
-    public User createUser(User user){
-        // criptografa a senha
-        String senhaHash = encoder.encode(user.getSenha());
+    public User createUser(UserDto dto){
+        // instanciar o user
+       User user = new User();
 
-        // substitui a senha normal pela criptografada
+       // set dos valores com base no dto recebido
+       user.setNome(dto.nome());
+       user.setUserName(dto.userName());
+       user.setEmail(dto.email());
+
+       // os usarios novos nascem como USER
+       user.setRole(Role.USER);
+
+       // criptografar a senha
+        String senhaHash = encoder.encode(dto.senha());
         user.setSenha(senhaHash);
 
-        // criar perfil pro usuario
+        // cria profile automaticamente
         Profile profile = new Profile("", null, null, user);
-        
-        // set pro lado inverso da relação
         user.setProfile(profile);
-        
-        
-        return repository.save(user); // salva o objeto recebido
+
+        // salva o user no banco
+        return repository.save(user);
+
     }
                             
 
     // excluir usuario
     // retorna void pois o delete não precisa retornar nada na controller apenas 204
     public void deleteUser(Long id){
+        String email = (String) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+        User user = repository.findByEmail(email);
+
+        if (!user.getId().equals(id)){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não pode apagar outro usuário");
+        }
         if (!repository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
         }
@@ -117,7 +134,7 @@ public class UserService {
         }   
         
         // gerar o token com o email existente
-        return jtwService.gerarToken(user.getEmail());
+        return jtwService.gerarToken(user);
     }
 
 

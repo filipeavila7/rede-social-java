@@ -17,6 +17,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "posts")
@@ -26,10 +28,19 @@ public class Post {
     private Long id;
 
     @Column(nullable = false)
+    @NotBlank
+    @Size(max = 50)
     private String content;
 
     @Column(nullable = false)
+    @NotBlank
     private String imageUrl;
+
+    @Column(nullable = false)
+    @NotBlank
+    @Size(max = 50)
+    private String description;
+
 
     @Column
     private LocalDateTime createdAt;
@@ -72,7 +83,9 @@ public class Post {
     }
 
 
-    // mostrar no json o total de curtidas e comentáario contando o tamanho da lista  
+
+
+    // mostrar no json o total de curtidas e comentáario contando o tamanho da lista
     @JsonProperty("likesCount")
     public int getLikesCount() {
         return likes == null ? 0 : likes.size();
@@ -139,6 +152,13 @@ public class Post {
         return comments;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     @Override
     public String toString() {
