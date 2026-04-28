@@ -4,7 +4,7 @@ import com.example.demo.entity.Post;
 
 import java.util.List;
 
-import org.springframework.data.jpa.repository.JpaRepository; 
+import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
     // save()
@@ -18,5 +18,4 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByUserIdOrderByCreatedAtDescIdDesc(Long userId); // retona os post de um usuario especifico
     List<Post> findByUserEmailOrderByCreatedAtDescIdDesc(String email); // retorna o email correspondente do usuario do post
     long countByUserId(Long userId); // retorna a quantidade de posts de um usuario
-    
 }

@@ -1,6 +1,9 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.PostDto;
 import com.example.demo.dto.PostResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -9,6 +12,7 @@ import com.example.demo.service.PostService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,8 +38,20 @@ public class PostController {
     // ROTAS GET
     // /posts
     @GetMapping()
-    public ResponseEntity<List<PostResponse>> getAllPosts() {
-        return ResponseEntity.ok(service.getAllPosts());
+    public ResponseEntity<Page<PostResponse>> getAllPosts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size,
+            @RequestParam(required = false) Long seed) {
+
+        long resolvedSeed = (seed != null) ? seed : Math.abs(new Random().nextLong() % 1_000_000);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Feed-Seed", String.valueOf(resolvedSeed));
+        headers.add("Access-Control-Expose-Headers", "X-Feed-Seed"); // ← ESSENCIAL pro front ler o header
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(service.getAllPosts(page, size, resolvedSeed));
     }
 
     // /posts/{postId}
@@ -76,7 +92,7 @@ public class PostController {
     // POST
     // criar post
     @PostMapping
-    public ResponseEntity<Post> createPost(@RequestBody Post post) {
+    public ResponseEntity<Post> createPost(@RequestBody PostDto post) {
         Post createdPost = service.createPost(post);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(createdPost);

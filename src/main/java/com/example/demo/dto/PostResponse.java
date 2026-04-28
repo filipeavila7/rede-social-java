@@ -1,6 +1,9 @@
 package com.example.demo.dto;
 
+import com.example.demo.entity.Tag;
+
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record PostResponse(
         Long id,
@@ -9,6 +12,7 @@ public record PostResponse(
         UserResponse user,
         LocalDateTime createdAt,
         String description,
+        List<Tag> tags,
         int likesCount,
         int commentsCount
 ) {

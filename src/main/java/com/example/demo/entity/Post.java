@@ -7,16 +7,7 @@ import com.example.demo.util.FileUrlUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -69,7 +60,13 @@ public class Post {
     private List<Commente> comments;
 
 
-    
+    @ManyToMany
+    @JoinTable(
+            name = "post_tags",
+            joinColumns = @JoinColumn(name = "post_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private List<Tag> tags;
 
     public Post() {
     }
@@ -146,7 +143,13 @@ public class Post {
         return likes;
     }
 
+    public List<Tag> getTags() {
+        return tags;
+    }
 
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
+    }
 
     public List<Commente> getComments() {
         return comments;
@@ -159,6 +162,7 @@ public class Post {
     public void setDescription(String description) {
         this.description = description;
     }
+
 
     @Override
     public String toString() {

@@ -1,12 +1,21 @@
 package com.example.demo.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.example.demo.dto.PostDto;
 import com.example.demo.dto.PostResponse;
 import com.example.demo.dto.UserResponse;
+import com.example.demo.entity.Tag;
+import com.example.demo.repository.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -14,10 +23,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.entity.Post;
 import com.example.demo.entity.User;
-import com.example.demo.repository.CommentRepository;
-import com.example.demo.repository.LikeRepository;
-import com.example.demo.repository.PostRepository;
-import com.example.demo.repository.UserRepository;
 
 @Service
 public class PostService {
@@ -26,42 +31,67 @@ public class PostService {
     private final UserRepository userRepository;
     private final LikeRepository likeRepository;
     private final CommentRepository commentRepository;
+    private final TagRepository tagRepository;
 
     // injetar no construtor
-    public PostService(PostRepository postRepository, UserRepository userRepository, LikeRepository likeRepository,
-            CommentRepository commentRepository) {
+
+
+    public PostService(PostRepository postRepository, UserRepository userRepository, LikeRepository likeRepository, CommentRepository commentRepository, TagRepository tagRepository) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.likeRepository = likeRepository;
         this.commentRepository = commentRepository;
+        this.tagRepository = tagRepository;
     }
 
     // listar todos os posts
-    public List<PostResponse> getAllPosts() {
-        return postRepository.findAll()
-                .stream()
-                .map(this::toPostResponse)
-                .toList();
+    public Page<PostResponse> getAllPosts(int page, int size, long seed) {
+        Pageable pageable = PageRequest.of(page, size);
+        List<Post> orderedPosts = new ArrayList<>(postRepository.findAll());
+
+        orderedPosts.sort(Comparator
+                .comparingLong((Post post) -> seededOrderKey(post.getId(), seed))
+                .thenComparing(Post::getId));
+
+        int start = Math.toIntExact(pageable.getOffset());
+        int end = Math.min(start + pageable.getPageSize(), orderedPosts.size());
+        List<Post> pagedPosts = start >= orderedPosts.size()
+                ? List.of()
+                : orderedPosts.subList(start, end);
+
+        return new PageImpl<>(pagedPosts, pageable, orderedPosts.size())
+                .map(this::toPostResponse);
     }
 
     // criar um post usando o email do usuario logado
-    public Post createPost(Post post) {
-        // pega o email do usuário autenticado
+    public Post createPost(PostDto dto) {
         String email = (String) SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getPrincipal();
 
-        // adciona o email pego do user logado no find para encontrar ele no banco
         User user = userRepository.findByEmail(email);
+
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não encontrado");
         }
-        // fk key
-        // salvar usuario dono do post campo user_id fk key
-        post.setUser(user);
+
+        List<Tag> tags = tagRepository.findAllById(dto.tagIds());
+
+        if (tags.size() > 3) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Máximo de 3 tags");
+        }
+
+        Post post = new Post();
+        post.setContent(dto.content());
+        post.setDescription(dto.description());
+        post.setImageUrl(dto.imageUrl());
         post.setCreatedAt(LocalDateTime.now());
+        post.setUser(user);
+        post.setTags(tags);
+
         return postRepository.save(post);
     }
+
 
     // buscar post pelo id
     public PostResponse getPostById(Long id) {
@@ -162,9 +192,21 @@ public class PostService {
                 ),
                 post.getCreatedAt(),
                 post.getDescription(),
+                post.getTags(),
                 post.getLikes().size(),
                 post.getComments().size()
         );
+    }
+
+    private long seededOrderKey(Long postId, long seed) {
+        long value = (postId == null) ? 0L : postId;
+        long mixed = value ^ (seed * 0x9E3779B97F4A7C15L);
+        mixed ^= (mixed >>> 33);
+        mixed *= 0xff51afd7ed558ccdl;
+        mixed ^= (mixed >>> 33);
+        mixed *= 0xc4ceb9fe1a85ec53L;
+        mixed ^= (mixed >>> 33);
+        return mixed;
     }
 
 }
