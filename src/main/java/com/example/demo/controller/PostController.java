@@ -67,12 +67,12 @@ public class PostController {
         return ResponseEntity.ok(service.getMyPosts());
     }
 
-    // /posts/user?email=usuario@email.com
+    // /posts/user?email=userName
     // retornar os post de um outro usuario pelo email
     // quando uma rota get recebe um parametro, ele vai na url, no caso o email
     @GetMapping("/user")
-    public ResponseEntity<List<Post>> getPostsByUserEmail(@RequestParam String email) {
-        return ResponseEntity.ok(service.getPostsByUserEmail(email));
+    public ResponseEntity<List<Post>> getPostsByUserName(@RequestParam String userName) {
+        return ResponseEntity.ok(service.getPostsByUserName(userName));
     }
 
     // /posts/user/{userId}/count
@@ -91,6 +91,7 @@ public class PostController {
 
     // POST
     // criar post
+    // /post
     @PostMapping
     public ResponseEntity<Post> createPost(@RequestBody PostDto post) {
         Post createdPost = service.createPost(post);

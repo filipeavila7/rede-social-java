@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import java.util.List;
 
+import com.example.demo.dto.FollowingProfileResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -106,17 +107,19 @@ public class FollowService {
     }
 
     // pegar seguidores e seguindo de outros seguidores
-    public List<User> getFollowing(Long userId) {
+    public List<FollowingProfileResponse> getFollowing(Long userId) {
         return followRepository.findByFollowerId(userId)
                 .stream()
                 .map(Follow::getFollowed)
+                .map(this::toFollowingProfileResponse)
                 .toList();
     }
 
-    public List<User> getFollowers(Long userId) {
+    public List<FollowingProfileResponse> getFollowers(Long userId) {
         return followRepository.findByFollowedId(userId)
                 .stream()
                 .map(Follow::getFollower)
+                .map(this::toFollowingProfileResponse)
                 .toList();
     }
     
@@ -149,6 +152,17 @@ public class FollowService {
                 .stream()
                 .map(Follow::getFollower)
                 .toList();
+    }
+
+
+    private FollowingProfileResponse toFollowingProfileResponse(User user) {
+        return new FollowingProfileResponse(
+                user.getId(),
+                user.getNome(),
+                user.getProfile() != null ? user.getProfile().getImageUrlProfile() : null,
+                user.getProfile() != null ? user.getProfile().getMessageStatus() : null,
+                user.getUserName()
+        );
     }
 
 }

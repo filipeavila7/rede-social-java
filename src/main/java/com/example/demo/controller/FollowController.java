@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.FollowingProfileResponse;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -66,13 +67,13 @@ public class FollowController {
     // seguidores e seguindo de outros users
     // GET /users/{userId}/following
     @GetMapping("/{userId}/following")
-    public ResponseEntity<List<User>> getFollowing(@PathVariable Long userId) {
+    public ResponseEntity<List<FollowingProfileResponse>> getFollowing(@PathVariable Long userId) {
         return ResponseEntity.ok(service.getFollowing(userId));
     }
 
     // GET /users/{userId}/followers
     @GetMapping("/{userId}/followers")
-    public ResponseEntity<List<User>> getFollowers(@PathVariable Long userId) {
+    public ResponseEntity<List<FollowingProfileResponse>> getFollowers(@PathVariable Long userId) {
         return ResponseEntity.ok(service.getFollowers(userId));
     }
 

@@ -1,11 +1,7 @@
 package com.example.demo.service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.example.demo.dto.PostDto;
 import com.example.demo.dto.PostResponse;
@@ -63,7 +59,6 @@ public class PostService {
                 .map(this::toPostResponse);
     }
 
-    // criar um post usando o email do usuario logado
     public Post createPost(PostDto dto) {
         String email = (String) SecurityContextHolder.getContext()
                 .getAuthentication()
@@ -75,10 +70,24 @@ public class PostService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não encontrado");
         }
 
+        // validar maximo de 3 tags
+        if (dto.tagIds().size() > 3) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Máximo de 3 tags");
+        }
+
+        // validar duplicadas
+        Set<Long> uniqueTags = new HashSet<>(dto.tagIds());
+
+        if (uniqueTags.size() != dto.tagIds().size()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tags duplicadas não são permitidas");
+        }
+
+        // buscar tags no banco
         List<Tag> tags = tagRepository.findAllById(dto.tagIds());
 
-        if (tags.size() > 3) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Máximo de 3 tags");
+        // validar se todas existem
+        if (tags.size() != dto.tagIds().size()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Uma ou mais tags são inválidas");
         }
 
         Post post = new Post();
@@ -157,8 +166,8 @@ public class PostService {
     }
 
     // buscar posts de outros usuarios pelo email
-    public List<Post> getPostsByUserEmail(String email) {
-        return postRepository.findByUserEmailOrderByCreatedAtDescIdDesc(email);
+    public List<Post> getPostsByUserName(String userName) {
+        return postRepository.findByUserUserNameOrderByCreatedAtDescIdDesc(userName);
     }
 
     // contar total de posts de um usuario pelo id
@@ -187,8 +196,8 @@ public class PostService {
                 new UserResponse(
                         post.getUser().getId(),
                         post.getUser().getNome(),
-                        post.getUser().getEmail(),
-                        post.getUser().getProfile().getImageUrlProfile()
+                        post.getUser().getProfile().getImageUrlProfile(),
+                        post.getUser().getUserName()
                 ),
                 post.getCreatedAt(),
                 post.getDescription(),

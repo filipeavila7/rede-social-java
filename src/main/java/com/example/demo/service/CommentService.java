@@ -92,10 +92,10 @@ public class CommentService {
                 new UserResponse(
                         comment.getUser().getId(),
                         comment.getUser().getNome(),
-                        comment.getUser().getEmail(),
                         comment.getUser().getProfile() != null
                                 ? comment.getUser().getProfile().getImageUrlProfile()
-                                : null
+                                : null,
+                        comment.getUser().getUserName()
                 ),
                 new PostSummaryResponse(
                         comment.getPost().getId(),

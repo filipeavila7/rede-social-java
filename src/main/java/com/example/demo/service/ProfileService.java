@@ -132,7 +132,7 @@ public class ProfileService {
                     Profile p = u.getProfile();
                     String img = p != null ? p.getImageUrlProfile() : null;
                     String status = p != null ? getActiveStatus(p) : null;
-                    return new FollowingProfileResponse(u.getId(), u.getNome(), img, status);
+                    return new FollowingProfileResponse(u.getId(), u.getNome(), img, status, u.getUserName());
                 })
                 .toList();
     }
@@ -155,7 +155,7 @@ public class ProfileService {
                     Profile p = u.getProfile();
                     String img = p != null ? p.getImageUrlProfile() : null;
                     String status = p != null ? getActiveStatus(p) : null;
-                    return new FollowingProfileResponse(u.getId(), u.getNome(), img, status);
+                    return new FollowingProfileResponse(u.getId(), u.getNome(), img, status, u.getUserName());
                 })
                 .toList();
     }
@@ -166,7 +166,8 @@ public class ProfileService {
                 profile.getBio(),
                 profile.getImageUrlProfile(),
                 getActiveStatus(profile),
-                user.getUserName()
+                user.getUserName(),
+                user.getId()
         );
     }
 

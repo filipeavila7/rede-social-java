@@ -35,7 +35,7 @@ public class ProfileController {
         return ResponseEntity.ok(service.getMyProfile());
     }
 
-    // GET /profiles/user?email=usuario@email.com
+    // GET /profiles/user?userName
     @GetMapping("/user")
     public ResponseEntity<ProfileResponse> getProfileByUserName(@RequestParam String userName) {
         return ResponseEntity.ok(service.getProfileByUserName(userName));

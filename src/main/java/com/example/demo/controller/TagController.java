@@ -21,4 +21,4 @@ public class TagController {
     public List<Tag> getAllTags(){
         return repository.findAll();
     }
-}
+}   
