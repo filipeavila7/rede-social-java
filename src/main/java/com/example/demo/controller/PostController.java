@@ -53,6 +53,23 @@ public class PostController {
                 .headers(headers)
                 .body(service.getAllPosts(page, size, resolvedSeed));
     }
+    // /posts/search
+    @GetMapping("/search")
+    public ResponseEntity<Page<PostResponse>> searchPosts(
+            @RequestParam String termo,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "9") int size
+    ) {
+        return ResponseEntity.ok(service.searchPosts(termo, page, size));
+    }
+
+
+    @GetMapping("/search/suggestions")
+    public ResponseEntity<List<String>> searchPostSuggestions(
+            @RequestParam String termo
+    ) {
+        return ResponseEntity.ok(service.searchPostSuggestions(termo));
+    }
 
     // /posts/{postId}
     @GetMapping("/{postId}")
@@ -63,16 +80,23 @@ public class PostController {
     // /posts/user/me
     // retornar todos os posts do usuario logado
     @GetMapping("/user/me")
-    public ResponseEntity<List<Post>> getPostByUser() {
-        return ResponseEntity.ok(service.getMyPosts());
+    public ResponseEntity<Page<PostResponse>> getPostByUser(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "6") int size
+    ) {
+        return ResponseEntity.ok(service.getMyPosts(page, size));
     }
 
-    // /posts/user?email=userName
-    // retornar os post de um outro usuario pelo email
-    // quando uma rota get recebe um parametro, ele vai na url, no caso o email
+    // /posts/user?userName=nomeDoUsuario
+    // retorna todos os posts de um outro usuário com base no userName enviado na URL
+    // @RequestParam captura o parâmetro da requisição GET diretamente da URL
     @GetMapping("/user")
-    public ResponseEntity<List<Post>> getPostsByUserName(@RequestParam String userName) {
-        return ResponseEntity.ok(service.getPostsByUserName(userName));
+    public ResponseEntity<Page<PostResponse>> getPostsByUserName(
+            @RequestParam String userName,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "6") int size
+    ) {
+        return ResponseEntity.ok(service.getPostsByUserName(userName, page, size));
     }
 
     // /posts/user/{userId}/count

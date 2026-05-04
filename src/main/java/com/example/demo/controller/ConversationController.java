@@ -30,4 +30,10 @@ public class ConversationController {
     public ResponseEntity<List<ConversationResponse>> getMyContactsAlias() {
         return ResponseEntity.ok(service.getMyContacts());
     }
+
+    // POST /conversations/{otherUserId}
+    @PostMapping("/open/{otherUserId}")
+    public ResponseEntity<ConversationResponse> openConversation(@PathVariable Long otherUserId){
+        return ResponseEntity.ok(service.openConversation(otherUserId));
+    }
 }

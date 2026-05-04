@@ -10,6 +10,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Size;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -21,12 +23,14 @@ public class Profile {
     private Long id;
 
     @Column
+    @Size(max = 200)
     private String bio;
     
     @Column
     private String imageUrlProfile;
 
     @Column
+    @Size(max = 20)
     private String messageStatus;
 
     @Column
@@ -34,6 +38,7 @@ public class Profile {
 
 
     @OneToOne
+    @JsonIgnore
     @JoinColumn(name = "user_id", unique = true, nullable = false)
     private User user;
 

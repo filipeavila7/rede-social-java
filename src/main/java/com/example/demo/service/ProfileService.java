@@ -59,6 +59,19 @@ public class ProfileService {
         return toResponse(user, profile);
     }
 
+    // metodo para pesquisar usuarios pelo userName
+    public List<ProfileResponse> searchProfiles(String termo) {
+        if (termo == null || termo.trim().isEmpty()) {
+            return List.of();
+        }
+        // retorna uma profileResponse so com os campos que queremos
+        return profileRepository
+                .findByUser_userNameContainingIgnoreCase(termo.trim())
+                .stream()
+                .map(profile -> toResponse(profile.getUser(), profile))
+                .toList();
+    }
+
     // Busca o perfil de outro usuario pelo email.
     // Aplica a mesma regra de expirar o status.
     public ProfileResponse getProfileByUserName(String userName) {

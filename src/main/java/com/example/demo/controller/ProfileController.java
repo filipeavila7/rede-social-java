@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,9 +54,15 @@ public class ProfileController {
         return ResponseEntity.ok(service.getFollowersProfiles());
     }
 
+    // GET /profiles/search
+    @GetMapping("/search")
+    public ResponseEntity<List<ProfileResponse>> search(@RequestParam String q) {
+        return ResponseEntity.ok(service.searchProfiles(q));
+    }
+
     // PUT
     @PutMapping("me")
-    public ResponseEntity<Profile> uptadeMyProfile(@RequestBody Profile profile) {
+    public ResponseEntity<Profile> uptadeMyProfile(@Valid @RequestBody Profile profile) {
         Profile profileUpdate = service.updateMyProfile(profile);
 
         return ResponseEntity.ok(profileUpdate);

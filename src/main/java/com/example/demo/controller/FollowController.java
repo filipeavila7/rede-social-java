@@ -71,6 +71,11 @@ public class FollowController {
         return ResponseEntity.ok(service.getFollowing(userId));
     }
 
+    @GetMapping("/{id}/followingStatus")
+    public boolean amIFollowing(@PathVariable Long id) {
+        return service.amIFollowing(id);
+    }
+
     // GET /users/{userId}/followers
     @GetMapping("/{userId}/followers")
     public ResponseEntity<List<FollowingProfileResponse>> getFollowers(@PathVariable Long userId) {

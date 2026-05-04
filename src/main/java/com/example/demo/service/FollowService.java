@@ -165,4 +165,17 @@ public class FollowService {
         );
     }
 
+    public boolean amIFollowing(Long followedId) {
+        String email = (String) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+
+        User me = userRepository.findByEmail(email);
+
+        if (me == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não encontrado");
+        }
+
+        return followRepository.existsByFollowerIdAndFollowedId(me.getId(), followedId);
+    }
+
 }

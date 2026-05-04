@@ -22,17 +22,18 @@ import com.example.demo.entity.User;
 
 @Service
 public class PostService {
-    // repository de user e post
+
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final LikeRepository likeRepository;
     private final CommentRepository commentRepository;
     private final TagRepository tagRepository;
 
-    // injetar no construtor
-
-
-    public PostService(PostRepository postRepository, UserRepository userRepository, LikeRepository likeRepository, CommentRepository commentRepository, TagRepository tagRepository) {
+    public PostService(PostRepository postRepository,
+                       UserRepository userRepository,
+                       LikeRepository likeRepository,
+                       CommentRepository commentRepository,
+                       TagRepository tagRepository) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.likeRepository = likeRepository;
@@ -40,26 +41,7 @@ public class PostService {
         this.tagRepository = tagRepository;
     }
 
-    // listar todos os posts
-    public Page<PostResponse> getAllPosts(int page, int size, long seed) {
-        Pageable pageable = PageRequest.of(page, size);
-        List<Post> orderedPosts = new ArrayList<>(postRepository.findAll());
-
-        orderedPosts.sort(Comparator
-                .comparingLong((Post post) -> seededOrderKey(post.getId(), seed))
-                .thenComparing(Post::getId));
-
-        int start = Math.toIntExact(pageable.getOffset());
-        int end = Math.min(start + pageable.getPageSize(), orderedPosts.size());
-        List<Post> pagedPosts = start >= orderedPosts.size()
-                ? List.of()
-                : orderedPosts.subList(start, end);
-
-        return new PageImpl<>(pagedPosts, pageable, orderedPosts.size())
-                .map(this::toPostResponse);
-    }
-
-    public Post createPost(PostDto dto) {
+    private User getLoggedUser() {
         String email = (String) SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getPrincipal();
@@ -70,22 +52,47 @@ public class PostService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não encontrado");
         }
 
-        // validar maximo de 3 tags
+        return user;
+    }
+
+    // listar todos os posts
+    public Page<PostResponse> getAllPosts(int page, int size, long seed) {
+        User loggedUser = getLoggedUser();
+
+        Pageable pageable = PageRequest.of(page, size);
+        List<Post> orderedPosts = new ArrayList<>(postRepository.findAll());
+
+        orderedPosts.sort(Comparator
+                .comparingLong((Post post) -> seededOrderKey(post.getId(), seed))
+                .thenComparing(Post::getId));
+
+        int start = Math.toIntExact(pageable.getOffset());
+        int end = Math.min(start + pageable.getPageSize(), orderedPosts.size());
+
+        List<Post> pagedPosts = start >= orderedPosts.size()
+                ? List.of()
+                : orderedPosts.subList(start, end);
+
+        return new PageImpl<>(pagedPosts, pageable, orderedPosts.size())
+                .map(post -> toPostResponse(post, loggedUser.getId()));
+    }
+
+    // criar post
+    public Post createPost(PostDto dto) {
+        User user = getLoggedUser();
+
         if (dto.tagIds().size() > 3) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Máximo de 3 tags");
         }
 
-        // validar duplicadas
         Set<Long> uniqueTags = new HashSet<>(dto.tagIds());
 
         if (uniqueTags.size() != dto.tagIds().size()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tags duplicadas não são permitidas");
         }
 
-        // buscar tags no banco
         List<Tag> tags = tagRepository.findAllById(dto.tagIds());
 
-        // validar se todas existem
         if (tags.size() != dto.tagIds().size()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Uma ou mais tags são inválidas");
         }
@@ -101,85 +108,78 @@ public class PostService {
         return postRepository.save(post);
     }
 
-
     // buscar post pelo id
     public PostResponse getPostById(Long id) {
+        User loggedUser = getLoggedUser();
+
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post não encontrado"));
 
-        return toPostResponse(post);
+        return toPostResponse(post, loggedUser.getId());
     }
 
-    // editar um post
+    // editar post
     public Post updatePost(Long id, Post postAtualizado) {
-        // busca o post pelo o id passado
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post não encontrado"));
 
-        // pegar email do usuario logado
-        String email = (String) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
+        User loggedUser = getLoggedUser();
 
-        // verifica se ele é o dono daquele post
-        if (!post.getUser().getEmail().equals(email)) {
+        if (!post.getUser().getEmail().equals(loggedUser.getEmail())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não pode editar este post");
         }
 
-        // substitui os valores
         post.setContent(postAtualizado.getContent());
         post.setImageUrl(postAtualizado.getImageUrl());
         post.setDescription(postAtualizado.getDescription());
 
-        // salvar alterações
         return postRepository.save(post);
-
     }
 
-    // deletar um post
+    // deletar post
     public void deletePost(Long id) {
-        // referencia do post encontrado pelo id passado na url da requisição
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post não encontrado"));
 
-        // pegar email do usario logado no momento, para garantir que ele so apague os
-        // posts dele
-        String email = (String) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
+        User loggedUser = getLoggedUser();
 
-        // se email daquele usuario logado não pertencer ao usuario dono do post, ele
-        // não deixa apagar
-        if (!post.getUser().getEmail().equals(email)) {
+        if (!post.getUser().getEmail().equals(loggedUser.getEmail())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não pode apagar este post");
         }
 
-        // caso o email seja o mesmo ele apaga
         postRepository.deleteById(id);
     }
 
-    // buscar posts do usuario logado
-    public List<Post> getMyPosts() {
-        String email = (String) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
-        User user = userRepository.findByEmail(email);
-        return postRepository.findByUserIdOrderByCreatedAtDescIdDesc(user.getId());
+    // posts do usuario logado
+    public Page<PostResponse> getMyPosts(int page, int size) {
+        User user = getLoggedUser();
 
+        Pageable pageable = PageRequest.of(page, size);
+
+        return postRepository
+                .findByUserIdOrderByCreatedAtDesc(user.getId(), pageable)
+                .map(post -> toPostResponse(post, user.getId()));
     }
 
-    // buscar posts de outros usuarios pelo email
-    public List<Post> getPostsByUserName(String userName) {
-        return postRepository.findByUserUserNameOrderByCreatedAtDescIdDesc(userName);
+    // posts de outro usuario
+    public Page<PostResponse> getPostsByUserName(String userName, int page, int size) {
+        User loggedUser = getLoggedUser();
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return postRepository
+                .findByUserUserNameOrderByCreatedAtDesc(userName, pageable)
+                .map(post -> toPostResponse(post, loggedUser.getId()));
     }
 
-    // contar total de posts de um usuario pelo id
+    // quantidade de posts
     public long getPostsCountByUserId(Long userId) {
         return postRepository.countByUserId(userId);
     }
 
-    // calcular total de curtidas de um post pelo seu id
+    // stats isoladas
     public Map<String, Long> getPostStats(Long postId) {
-        // likes
         long likes = likeRepository.countByPostId(postId);
-        // comentarios
         long comments = commentRepository.countByPostId(postId);
 
         Map<String, Long> stats = new HashMap<>();
@@ -188,7 +188,13 @@ public class PostService {
         return stats;
     }
 
-    public PostResponse toPostResponse(Post post) {
+    // conversor para dto
+    public PostResponse toPostResponse(Post post, Long loggedUserId) {
+
+        long likesCount = likeRepository.countByPostId(post.getId());
+        long commentsCount = commentRepository.countByPostId(post.getId());
+        boolean likedByMe = likeRepository.existsByUserIdAndPostId(loggedUserId, post.getId());
+
         return new PostResponse(
                 post.getId(),
                 post.getContent(),
@@ -202,9 +208,63 @@ public class PostService {
                 post.getCreatedAt(),
                 post.getDescription(),
                 post.getTags(),
-                post.getLikes().size(),
-                post.getComments().size()
+                likesCount,
+                commentsCount,
+                likedByMe
         );
+    }
+
+    // pesquisar posts pelo titulo (content)
+    public Page<PostResponse> searchPosts(String termo, int page, int size) {
+
+        if (termo == null || termo.trim().isEmpty()) {
+            return Page.empty();
+        }
+
+        User loggedUser = getLoggedUser();
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return postRepository
+                .findDistinctByContentContainingIgnoreCaseOrTagsNameContainingIgnoreCaseOrderByCreatedAtDesc(
+                        termo.trim(),
+                        termo.trim(),
+                        pageable
+                )
+                .map(post -> toPostResponse(post, loggedUser.getId()));
+    }
+
+
+    //sugestões
+    public List<String> searchPostSuggestions(String termo) {
+
+        if (termo == null || termo.trim().isEmpty()) {
+            return List.of();
+        }
+
+        List<Post> posts = postRepository
+                .findTop8DistinctByContentContainingIgnoreCaseOrTagsNameContainingIgnoreCaseOrderByCreatedAtDesc(
+                        termo.trim(),
+                        termo.trim()
+                );
+
+        return posts.stream()
+                .flatMap(post -> {
+                    List<String> resultados = new ArrayList<>();
+
+                    if (post.getContent() != null) {
+                        resultados.add(post.getContent());
+                    }
+
+                    post.getTags().forEach(tag -> resultados.add(tag.getName()));
+
+                    return resultados.stream();
+                })
+                .filter(Objects::nonNull)
+                .filter(texto -> texto.toLowerCase().contains(termo.toLowerCase()))
+                .distinct()
+                .limit(6)
+                .toList();
     }
 
     private long seededOrderKey(Long postId, long seed) {
@@ -217,5 +277,4 @@ public class PostService {
         mixed ^= (mixed >>> 33);
         return mixed;
     }
-
 }

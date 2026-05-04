@@ -13,7 +13,8 @@ public record PostResponse(
         LocalDateTime createdAt,
         String description,
         List<Tag> tags,
-        int likesCount,
-        int commentsCount
+        long likesCount,
+        long commentsCount,
+        boolean likedByMe
 ) {
 }

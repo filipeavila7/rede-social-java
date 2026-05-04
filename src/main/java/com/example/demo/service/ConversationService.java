@@ -103,4 +103,47 @@ public class ConversationService {
     return contatos;
 }
 
+
+
+
+    public ConversationResponse openConversation(Long otherUserId) {
+
+        String email = (String) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+
+        User me = userRepository.findByEmail(email);
+
+        if (me == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não encontrado");
+        }
+
+        if (me.getId().equals(otherUserId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Você não pode abrir conversa consigo mesmo");
+        }
+
+        User other = userRepository.findById(otherUserId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
+
+        Conversation conversation = conversationRepository
+                .findBetweenUsers(me.getId(), other.getId())
+                .orElseGet(() -> conversationRepository.save(new Conversation(me, other)));
+
+        Message last = messageRepository
+                .findFirstByConversationIdOrderByCreatedAtDesc(conversation.getId())
+                .orElse(null);
+
+        String foto = other.getProfile() != null ? other.getProfile().getImageUrlProfile() : null;
+        String lastMsg = last != null ? last.getContent() : null;
+        String lastAt = last != null ? last.getCreatedAt().toString() : null;
+
+        return new ConversationResponse(
+                conversation.getId(),
+                other.getId(),
+                other.getNome(),
+                foto,
+                lastMsg,
+                lastAt
+        );
+    }
+
 }
