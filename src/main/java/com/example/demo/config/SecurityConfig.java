@@ -40,7 +40,8 @@ public class SecurityConfig {
                                 "/js/**",
                                 "/favicon.ico",
                                 "/uploads/**",
-                                "/files/**"
+                                "/files/**",
+                                "/ws/**"
                         ).permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.POST, "/users").permitAll()

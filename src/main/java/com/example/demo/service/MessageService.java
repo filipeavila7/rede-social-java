@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import java.util.List;
 
+import com.example.demo.dto.NotificationResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -22,15 +23,17 @@ public class MessageService {
     private final MessageRepository messageRepository;
     private final ConversationRepository conversationRepository;
     private final UserRepository userRepository;
+    private final WebSocketService webSocketService;
 
     public MessageService(
-        MessageRepository messageRepository,
-        ConversationRepository conversationRepository,
-        UserRepository userRepository
+            MessageRepository messageRepository,
+            ConversationRepository conversationRepository,
+            UserRepository userRepository, WebSocketService webSocketService
     ) {
         this.messageRepository = messageRepository;
         this.conversationRepository = conversationRepository;
         this.userRepository = userRepository;
+        this.webSocketService = webSocketService;
     }
 
     private User getLoggedUser() {
@@ -76,10 +79,28 @@ public class MessageService {
         if (!belongsToConversation(conversation, sender)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não pertence a essa conversa");
         }
+
         // criar nova mensagem e salvar no banco
         Message message = new Message(conversation, sender, content);
         Message saved = messageRepository.save(message);
-        return toResponse(saved);
+
+        MessageResponse response = toResponse(saved);
+
+        NotificationResponse notification = new NotificationResponse(
+                "MESSAGE",
+                conversation.getId(),
+                sender.getId(),
+                sender.getNome(),
+                sender.getProfile() != null ? sender.getProfile().getImageUrlProfile() : null,
+                content
+        );
+
+        webSocketService.sendMessageToUser(receiver.getId(), response);
+        webSocketService.sendNotificationToUser(receiver.getId(), notification);
+
+        return response;
+
+
     }
 
     // Buscar mensagens por conversationId (somente participantes)
