@@ -8,5 +8,6 @@ public record MessageResponse(
     String senderName,
     String senderPhoto,
     String content,
-    String createdAt
+    String createdAt,
+     String readAt
 ) {}

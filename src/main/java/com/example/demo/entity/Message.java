@@ -39,6 +39,11 @@ public class Message {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "read_at")
+    private LocalDateTime readAt;
+
+
+
     
     
     public Message() {
@@ -87,14 +92,11 @@ public class Message {
         this.createdAt = createdAt;
     }
 
+    public LocalDateTime getReadAt() {
+        return readAt;
+    }
 
-
-    
-
-
-
-    
-
-    
-
+    public void setReadAt(LocalDateTime readAt) {
+        this.readAt = readAt;
+    }
 }
