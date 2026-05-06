@@ -37,4 +37,13 @@ public class MessageController {
     public ResponseEntity<List<MessageResponse>> getMessages(@PathVariable Long conversationId) {
         return ResponseEntity.ok(service.getMessages(conversationId));
     }
+
+
+
+
+    @PostMapping("/conversation/{conversationId}/read")
+    public ResponseEntity<Void> markAsRead(@PathVariable Long conversationId) {
+        service.markConversationAsRead(conversationId);
+        return ResponseEntity.ok().build();
+    }
 }

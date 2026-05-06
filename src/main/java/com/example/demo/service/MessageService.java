@@ -106,70 +106,60 @@ public class MessageService {
 
     }
 
-    public List<MessageResponse> getMessages(Long conversationId) {
-        User me = getLoggedUser(); // usuario logado que abriu o chat
+    public void markConversationAsRead(Long conversationId) {
+        User me = getLoggedUser();
 
-        // busca a conversa no banco
         Conversation conversation = conversationRepository.findById(conversationId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conversa não encontrada"));
 
-        // garante que ele pertence a essa conversa
         if (!belongsToConversation(conversation, me)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não pertence a essa conversa");
         }
 
-        // pega todas as mensagens da conversa em ordem
-        List<Message> messages = messageRepository.findByConversationIdOrderByCreatedAtAsc(conversationId);
+        List<Message> messages = messageRepository
+                .findByConversationIdOrderByCreatedAtAsc(conversationId);
 
-        // lista para armazenar somente as mensagens que foram lidas AGORA
         List<Message> readNowMessages = new ArrayList<>();
 
-        // percorre todas as mensagens
         for (Message msg : messages) {
-
-            // verifica se a mensagem foi enviada pelo OUTRO usuário
             boolean isFromOtherUser = !msg.getSender().getId().equals(me.getId());
-
-            // se veio do outro e ainda nao foi lida
             if (isFromOtherUser && msg.getReadAt() == null) {
-
-                // marca horario de leitura
                 msg.setReadAt(LocalDateTime.now());
-
-                // adiciona na lista das que acabaram de ser lidas
                 readNowMessages.add(msg);
             }
         }
 
-        // se realmente houve mensagens lidas agora
         if (!readNowMessages.isEmpty()) {
-
-            // salva somente as alteradas
             messageRepository.saveAll(readNowMessages);
 
-            // pega os ids dessas mensagens para enviar ao remetente
             List<Long> messageIds = readNowMessages.stream()
                     .map(Message::getId)
                     .toList();
 
-            // como todas essas mensagens vieram do outro usuário,
-            // podemos pegar o senderId da primeira
             Long senderId = readNowMessages.get(0).getSender().getId();
 
-            // monta dto de notificação de leitura
-            ReadNotificationResponse readNotification = new ReadNotificationResponse(
-                    "READ",
-                    messageIds
-            );
-
-            // envia websocket realtime para quem mandou as mensagens
+            ReadNotificationResponse readNotification = new ReadNotificationResponse("READ", messageIds);
             webSocketService.sendReadStatusToUser(senderId, readNotification);
         }
+    }
 
-        // retorna mensagens normalmente para quem abriu o chat
-        return messages.stream()
-                .map(this::toResponse)
-                .toList();
+    public List<MessageResponse> getMessages(Long conversationId) {
+        User me = getLoggedUser();
+
+        Conversation conversation = conversationRepository.findById(conversationId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conversa não encontrada"));
+
+        if (!belongsToConversation(conversation, me)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não pertence a essa conversa");
+        }
+
+        // ✅ reutiliza a lógica de leitura
+        markConversationAsRead(conversationId);
+
+        List<Message> messages = messageRepository
+                .findByConversationIdOrderByCreatedAtAsc(conversationId);
+
+        return messages.stream().map(this::toResponse).toList();
     }
 
     // Converte Message para DTO com foto do perfil do remetente
