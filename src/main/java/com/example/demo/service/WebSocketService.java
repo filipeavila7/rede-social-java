@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.ConversationUpdateResponse;
 import com.example.demo.dto.NotificationRealtimeResponse;
 import com.example.demo.dto.MessageResponse;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -27,6 +28,15 @@ public class WebSocketService {
         messagingTemplate.convertAndSend(
                 "/topic/notifications/" + userId,
                 notification
+        );
+    }
+
+
+    // atualizar fora da conversation
+    public void sendConversationUpdate(Long userId, ConversationUpdateResponse response) {
+        messagingTemplate.convertAndSend(
+                "/topic/conversations/" + userId,
+                response
         );
     }
 }

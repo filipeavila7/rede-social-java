@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.example.demo.dto.ConversationUpdateResponse;
 import com.example.demo.dto.MessageResponse;
 import com.example.demo.dto.NotificationRealtimeResponse;
 import com.example.demo.dto.UnreadCountResponse;
@@ -111,7 +112,7 @@ public class MessageService {
         MessageResponse response = toResponse(saved);
 
         // =========================
-        // REALTIME CHAT
+        // CHAT REALTIME (MENSAGEM)
         // =========================
         webSocketService.sendMessageToConversation(
                 conversation.getId(),
@@ -140,6 +141,20 @@ public class MessageService {
                 receiver.getId(),
                 notification
         );
+
+        // =========================
+        // UPDATE DE CONVERSA (NOVO)
+        // =========================
+        ConversationUpdateResponse convUpdate =
+                new ConversationUpdateResponse(
+                        conversation.getId(),
+                        saved.getContent(),
+                        saved.getCreatedAt(),
+                        sender.getId()
+                );
+
+        webSocketService.sendConversationUpdate(sender.getId(), convUpdate);
+        webSocketService.sendConversationUpdate(receiver.getId(), convUpdate);
 
         return response;
     }
