@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import java.util.List;
 
+import com.example.demo.dto.UnreadCountResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +40,12 @@ public class MessageController {
     }
 
 
+    @GetMapping("/conversations/unread")
+    public List<UnreadCountResponse> getUnread() {
+        return service.getUnreadConversations();
+    }
+
+
 
 
     @PostMapping("/conversation/{conversationId}/read")
@@ -46,4 +53,6 @@ public class MessageController {
         service.markConversationAsRead(conversationId);
         return ResponseEntity.ok().build();
     }
+
+
 }

@@ -3,14 +3,12 @@ package com.example.demo.service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.example.demo.dto.NotificationRealtimeResponse;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.example.demo.dto.MessageResponse;
+import com.example.demo.dto.NotificationRealtimeResponse;
+import com.example.demo.dto.UnreadCountResponse;
 import com.example.demo.entity.Conversation;
 import com.example.demo.entity.Message;
 import com.example.demo.entity.Profile;
@@ -18,6 +16,10 @@ import com.example.demo.entity.User;
 import com.example.demo.repository.ConversationRepository;
 import com.example.demo.repository.MessageRepository;
 import com.example.demo.repository.UserRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class MessageService {
@@ -39,6 +41,9 @@ public class MessageService {
         this.webSocketService = webSocketService;
     }
 
+    // =========================
+    // AUTH USER
+    // =========================
     private User getLoggedUser() {
         String email = (String) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
@@ -106,7 +111,7 @@ public class MessageService {
         MessageResponse response = toResponse(saved);
 
         // =========================
-        // CHAT REALTIME (CONVERSA)
+        // REALTIME CHAT
         // =========================
         webSocketService.sendMessageToConversation(
                 conversation.getId(),
@@ -162,26 +167,23 @@ public class MessageService {
         List<Message> messages =
                 messageRepository.findByConversationIdOrderByCreatedAtAsc(conversationId);
 
-        List<Message> readNowMessages = new ArrayList<>();
+        List<Message> updated = new ArrayList<>();
 
         for (Message msg : messages) {
 
-            boolean isFromOtherUser =
-                    !msg.getSender().getId().equals(me.getId());
+            boolean isOtherUser = !msg.getSender().getId().equals(me.getId());
 
-            if (isFromOtherUser && msg.getReadAt() == null) {
+            if (isOtherUser && msg.getReadAt() == null) {
                 msg.setReadAt(LocalDateTime.now());
-                readNowMessages.add(msg);
+                updated.add(msg);
             }
         }
 
-        if (!readNowMessages.isEmpty()) {
+        if (!updated.isEmpty()) {
 
-            messageRepository.saveAll(readNowMessages);
+            messageRepository.saveAll(updated);
 
-            Long senderId = readNowMessages.get(0)
-                    .getSender()
-                    .getId();
+            Long senderId = updated.get(0).getSender().getId();
 
             NotificationRealtimeResponse readNotification =
                     new NotificationRealtimeResponse(
@@ -236,7 +238,43 @@ public class MessageService {
     }
 
     // =========================
-    // DTO MAPPER
+    // UNREAD COUNT (BADGE)
+    // =========================
+    public List<UnreadCountResponse> getUnreadConversations() {
+
+        User me = getLoggedUser();
+
+        List<Conversation> conversations =
+                conversationRepository.findAllByUserId(me.getId());
+
+        if (conversations.isEmpty()) {
+            return List.of();
+        }
+
+        List<Long> ids = conversations.stream()
+                .map(Conversation::getId)
+                .toList();
+
+        List<Object[]> result =
+                messageRepository.countUnreadByConversations(ids, me.getId());
+
+        Map<Long, Long> countMap = result.stream()
+                .collect(Collectors.toMap(
+                        r -> (Long) r[0],
+                        r -> (Long) r[1],
+                        Long::sum
+                ));
+
+        return conversations.stream()
+                .map(c -> new UnreadCountResponse(
+                        c.getId(),
+                        countMap.getOrDefault(c.getId(), 0L)
+                ))
+                .toList();
+    }
+
+    // =========================
+    // MAPPER
     // =========================
     private MessageResponse toResponse(Message message) {
 
