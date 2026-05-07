@@ -4,8 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.demo.dto.NotificationResponse;
-import com.example.demo.dto.ReadNotificationResponse;
+import com.example.demo.dto.NotificationRealtimeResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -31,7 +30,8 @@ public class MessageService {
     public MessageService(
             MessageRepository messageRepository,
             ConversationRepository conversationRepository,
-            UserRepository userRepository, WebSocketService webSocketService
+            UserRepository userRepository,
+            WebSocketService webSocketService
     ) {
         this.messageRepository = messageRepository;
         this.conversationRepository = conversationRepository;
@@ -41,88 +41,134 @@ public class MessageService {
 
     private User getLoggedUser() {
         String email = (String) SecurityContextHolder.getContext()
-            .getAuthentication().getPrincipal();
+                .getAuthentication().getPrincipal();
 
         User user = userRepository.findByEmail(email);
+
         if (user == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não encontrado");
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Usuário não encontrado"
+            );
         }
+
         return user;
     }
 
-    // ver se o usuario é o msm da conversa
     private boolean belongsToConversation(Conversation c, User u) {
         return u.getId().equals(c.getUserA().getId()) ||
-               u.getId().equals(c.getUserB().getId());
+                u.getId().equals(c.getUserB().getId());
     }
 
-    // Enviar mensagem (cria conversa se nao existir)
-    // enviar mensagem para usuario passando o id e o content
+    // =========================
+    // SEND MESSAGE
+    // =========================
     public MessageResponse sendMessage(Long receiverId, String content) {
-        if (content == null || content.trim().isEmpty() ) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Conteúdo vazio");
+
+        if (content == null || content.trim().isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Conteúdo vazio"
+            );
         }
-        User sender = getLoggedUser(); // define que quem mandou é o usuario logado
 
+        User sender = getLoggedUser();
 
-        // caso o id do logado seja igual ao id passado para enviar a msg
         if (sender.getId().equals(receiverId)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Você não pode enviar mensagem para si mesmo");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Você não pode enviar mensagem para si mesmo"
+            );
         }
-        // pegar usuario do banco pelo id passado
+
         User receiver = userRepository.findById(receiverId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Usuário não encontrado"
+                ));
 
-        // encontrar a conversa no banco, caso ainda não exista, ele cria com quem mandou e quem ta recebendo
         Conversation conversation = conversationRepository
-            .findBetweenUsers(sender.getId(), receiver.getId())
-            .orElseGet(() -> conversationRepository.save(new Conversation(sender, receiver))); // se não tiver chat, cria apos a msg
+                .findBetweenUsers(sender.getId(), receiver.getId())
+                .orElseGet(() -> conversationRepository.save(
+                        new Conversation(sender, receiver)
+                ));
 
-        // segurança extra (garante que só participantes enviem)
         if (!belongsToConversation(conversation, sender)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não pertence a essa conversa");
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Você não pertence a essa conversa"
+            );
         }
 
-        // criar nova mensagem e salvar no banco
         Message message = new Message(conversation, sender, content);
         Message saved = messageRepository.save(message);
 
         MessageResponse response = toResponse(saved);
 
-        NotificationResponse notification = new NotificationResponse(
-                "MESSAGE",
+        // =========================
+        // CHAT REALTIME (CONVERSA)
+        // =========================
+        webSocketService.sendMessageToConversation(
                 conversation.getId(),
-                sender.getId(),
-                sender.getNome(),
-                sender.getProfile() != null ? sender.getProfile().getImageUrlProfile() : null,
-                content
+                response
         );
 
-        webSocketService.sendMessageToConversation(conversation.getId(), response);
-        webSocketService.sendNotificationToUser(receiver.getId(), notification);
+        // =========================
+        // NOTIFICAÇÃO GLOBAL
+        // =========================
+        NotificationRealtimeResponse notification =
+                new NotificationRealtimeResponse(
+                        "MESSAGE",
+                        sender.getId(),
+                        sender.getNome(),
+                        sender.getProfile() != null
+                                ? sender.getProfile().getImageUrlProfile()
+                                : null,
+                        null,
+                        conversation.getId(),
+                        saved.getId(),
+                        content,
+                        LocalDateTime.now()
+                );
+
+        webSocketService.sendNotificationToUser(
+                receiver.getId(),
+                notification
+        );
 
         return response;
-
-
     }
 
+    // =========================
+    // MARK AS READ
+    // =========================
     public void markConversationAsRead(Long conversationId) {
+
         User me = getLoggedUser();
 
         Conversation conversation = conversationRepository.findById(conversationId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conversa não encontrada"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Conversa não encontrada"
+                ));
 
         if (!belongsToConversation(conversation, me)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não pertence a essa conversa");
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Você não pertence a essa conversa"
+            );
         }
 
-        List<Message> messages = messageRepository
-                .findByConversationIdOrderByCreatedAtAsc(conversationId);
+        List<Message> messages =
+                messageRepository.findByConversationIdOrderByCreatedAtAsc(conversationId);
 
         List<Message> readNowMessages = new ArrayList<>();
 
         for (Message msg : messages) {
-            boolean isFromOtherUser = !msg.getSender().getId().equals(me.getId());
+
+            boolean isFromOtherUser =
+                    !msg.getSender().getId().equals(me.getId());
+
             if (isFromOtherUser && msg.getReadAt() == null) {
                 msg.setReadAt(LocalDateTime.now());
                 readNowMessages.add(msg);
@@ -130,45 +176,84 @@ public class MessageService {
         }
 
         if (!readNowMessages.isEmpty()) {
+
             messageRepository.saveAll(readNowMessages);
 
-            List<Long> messageIds = readNowMessages.stream()
-                    .map(Message::getId)
-                    .toList();
+            Long senderId = readNowMessages.get(0)
+                    .getSender()
+                    .getId();
 
-            Long senderId = readNowMessages.get(0).getSender().getId();
+            NotificationRealtimeResponse readNotification =
+                    new NotificationRealtimeResponse(
+                            "READ",
+                            me.getId(),
+                            me.getNome(),
+                            me.getProfile() != null
+                                    ? me.getProfile().getImageUrlProfile()
+                                    : null,
+                            null,
+                            conversationId,
+                            null,
+                            null,
+                            LocalDateTime.now()
+                    );
 
-            ReadNotificationResponse readNotification = new ReadNotificationResponse("READ", messageIds);
-            webSocketService.sendReadStatusToUser(senderId, readNotification);
+            webSocketService.sendNotificationToUser(
+                    senderId,
+                    readNotification
+            );
         }
     }
 
+    // =========================
+    // GET MESSAGES
+    // =========================
     public List<MessageResponse> getMessages(Long conversationId) {
+
         User me = getLoggedUser();
 
         Conversation conversation = conversationRepository.findById(conversationId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conversa não encontrada"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Conversa não encontrada"
+                ));
 
         if (!belongsToConversation(conversation, me)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não pertence a essa conversa");
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Você não pertence a essa conversa"
+            );
         }
 
-        // ✅ reutiliza a lógica de leitura
         markConversationAsRead(conversationId);
 
-        List<Message> messages = messageRepository
-                .findByConversationIdOrderByCreatedAtAsc(conversationId);
+        List<Message> messages =
+                messageRepository.findByConversationIdOrderByCreatedAtAsc(conversationId);
 
-        return messages.stream().map(this::toResponse).toList();
+        return messages.stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-    // Converte Message para DTO com foto do perfil do remetente
+    // =========================
+    // DTO MAPPER
+    // =========================
     private MessageResponse toResponse(Message message) {
+
         User sender = message.getSender();
         Profile profile = sender.getProfile();
-        String photo = profile != null ? profile.getImageUrlProfile() : null;
-        String createdAt = message.getCreatedAt() != null ? message.getCreatedAt().toString() : null;
-        String readAt = message.getReadAt() != null ? message.getReadAt().toString() : null;
+
+        String photo = profile != null
+                ? profile.getImageUrlProfile()
+                : null;
+
+        String createdAt = message.getCreatedAt() != null
+                ? message.getCreatedAt().toString()
+                : null;
+
+        String readAt = message.getReadAt() != null
+                ? message.getReadAt().toString()
+                : null;
 
         return new MessageResponse(
                 message.getId(),

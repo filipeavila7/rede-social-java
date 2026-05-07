@@ -1,7 +1,6 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.NotificationResponse;
-import com.example.demo.dto.ReadNotificationResponse;
+import com.example.demo.dto.NotificationRealtimeResponse;
 import com.example.demo.dto.MessageResponse;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -15,18 +14,19 @@ public class WebSocketService {
         this.messagingTemplate = messagingTemplate;
     }
 
-    // CANAL DA CONVERSA (REALTIME CHAT)
+    // CHAT (conversa)
     public void sendMessageToConversation(Long conversationId, MessageResponse response) {
-        messagingTemplate.convertAndSend("/topic/messages/conversation/" + conversationId, response);
+        messagingTemplate.convertAndSend(
+                "/topic/messages/conversation/" + conversationId,
+                response
+        );
     }
 
-    // NOTIFICAÇÃO PARA SIDEBAR/LISTA DE CONVERSAS
-    public void sendNotificationToUser(Long userId, NotificationResponse notification) {
-        messagingTemplate.convertAndSend("/topic/notifications/" + userId, notification);
-    }
-
-    // AVISO DE LEITURA
-    public void sendReadStatusToUser(Long userId, ReadNotificationResponse notification) {
-        messagingTemplate.convertAndSend("/topic/read-status/" + userId, notification);
+    // TUDO QUE NÃO É CHAT (LIKE, MESSAGE, READ, FOLLOW, ETC)
+    public void sendNotificationToUser(Long userId, NotificationRealtimeResponse notification) {
+        messagingTemplate.convertAndSend(
+                "/topic/notifications/" + userId,
+                notification
+        );
     }
 }
