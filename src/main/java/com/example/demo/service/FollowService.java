@@ -1,8 +1,12 @@
 package com.example.demo.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.demo.dto.FollowingProfileResponse;
+import com.example.demo.dto.NotificationRealtimeResponse;
+import com.example.demo.entity.Notification;
+import com.example.demo.repository.NotificationRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -17,10 +21,15 @@ import com.example.demo.repository.UserRepository;
 public class FollowService {
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
+    private final WebSocketService webSocketService;
+    private final NotificationRepository notificationRepository;
 
-    public FollowService(FollowRepository followRepository, UserRepository userRepository) {
+
+    public FollowService(FollowRepository followRepository, UserRepository userRepository, WebSocketService webSocketService, NotificationRepository notificationRepository) {
         this.followRepository = followRepository;
         this.userRepository = userRepository;
+        this.webSocketService = webSocketService;
+        this.notificationRepository = notificationRepository;
     }
 
     // seguir usuario pelo id dele
@@ -54,8 +63,47 @@ public class FollowService {
         // objeto de novo seguidor, passando quem seguiu e quem esta sendo seguido
         Follow follow = new Follow(follower, followed);
 
+
         // salvar no banco
-        return followRepository.save(follow);
+        Follow followSaved = followRepository.save(follow);
+
+        // salva a notificação no banco
+        Notification notification = new Notification();
+        notification.setType("FOLLOW");
+        notification.setContent(follower.getNome() + " seguiu você");
+        notification.setCreatedAt(LocalDateTime.now());
+        notification.setIsRead(false);
+        notification.setSender(follower);
+        notification.setReceiver(followed);
+        notification.setPost(null);
+
+        notificationRepository.save(notification);
+
+        // cria a notificação para enviar via webSocket
+        NotificationRealtimeResponse dto =
+                new NotificationRealtimeResponse(
+                        "FOLLOW",
+                        follower.getId(),
+                        follower.getNome(),
+                        follower.getProfile() != null
+                                ? follower.getProfile().getImageUrlProfile()
+                                : null,
+                        null,
+                        null,
+                        null,
+                        notification.getContent(),
+                        LocalDateTime.now()
+                );
+
+        // enviar notificação
+        webSocketService.sendNotificationToUser(
+                followedId,
+                dto
+        );
+
+
+
+        return followSaved;
 
     }
 

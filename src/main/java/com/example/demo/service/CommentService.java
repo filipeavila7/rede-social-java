@@ -1,10 +1,14 @@
 package com.example.demo.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.demo.dto.CommentResponse;
+import com.example.demo.dto.NotificationRealtimeResponse;
 import com.example.demo.dto.PostSummaryResponse;
 import com.example.demo.dto.UserResponse;
+import com.example.demo.entity.Notification;
+import com.example.demo.repository.NotificationRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -22,12 +26,16 @@ public class CommentService {
     public final CommentRepository commentRepository;
     public final UserRepository userRepository;
     public final PostRepository postRepository;
+    public final WebSocketService webSocketService;
+    public final NotificationRepository notificationRepository;
 
-    public CommentService(CommentRepository commentRepository, UserRepository userRepository,
-            PostRepository postRepository) {
+
+    public CommentService(CommentRepository commentRepository, UserRepository userRepository, PostRepository postRepository, WebSocketService webSocketService, NotificationRepository notificationRepository) {
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
         this.postRepository = postRepository;
+        this.webSocketService = webSocketService;
+        this.notificationRepository = notificationRepository;
     }
 
     // criar comentario em um post a partir do postId com user loogaado
@@ -49,8 +57,48 @@ public class CommentService {
         novoComentario.setPost(post);
         novoComentario.setUser(user);
 
+        Commente saveComment = commentRepository.save(novoComentario);
+
+        // só notifica se não for o próprio post
+        if (!post.getUser().getId().equals(user.getId())) {
+
+            // salva a notificação no banco
+            Notification notification = new Notification();
+            notification.setType("COMMENT");
+            notification.setContent(user.getNome() + " comentou: " + novoComentario.getContent());
+            notification.setCreatedAt(LocalDateTime.now());
+            notification.setIsRead(false);
+            notification.setSender(user);
+            notification.setReceiver(post.getUser());
+            notification.setPost(post);
+
+            notificationRepository.save(notification);
+
+            // cria a notificação para enviar via webSocket
+            NotificationRealtimeResponse dto =
+                    new NotificationRealtimeResponse(
+                            "COMMENT",
+                            user.getId(),
+                            user.getNome(),
+                            user.getProfile() != null
+                                    ? user.getProfile().getImageUrlProfile()
+                                    : null,
+                            postId,
+                            null,
+                            null,
+                            notification.getContent(),
+                            LocalDateTime.now()
+                    );
+
+            // enviar notificação
+            webSocketService.sendNotificationToUser(
+                    post.getUser().getId(),
+                    dto
+            );
+        }
+
         // salva no banco
-        return commentRepository.save(novoComentario);
+        return saveComment;
 
     }
 
