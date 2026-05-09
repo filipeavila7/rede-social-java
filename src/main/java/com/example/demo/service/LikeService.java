@@ -92,6 +92,7 @@ public class LikeService {
                                 "LIKE",
                                 user.getId(),
                                 user.getNome(),
+                                user.getUserName(),
                                 user.getProfile() != null
                                         ? user.getProfile().getImageUrlProfile()
                                         : null,

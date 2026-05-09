@@ -70,7 +70,7 @@ public class FollowService {
         // salva a notificação no banco
         Notification notification = new Notification();
         notification.setType("FOLLOW");
-        notification.setContent(follower.getNome() + " seguiu você");
+        notification.setContent(follower.getUserName() + " começou a seguiu você");
         notification.setCreatedAt(LocalDateTime.now());
         notification.setIsRead(false);
         notification.setSender(follower);
@@ -85,6 +85,7 @@ public class FollowService {
                         "FOLLOW",
                         follower.getId(),
                         follower.getNome(),
+                        follower.getUserName(),
                         follower.getProfile() != null
                                 ? follower.getProfile().getImageUrlProfile()
                                 : null,

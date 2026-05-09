@@ -127,6 +127,7 @@ public class MessageService {
                         "MESSAGE",
                         sender.getId(),
                         sender.getNome(),
+                        sender.getUserName(),
                         sender.getProfile() != null
                                 ? sender.getProfile().getImageUrlProfile()
                                 : null,
@@ -205,6 +206,7 @@ public class MessageService {
                             "READ",
                             me.getId(),
                             me.getNome(),
+                            me.getUserName(),
                             me.getProfile() != null
                                     ? me.getProfile().getImageUrlProfile()
                                     : null,

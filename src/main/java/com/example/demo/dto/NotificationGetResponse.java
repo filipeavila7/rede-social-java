@@ -2,27 +2,16 @@ package com.example.demo.dto;
 
 import java.time.LocalDateTime;
 
-public record NotificationRealtimeResponse(
-
+public record NotificationGetResponse(
+        Long id,
         String type,
-
-        Long senderId,
-
-        String senderName,
-
-        String senderUserName,
-
-        String senderPhoto,
-
-        Long postId,
-
-        Long conversationId,
-
-        Long messageId,
-
         String content,
-
-        LocalDateTime createdAt
-
+        Boolean isRead,
+        LocalDateTime createdAt,
+        Long senderId,
+        String senderName,
+        String senderUserName,
+        String senderPhoto,
+        Long postId
 ) {
 }

@@ -80,6 +80,7 @@ public class CommentService {
                             "COMMENT",
                             user.getId(),
                             user.getNome(),
+                            user.getUserName(),
                             user.getProfile() != null
                                     ? user.getProfile().getImageUrlProfile()
                                     : null,
