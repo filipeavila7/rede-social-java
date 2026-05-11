@@ -48,6 +48,14 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/reiviar-token")
+    public ResponseEntity<Void> freiviarToken(
+            @RequestBody ForgotPasswordRequest request
+    ) {
+        authService.reenviarEmail(request.email());
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/reset-password")
     public ResponseEntity<Void> resetPassword(
             @RequestBody ResetPasswordRequest request

@@ -17,6 +17,8 @@ public class PasswordResetToken {
 
     private LocalDateTime expiracao;
 
+    private LocalDateTime ultimoEnvio;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -51,5 +53,13 @@ public class PasswordResetToken {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public LocalDateTime getUltimoEnvio() {
+        return ultimoEnvio;
+    }
+
+    public void setUltimoEnvio(LocalDateTime ultimoEnvio) {
+        this.ultimoEnvio = ultimoEnvio;
     }
 }
