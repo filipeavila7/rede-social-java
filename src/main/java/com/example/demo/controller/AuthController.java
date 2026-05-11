@@ -2,6 +2,9 @@ package com.example.demo.controller;
 
 import java.security.Provider.Service;
 
+import com.example.demo.dto.ForgotPasswordRequest;
+import com.example.demo.dto.ResetPasswordRequest;
+import com.example.demo.service.AuthService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,10 +20,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController
 @RequestMapping("/auth") // endpoint base
 public class AuthController {
-    private UserService service;
+    private final UserService service;
+    private final AuthService authService;
 
-    public AuthController(UserService service) {
+    public AuthController(UserService service, AuthService authService) {
         this.service = service;
+        this.authService = authService;
     }
 
     @PostMapping("login")
@@ -34,5 +39,23 @@ public class AuthController {
         return ResponseEntity.ok(new LoginResponse(token));
        
     }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Void> forgotPassword(
+            @RequestBody ForgotPasswordRequest request
+    ) {
+        authService.solicitarReset(request.email());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(
+            @RequestBody ResetPasswordRequest request
+    ) {
+        authService.redefinirSenha(request.token(), request.novaSenha());
+        return ResponseEntity.ok().build();
+    }
+
+
     
 }
