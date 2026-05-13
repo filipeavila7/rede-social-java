@@ -34,9 +34,14 @@ public class MessageController {
 
     // GET /messages/conversation/{conversationId}
     // listar todas as mensagens de uma conversa
-    @GetMapping("/conversation/{conversationId}")
-    public ResponseEntity<List<MessageResponse>> getMessages(@PathVariable Long conversationId) {
-        return ResponseEntity.ok(service.getMessages(conversationId));
+    @GetMapping("/{conversationId}/messages")
+    public List<MessageResponse> getMessages(
+            @PathVariable Long conversationId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        System.out.println("ENTROU NO ENDPOINT");
+        return service.getMessages(conversationId, page, size);
     }
 
 

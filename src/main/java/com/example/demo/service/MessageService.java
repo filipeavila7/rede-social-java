@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -17,6 +18,9 @@ import com.example.demo.entity.User;
 import com.example.demo.repository.ConversationRepository;
 import com.example.demo.repository.MessageRepository;
 import com.example.demo.repository.UserRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -227,7 +231,12 @@ public class MessageService {
     // =========================
     // GET MESSAGES
     // =========================
-    public List<MessageResponse> getMessages(Long conversationId) {
+
+    public List<MessageResponse> getMessages(
+            Long conversationId,
+            int page,
+            int size
+    ) {
 
         User me = getLoggedUser();
 
@@ -246,12 +255,27 @@ public class MessageService {
 
         markConversationAsRead(conversationId);
 
-        List<Message> messages =
-                messageRepository.findByConversationIdOrderByCreatedAtAsc(conversationId);
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.DESC, "createdAt")
+        );
 
-        return messages.stream()
-                .map(this::toResponse)
-                .toList();
+        List<MessageResponse> messages = new ArrayList<>(
+                messageRepository
+                        .findByConversationIdOrderByCreatedAtDesc(
+                                conversationId,
+                                pageable
+                        )
+                        .stream()
+                        .map(this::toResponse)
+                        .toList()
+        );
+
+        // inverte para ficar em ordem correta no chat
+        Collections.reverse(messages);
+
+        return messages;
     }
 
     // =========================
