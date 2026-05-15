@@ -34,9 +34,9 @@ public class UploadController {
         }
 
         // valida tamanho (2MB)
-        if (file.getSize() > 2 * 1024 * 1024) {
+        if (file.getSize() > 10 * 1024 * 1024) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", "Arquivo maior que 2MB"));
+                    .body(Map.of("error", "Arquivo maior que 10MB"));
         }
 
         // valida tipo, aceitar somente png e jpeg
