@@ -100,28 +100,28 @@ public class PostService {
 
 
     // buscar post pelo id
-    public PostDetaisResponse getPostById(Long id) {
+    public PostDetaisResponse getPostById(Long postId) {
         // pegar usuario logado
         User loggedUser = globalHelperService.getLoggedUser();
 
         // verifica se o post existe
-        Post post = postRepository.findById(id)
-                .orElseThrow(PostNotFoundException::new);
+        Post post = globalHelperService.findPostById(postId);
 
         // retorna o post response
         return postMapper.toPostDetaisResponse(post, loggedUser.getId());
     }
 
     // editar post
-    public Post updatePost(Long id, Post postAtualizado) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post não encontrado"));
+    // WARNING - esse metodo possivelmente sera removido
+    public Post updatePost(Long postId, Post postAtualizado) {
+        // busca o post
+        Post post = globalHelperService.findPostById(postId);
 
+        // pega o user logado
         User loggedUser = globalHelperService.getLoggedUser();
 
-        if (!post.getUser().getEmail().equals(loggedUser.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não pode editar este post");
-        }
+        // verifica se o user logado é o dono do post
+        globalHelperService.validatePostOwnership(post, loggedUser);
 
         post.setContent(postAtualizado.getContent());
         post.setImageUrl(postAtualizado.getImageUrl());
@@ -131,17 +131,18 @@ public class PostService {
     }
 
     // deletar post
-    public void deletePost(Long id) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post não encontrado"));
+    public void deletePost(Long postId) {
+        // busca o post
+        Post post = globalHelperService.findPostById(postId);
 
+        // pega o user logado
         User loggedUser = globalHelperService.getLoggedUser();
 
-        if (!post.getUser().getEmail().equals(loggedUser.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não pode apagar este post");
-        }
+        // verifica se o user logado é o dono do post
+        globalHelperService.validatePostOwnership(post, loggedUser);
 
-        postRepository.deleteById(id);
+        // deleta
+        postRepository.delete(post);
     }
 
     // posts do usuario logado
@@ -152,7 +153,7 @@ public class PostService {
 
         return postRepository
                 .findByUserIdOrderByCreatedAtDesc(user.getId(), pageable)
-                .map(post -> toPostResponse(post, user.getId()));
+                .map(post -> postMapper.toPostDetaisResponse(post, user.getId()));
     }
 
     // posts de outro usuario
