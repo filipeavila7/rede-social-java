@@ -13,7 +13,7 @@ public interface UserRepository extends JpaRepository<User, Long> { // passar cl
     // findById()
     // deleteById()
 
-    User findByEmail(String email); // procurar pelo email
+    Optional<User>  findByEmail(String email); // procurar pelo email
     Optional<User> findByuserName(String userName);
     List<User> findByuserNameContainingIgnoreCase(String userName);
 }
