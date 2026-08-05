@@ -3,12 +3,14 @@ package com.example.demo.post.service;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import com.example.demo.exeptions.post.PostNotFoundException;
 import com.example.demo.exeptions.tag.TagConflictException;
 import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.post.dto.PostRequest;
 import com.example.demo.post.dto.PostDetaisResponse;
-import com.example.demo.dto.UserResponse;
 import com.example.demo.entity.Tag;
+import com.example.demo.post.dto.PostResponse;
+import com.example.demo.post.mapper.PostMapper;
 import com.example.demo.post.repository.PostRepository;
 import com.example.demo.repository.*;
 import jakarta.transaction.Transactional;
@@ -29,7 +31,7 @@ import com.example.demo.entity.User;
 public class PostService {
 
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
+    private final PostMapper postMapper;
     private final LikeRepository likeRepository;
     private final CommentRepository commentRepository;
     private final TagRepository tagRepository;
@@ -56,12 +58,12 @@ public class PostService {
                 : orderedPosts.subList(start, end);
 
         return new PageImpl<>(pagedPosts, pageable, orderedPosts.size())
-                .map(post -> toPostResponse(post, loggedUser.getId()));
+                .map(post -> postMapper.toPostDetaisResponse(post, loggedUser.getId()));
     }
 
     // criar post
     @Transactional
-    public Post createPost(PostRequest request) {
+    public PostResponse createPost(PostRequest request) {
         // pega o user logado
         User user = globalHelperService.getLoggedUser();
 
@@ -93,17 +95,21 @@ public class PostService {
         post.setUser(user);
         post.setTags(tags);
 
-        return postRepository.save(post);
+        return postMapper.toPostResponse(postRepository.save(post));
     }
+
 
     // buscar post pelo id
     public PostDetaisResponse getPostById(Long id) {
+        // pegar usuario logado
         User loggedUser = globalHelperService.getLoggedUser();
 
+        // verifica se o post existe
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post não encontrado"));
+                .orElseThrow(PostNotFoundException::new);
 
-        return toPostResponse(post, loggedUser.getId());
+        // retorna o post response
+        return postMapper.toPostDetaisResponse(post, loggedUser.getId());
     }
 
     // editar post
@@ -177,30 +183,7 @@ public class PostService {
     }
 
     // conversor para dto
-    public PostDetaisResponse toPostResponse(Post post, Long loggedUserId) {
 
-        long likesCount = likeRepository.countByPostId(post.getId());
-        long commentsCount = commentRepository.countByPostId(post.getId());
-        boolean likedByMe = likeRepository.existsByUserIdAndPostId(loggedUserId, post.getId());
-
-        return new PostDetaisResponse(
-                post.getId(),
-                post.getContent(),
-                post.getImageUrl(),
-                new UserResponse(
-                        post.getUser().getId(),
-                        post.getUser().getNome(),
-                        post.getUser().getProfile().getImageUrlProfile(),
-                        post.getUser().getUserName()
-                ),
-                post.getCreatedAt(),
-                post.getDescription(),
-                post.getTags(),
-                likesCount,
-                commentsCount,
-                likedByMe
-        );
-    }
 
     // pesquisar posts pelo titulo (content)
     public Page<PostDetaisResponse> searchPosts(String termo, int page, int size) {
