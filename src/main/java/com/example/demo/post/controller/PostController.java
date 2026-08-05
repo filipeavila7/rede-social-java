@@ -1,8 +1,12 @@
-package com.example.demo.controller;
+package com.example.demo.post.controller;
 
 import com.example.demo.post.dto.PostRequest;
 import com.example.demo.post.dto.PostDetaisResponse;
+import com.example.demo.post.dto.PostResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,18 +29,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/posts")
 public class PostController {
 
     public final PostService service;
 
-    // injetar a service no construtor
-    public PostController(PostService service) {
-        this.service = service;
-    }
 
-    // ROTAS GET
-    // /posts
+    // ========== GET ==========
+
     @GetMapping()
     public ResponseEntity<Page<PostDetaisResponse>> getAllPosts(
             @RequestParam(defaultValue = "0") int page,
@@ -53,16 +54,15 @@ public class PostController {
                 .headers(headers)
                 .body(service.getAllPosts(page, size, resolvedSeed));
     }
-    // /posts/search
+
     @GetMapping("/search")
     public ResponseEntity<Page<PostDetaisResponse>> searchPosts(
             @RequestParam String termo,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "9") int size
+            @PageableDefault(size = 12)
+            Pageable pageable
     ) {
-        return ResponseEntity.ok(service.searchPosts(termo, page, size));
+        return ResponseEntity.ok(service.searchPosts(termo, pageable));
     }
-
 
     @GetMapping("/search/suggestions")
     public ResponseEntity<List<String>> searchPostSuggestions(
@@ -71,14 +71,11 @@ public class PostController {
         return ResponseEntity.ok(service.searchPostSuggestions(termo));
     }
 
-    // /posts/{postId}
     @GetMapping("/{postId}")
     public ResponseEntity<PostDetaisResponse> getPostById(@PathVariable Long postId){
         return ResponseEntity.ok(service.getPostById(postId));
     }
 
-    // /posts/user/me
-    // retornar todos os posts do usuario logado
     @GetMapping("/user/me")
     public ResponseEntity<Page<PostDetaisResponse>> getPostByUser(
             @RequestParam(defaultValue = "0") int page,
@@ -87,9 +84,7 @@ public class PostController {
         return ResponseEntity.ok(service.getMyPosts(page, size));
     }
 
-    // /posts/user?userName=nomeDoUsuario
-    // retorna todos os posts de um outro usuário com base no userName enviado na URL
-    // @RequestParam captura o parâmetro da requisição GET diretamente da URL
+
     @GetMapping("/user")
     public ResponseEntity<Page<PostDetaisResponse>> getPostsByUserName(
             @RequestParam String userName,
@@ -99,7 +94,7 @@ public class PostController {
         return ResponseEntity.ok(service.getPostsByUserName(userName, page, size));
     }
 
-    // /posts/user/{userId}/count
+
     // retorna a quantidade total de posts de um usuario pelo id
     @GetMapping("/user/{userId}/count")
     public ResponseEntity<Long> getPostsCountByUserId(@PathVariable Long userId) {
@@ -113,24 +108,23 @@ public class PostController {
         return ResponseEntity.ok(service.getPostStats(postId));
     }
 
-    // POST
-    // criar post
-    // /post
-    @PostMapping
-    public ResponseEntity<Post> createPost(@RequestBody PostRequest post) {
-        Post createdPost = service.createPost(post);
+    // ========== POST ==========
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdPost);
+    @PostMapping
+    public ResponseEntity<PostResponse> createPost(@RequestBody PostRequest post) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.createPost(post));
     }
 
-    // DELETE
+    // ========== DELETE ==========
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePost(@PathVariable Long id) {
         service.deletePost(id);
         return ResponseEntity.noContent().build();
     }
 
-    // Put
+    // ========== PUT ==========
+
     @PutMapping("/{id}")
     public ResponseEntity<Post> updatePost(@PathVariable Long id, @RequestBody Post post) {
         Post updatedPost = service.updatePost(id, post);

@@ -38,6 +38,7 @@ public class PostService {
     private final GlobalHelperService globalHelperService;
 
 
+    // ========== GET ==========
 
     // listar todos os posts
     public Page<PostDetaisResponse> getAllPosts(int page, int size, long seed) {
@@ -60,6 +61,116 @@ public class PostService {
         return new PageImpl<>(pagedPosts, pageable, orderedPosts.size())
                 .map(post -> postMapper.toPostDetaisResponse(post, loggedUser.getId()));
     }
+
+
+    // posts do usuario logado
+    public Page<PostDetaisResponse> getMyPosts(int page, int size) {
+        User user = globalHelperService.getLoggedUser();
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return postRepository
+                .findByUserIdOrderByCreatedAtDesc(user.getId(), pageable)
+                .map(post -> postMapper.toPostDetaisResponse(post, user.getId()));
+    }
+
+
+    // buscar post pelo id
+    public PostDetaisResponse getPostById(Long postId) {
+        // pegar usuario logado
+        User loggedUser = globalHelperService.getLoggedUser();
+
+        // verifica se o post existe
+        Post post = globalHelperService.findPostById(postId);
+
+        // retorna o post response
+        return postMapper.toPostDetaisResponse(post, loggedUser.getId());
+    }
+
+
+    // posts de outro usuario
+    public Page<PostDetaisResponse> getPostsByUserName(String userName, int page, int size) {
+        User loggedUser = globalHelperService.getLoggedUser();
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return postRepository
+                .findByUserUserNameOrderByCreatedAtDesc(userName, pageable)
+                .map(post -> postMapper.toPostDetaisResponse(post, loggedUser.getId()));
+    }
+
+    // quantidade de posts
+    public long getPostsCountByUserId(Long userId) {
+        return postRepository.countByUserId(userId);
+    }
+
+    // stats isoladas
+    public Map<String, Long> getPostStats(Long postId) {
+        long likes = likeRepository.countByPostId(postId);
+        long comments = commentRepository.countByPostId(postId);
+
+        Map<String, Long> stats = new HashMap<>();
+        stats.put("likes", likes);
+        stats.put("comments", comments);
+        return stats;
+    }
+
+
+    public Page<PostDetaisResponse> searchPosts(String termo, Pageable pageable) {
+
+        String busca = termo.trim();
+
+        if (busca.isEmpty()) {
+            return Page.empty();
+        }
+
+        User loggedUser = globalHelperService.getLoggedUser();
+
+        return postRepository
+                .findDistinctByContentContainingIgnoreCaseOrTagsNameContainingIgnoreCaseOrderByCreatedAtDesc(
+                        busca,
+                        busca,
+                        pageable
+                )
+                .map(post -> postMapper.toPostDetaisResponse(post, loggedUser.getId()));
+    }
+
+
+    //sugestões
+    public List<String> searchPostSuggestions(String termo) {
+
+        if (termo == null || termo.trim().isEmpty()) {
+            return List.of();
+        }
+
+        List<Post> posts = postRepository
+                .findTop8DistinctByContentContainingIgnoreCaseOrTagsNameContainingIgnoreCaseOrderByCreatedAtDesc(
+                        termo.trim(),
+                        termo.trim()
+                );
+
+        return posts.stream()
+                .flatMap(post -> {
+                    List<String> resultados = new ArrayList<>();
+
+                    if (post.getContent() != null) {
+                        resultados.add(post.getContent());
+                    }
+
+                    post.getTags().forEach(tag -> resultados.add(tag.getName()));
+
+                    return resultados.stream();
+                })
+                .filter(Objects::nonNull)
+                .filter(texto -> texto.toLowerCase().contains(termo.toLowerCase()))
+                .distinct()
+                .limit(6)
+                .toList();
+    }
+
+
+
+    // ========== POST ==========
 
     // criar post
     @Transactional
@@ -98,18 +209,7 @@ public class PostService {
         return postMapper.toPostResponse(postRepository.save(post));
     }
 
-
-    // buscar post pelo id
-    public PostDetaisResponse getPostById(Long postId) {
-        // pegar usuario logado
-        User loggedUser = globalHelperService.getLoggedUser();
-
-        // verifica se o post existe
-        Post post = globalHelperService.findPostById(postId);
-
-        // retorna o post response
-        return postMapper.toPostDetaisResponse(post, loggedUser.getId());
-    }
+    // ========== PUT ==========
 
     // editar post
     // WARNING - esse metodo possivelmente sera removido
@@ -130,6 +230,9 @@ public class PostService {
         return postRepository.save(post);
     }
 
+
+    // ========== DELETE ==========
+
     // deletar post
     public void deletePost(Long postId) {
         // busca o post
@@ -145,99 +248,6 @@ public class PostService {
         postRepository.delete(post);
     }
 
-    // posts do usuario logado
-    public Page<PostDetaisResponse> getMyPosts(int page, int size) {
-        User user = globalHelperService.getLoggedUser();
-
-        Pageable pageable = PageRequest.of(page, size);
-
-        return postRepository
-                .findByUserIdOrderByCreatedAtDesc(user.getId(), pageable)
-                .map(post -> postMapper.toPostDetaisResponse(post, user.getId()));
-    }
-
-    // posts de outro usuario
-    public Page<PostDetaisResponse> getPostsByUserName(String userName, int page, int size) {
-        User loggedUser = globalHelperService.getLoggedUser();
-
-        Pageable pageable = PageRequest.of(page, size);
-
-        return postRepository
-                .findByUserUserNameOrderByCreatedAtDesc(userName, pageable)
-                .map(post -> toPostResponse(post, loggedUser.getId()));
-    }
-
-    // quantidade de posts
-    public long getPostsCountByUserId(Long userId) {
-        return postRepository.countByUserId(userId);
-    }
-
-    // stats isoladas
-    public Map<String, Long> getPostStats(Long postId) {
-        long likes = likeRepository.countByPostId(postId);
-        long comments = commentRepository.countByPostId(postId);
-
-        Map<String, Long> stats = new HashMap<>();
-        stats.put("likes", likes);
-        stats.put("comments", comments);
-        return stats;
-    }
-
-    // conversor para dto
-
-
-    // pesquisar posts pelo titulo (content)
-    public Page<PostDetaisResponse> searchPosts(String termo, int page, int size) {
-
-        if (termo == null || termo.trim().isEmpty()) {
-            return Page.empty();
-        }
-
-        User loggedUser = globalHelperService.getLoggedUser();
-
-        Pageable pageable = PageRequest.of(page, size);
-
-        return postRepository
-                .findDistinctByContentContainingIgnoreCaseOrTagsNameContainingIgnoreCaseOrderByCreatedAtDesc(
-                        termo.trim(),
-                        termo.trim(),
-                        pageable
-                )
-                .map(post -> toPostResponse(post, loggedUser.getId()));
-    }
-
-
-    //sugestões
-    public List<String> searchPostSuggestions(String termo) {
-
-        if (termo == null || termo.trim().isEmpty()) {
-            return List.of();
-        }
-
-        List<Post> posts = postRepository
-                .findTop8DistinctByContentContainingIgnoreCaseOrTagsNameContainingIgnoreCaseOrderByCreatedAtDesc(
-                        termo.trim(),
-                        termo.trim()
-                );
-
-        return posts.stream()
-                .flatMap(post -> {
-                    List<String> resultados = new ArrayList<>();
-
-                    if (post.getContent() != null) {
-                        resultados.add(post.getContent());
-                    }
-
-                    post.getTags().forEach(tag -> resultados.add(tag.getName()));
-
-                    return resultados.stream();
-                })
-                .filter(Objects::nonNull)
-                .filter(texto -> texto.toLowerCase().contains(termo.toLowerCase()))
-                .distinct()
-                .limit(6)
-                .toList();
-    }
 
     private long seededOrderKey(Long postId, long seed) {
         long value = (postId == null) ? 0L : postId;
