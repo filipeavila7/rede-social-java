@@ -3,19 +3,21 @@ package com.example.demo.post.service;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import com.example.demo.exeptions.tag.TagConflictException;
+import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.post.dto.PostRequest;
-import com.example.demo.post.dto.PostResponse;
+import com.example.demo.post.dto.PostDetaisResponse;
 import com.example.demo.dto.UserResponse;
 import com.example.demo.entity.Tag;
 import com.example.demo.post.repository.PostRepository;
 import com.example.demo.repository.*;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -31,13 +33,13 @@ public class PostService {
     private final LikeRepository likeRepository;
     private final CommentRepository commentRepository;
     private final TagRepository tagRepository;
-
+    private final GlobalHelperService globalHelperService;
 
 
 
     // listar todos os posts
-    public Page<PostResponse> getAllPosts(int page, int size, long seed) {
-        User loggedUser = getLoggedUser();
+    public Page<PostDetaisResponse> getAllPosts(int page, int size, long seed) {
+        User loggedUser = globalHelperService.getLoggedUser();
 
         Pageable pageable = PageRequest.of(page, size);
         List<Post> orderedPosts = new ArrayList<>(postRepository.findAll());
@@ -58,29 +60,35 @@ public class PostService {
     }
 
     // criar post
-    public Post createPost(PostRequest dto) {
-        User user = getLoggedUser();
+    @Transactional
+    public Post createPost(PostRequest request) {
+        // pega o user logado
+        User user = globalHelperService.getLoggedUser();
 
-        if (dto.tagIds().size() > 3) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Máximo de 3 tags");
+        // verifica se os ids das tags passadas existem
+        List<Tag> tags = tagRepository.findAllById(request.tagIds());
+
+        if (tags.size() != request.tagIds().size()) {
+            throw new TagConflictException("Tag não encontrada");
         }
 
-        Set<Long> uniqueTags = new HashSet<>(dto.tagIds());
-
-        if (uniqueTags.size() != dto.tagIds().size()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tags duplicadas não são permitidas");
+        // verifica se tem no máximo 3 tags por post
+        if (request.tagIds().size() > 3) {
+            throw new TagConflictException("É permitido no máximo 3 tags");
         }
 
-        List<Tag> tags = tagRepository.findAllById(dto.tagIds());
+        // verificar se não estão repetidas
+        Set<Long> uniqueTags = new HashSet<>(request.tagIds());
 
-        if (tags.size() != dto.tagIds().size()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Uma ou mais tags são inválidas");
+        if (uniqueTags.size() != request.tagIds().size()) {
+            throw new TagConflictException("Tags repetidas");
         }
 
+        // cria o post
         Post post = new Post();
-        post.setContent(dto.content());
-        post.setDescription(dto.description());
-        post.setImageUrl(dto.imageUrl());
+        post.setContent(request.content());
+        post.setDescription(request.description());
+        post.setImageUrl(request.imageUrl());
         post.setCreatedAt(LocalDateTime.now());
         post.setUser(user);
         post.setTags(tags);
@@ -89,8 +97,8 @@ public class PostService {
     }
 
     // buscar post pelo id
-    public PostResponse getPostById(Long id) {
-        User loggedUser = getLoggedUser();
+    public PostDetaisResponse getPostById(Long id) {
+        User loggedUser = globalHelperService.getLoggedUser();
 
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post não encontrado"));
@@ -103,7 +111,7 @@ public class PostService {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post não encontrado"));
 
-        User loggedUser = getLoggedUser();
+        User loggedUser = globalHelperService.getLoggedUser();
 
         if (!post.getUser().getEmail().equals(loggedUser.getEmail())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não pode editar este post");
@@ -121,7 +129,7 @@ public class PostService {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post não encontrado"));
 
-        User loggedUser = getLoggedUser();
+        User loggedUser = globalHelperService.getLoggedUser();
 
         if (!post.getUser().getEmail().equals(loggedUser.getEmail())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não pode apagar este post");
@@ -131,8 +139,8 @@ public class PostService {
     }
 
     // posts do usuario logado
-    public Page<PostResponse> getMyPosts(int page, int size) {
-        User user = getLoggedUser();
+    public Page<PostDetaisResponse> getMyPosts(int page, int size) {
+        User user = globalHelperService.getLoggedUser();
 
         Pageable pageable = PageRequest.of(page, size);
 
@@ -142,8 +150,8 @@ public class PostService {
     }
 
     // posts de outro usuario
-    public Page<PostResponse> getPostsByUserName(String userName, int page, int size) {
-        User loggedUser = getLoggedUser();
+    public Page<PostDetaisResponse> getPostsByUserName(String userName, int page, int size) {
+        User loggedUser = globalHelperService.getLoggedUser();
 
         Pageable pageable = PageRequest.of(page, size);
 
@@ -169,13 +177,13 @@ public class PostService {
     }
 
     // conversor para dto
-    public PostResponse toPostResponse(Post post, Long loggedUserId) {
+    public PostDetaisResponse toPostResponse(Post post, Long loggedUserId) {
 
         long likesCount = likeRepository.countByPostId(post.getId());
         long commentsCount = commentRepository.countByPostId(post.getId());
         boolean likedByMe = likeRepository.existsByUserIdAndPostId(loggedUserId, post.getId());
 
-        return new PostResponse(
+        return new PostDetaisResponse(
                 post.getId(),
                 post.getContent(),
                 post.getImageUrl(),
@@ -195,13 +203,13 @@ public class PostService {
     }
 
     // pesquisar posts pelo titulo (content)
-    public Page<PostResponse> searchPosts(String termo, int page, int size) {
+    public Page<PostDetaisResponse> searchPosts(String termo, int page, int size) {
 
         if (termo == null || termo.trim().isEmpty()) {
             return Page.empty();
         }
 
-        User loggedUser = getLoggedUser();
+        User loggedUser = globalHelperService.getLoggedUser();
 
         Pageable pageable = PageRequest.of(page, size);
 

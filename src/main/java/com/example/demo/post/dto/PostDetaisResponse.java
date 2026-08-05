@@ -6,7 +6,7 @@ import com.example.demo.entity.Tag;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record PostResponse(
+public record PostDetaisResponse(
         Long id,
         String content,
         String imageUrl,

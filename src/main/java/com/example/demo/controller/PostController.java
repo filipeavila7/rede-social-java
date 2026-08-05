@@ -1,7 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.post.dto.PostRequest;
-import com.example.demo.post.dto.PostResponse;
+import com.example.demo.post.dto.PostDetaisResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,7 +38,7 @@ public class PostController {
     // ROTAS GET
     // /posts
     @GetMapping()
-    public ResponseEntity<Page<PostResponse>> getAllPosts(
+    public ResponseEntity<Page<PostDetaisResponse>> getAllPosts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size,
             @RequestParam(required = false) Long seed) {
@@ -55,7 +55,7 @@ public class PostController {
     }
     // /posts/search
     @GetMapping("/search")
-    public ResponseEntity<Page<PostResponse>> searchPosts(
+    public ResponseEntity<Page<PostDetaisResponse>> searchPosts(
             @RequestParam String termo,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "9") int size
@@ -73,14 +73,14 @@ public class PostController {
 
     // /posts/{postId}
     @GetMapping("/{postId}")
-    public ResponseEntity<PostResponse> getPostById(@PathVariable Long postId){
+    public ResponseEntity<PostDetaisResponse> getPostById(@PathVariable Long postId){
         return ResponseEntity.ok(service.getPostById(postId));
     }
 
     // /posts/user/me
     // retornar todos os posts do usuario logado
     @GetMapping("/user/me")
-    public ResponseEntity<Page<PostResponse>> getPostByUser(
+    public ResponseEntity<Page<PostDetaisResponse>> getPostByUser(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "6") int size
     ) {
@@ -91,7 +91,7 @@ public class PostController {
     // retorna todos os posts de um outro usuário com base no userName enviado na URL
     // @RequestParam captura o parâmetro da requisição GET diretamente da URL
     @GetMapping("/user")
-    public ResponseEntity<Page<PostResponse>> getPostsByUserName(
+    public ResponseEntity<Page<PostDetaisResponse>> getPostsByUserName(
             @RequestParam String userName,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "6") int size
