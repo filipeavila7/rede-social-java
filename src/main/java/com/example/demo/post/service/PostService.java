@@ -1,13 +1,15 @@
-package com.example.demo.service;
+package com.example.demo.post.service;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
-import com.example.demo.dto.PostDto;
-import com.example.demo.dto.PostResponse;
+import com.example.demo.post.dto.PostRequest;
+import com.example.demo.post.dto.PostResponse;
 import com.example.demo.dto.UserResponse;
 import com.example.demo.entity.Tag;
+import com.example.demo.post.repository.PostRepository;
 import com.example.demo.repository.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -17,10 +19,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.example.demo.entity.Post;
+import com.example.demo.post.entity.Post;
 import com.example.demo.entity.User;
 
 @Service
+@RequiredArgsConstructor
 public class PostService {
 
     private final PostRepository postRepository;
@@ -29,31 +32,8 @@ public class PostService {
     private final CommentRepository commentRepository;
     private final TagRepository tagRepository;
 
-    public PostService(PostRepository postRepository,
-                       UserRepository userRepository,
-                       LikeRepository likeRepository,
-                       CommentRepository commentRepository,
-                       TagRepository tagRepository) {
-        this.postRepository = postRepository;
-        this.userRepository = userRepository;
-        this.likeRepository = likeRepository;
-        this.commentRepository = commentRepository;
-        this.tagRepository = tagRepository;
-    }
 
-    private User getLoggedUser() {
-        String email = (String) SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getPrincipal();
 
-        User user = userRepository.findByEmail(email);
-
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não encontrado");
-        }
-
-        return user;
-    }
 
     // listar todos os posts
     public Page<PostResponse> getAllPosts(int page, int size, long seed) {
@@ -78,7 +58,7 @@ public class PostService {
     }
 
     // criar post
-    public Post createPost(PostDto dto) {
+    public Post createPost(PostRequest dto) {
         User user = getLoggedUser();
 
         if (dto.tagIds().size() > 3) {

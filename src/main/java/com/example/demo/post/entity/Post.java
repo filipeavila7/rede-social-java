@@ -1,8 +1,12 @@
-package com.example.demo.entity;
+package com.example.demo.post.entity;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.example.demo.entity.Commente;
+import com.example.demo.entity.Like;
+import com.example.demo.entity.Tag;
+import com.example.demo.entity.User;
 import com.example.demo.util.FileUrlUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;

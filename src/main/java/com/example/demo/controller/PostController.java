@@ -1,14 +1,14 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.PostDto;
-import com.example.demo.dto.PostResponse;
+import com.example.demo.post.dto.PostRequest;
+import com.example.demo.post.dto.PostResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.entity.Post;
-import com.example.demo.service.PostService;
+import com.example.demo.post.entity.Post;
+import com.example.demo.post.service.PostService;
 
 import java.util.List;
 import java.util.Map;
@@ -117,7 +117,7 @@ public class PostController {
     // criar post
     // /post
     @PostMapping
-    public ResponseEntity<Post> createPost(@RequestBody PostDto post) {
+    public ResponseEntity<Post> createPost(@RequestBody PostRequest post) {
         Post createdPost = service.createPost(post);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(createdPost);

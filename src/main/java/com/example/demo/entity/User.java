@@ -2,6 +2,7 @@ package com.example.demo.entity;
 
 import java.util.List;
 
+import com.example.demo.post.entity.Post;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 

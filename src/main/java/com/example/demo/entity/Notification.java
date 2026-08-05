@@ -1,5 +1,6 @@
 package com.example.demo.entity;
 
+import com.example.demo.post.entity.Post;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;

@@ -15,10 +15,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.entity.Commente;
-import com.example.demo.entity.Post;
+import com.example.demo.post.entity.Post;
 import com.example.demo.entity.User;
 import com.example.demo.repository.CommentRepository;
-import com.example.demo.repository.PostRepository;
+import com.example.demo.post.repository.PostRepository;
 import com.example.demo.repository.UserRepository;
 
 @Service

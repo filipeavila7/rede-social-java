@@ -1,8 +1,8 @@
-package com.example.demo.dto;
+package com.example.demo.post.dto;
 
 import java.util.List;
 
-public record PostDto(
+public record PostRequest(
         String content,
         String description,
         String imageUrl,

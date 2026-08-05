@@ -1,11 +1,9 @@
-package com.example.demo.repository;
+package com.example.demo.post.repository;
 
-import com.example.demo.entity.Post;
+import com.example.demo.post.entity.Post;
 
 import java.util.List;
-import java.util.Optional;
 
-import com.example.demo.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
