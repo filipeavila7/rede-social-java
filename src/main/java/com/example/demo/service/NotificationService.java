@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.dto.NotificationGetResponse;
 import com.example.demo.entity.Notification;
 import com.example.demo.entity.User;
+import com.example.demo.exeptions.user.UserNotFoundException;
 import com.example.demo.repository.NotificationRepository;
 import com.example.demo.repository.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -26,7 +27,8 @@ public class NotificationService {
     public List<NotificationGetResponse> getMyNotifications() {
         String email = (String) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
-        User user = userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(UserNotFoundException::new);
 
 
 
@@ -66,7 +68,8 @@ public class NotificationService {
                 .getAuthentication()
                 .getPrincipal();
 
-        User user = userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(UserNotFoundException::new);
 
         List<Notification> toDelete =
                 notificationRepository.findByIdInAndReceiverId(ids, user.getId());

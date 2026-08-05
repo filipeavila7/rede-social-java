@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.example.demo.dto.UserDto;
 import com.example.demo.entity.Role;
+import com.example.demo.exeptions.user.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -34,10 +35,9 @@ public class UserService {
 
     // retorna o usuario logado pelo email do token
     public User getMe(String email) {
-        User user = repository.findByEmail(email);
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
-        }
+        User user = repository.findByEmail(email)
+                .orElseThrow(UserNotFoundException::new);
+
         return user;
     }
 
