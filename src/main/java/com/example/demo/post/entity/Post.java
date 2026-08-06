@@ -14,8 +14,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 @Table(name = "posts")
 public class Post {
     @Id
@@ -23,17 +31,12 @@ public class Post {
     private Long id;
 
     @Column(nullable = false)
-    @NotBlank
-    @Size(max = 50)
     private String content;
 
     @Column(nullable = false)
-    @NotBlank
     private String imageUrl;
 
     @Column(nullable = false)
-    @NotBlank
-    @Size(max = 50)
     private String description;
 
 
@@ -41,29 +44,24 @@ public class Post {
     private LocalDateTime createdAt;
 
 
-    // muitos post pra um usuario
-    // aqui fica a fk do usuario no banco, user_id
-    // quem manda é a relação
+
+    // relacionamentos
+
+    // um post tem um user
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-
-    // UM POST TEM VÁRIAS CURTIDAS
-    // mappedBy = "post" → o atributo "post" está na classe Like, ou seja, a fk
-    // NÃO cria coluna no banco
-    // o JPA busca na tabela Like usando post_id
+    // um post tem varios likes
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    @JsonIgnore // evita loop infinito na API
-    private List<Like> likes; // lista de likes, jpa ja retorna todos os registros de likes que estão associados a fk de post, ou seja todos os likes que tem o id desse post
+    private List<Like> likes;
 
-
-    // UM POST TEM VÁRIOS COMENTÁRIOS
+    // um post tem varios comentarios
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    @JsonIgnore
     private List<Commente> comments;
 
 
+    // tabela intermediária que relaciona post com tag (post_tags) -> post_id | tag_id
     @ManyToMany
     @JoinTable(
             name = "post_tags",
@@ -72,19 +70,7 @@ public class Post {
     )
     private List<Tag> tags;
 
-    public Post() {
-    }
-
-
-    public Post(String content, String imageUrl, User user) {
-        this.content = content;
-        this.imageUrl = imageUrl;
-        this.user = user;
-        this.createdAt = LocalDateTime.now();
-    }
-
-
-
+    // TODO dar uma olhada nisso depois
 
     // mostrar no json o total de curtidas e comentáario contando o tamanho da lista
     @JsonProperty("likesCount")
@@ -96,93 +82,6 @@ public class Post {
     public int getCommentsCount() {
         return comments == null ? 0 : comments.size();
     }
-
-
-    public Long getId() {
-        return id;
-    }
-
-
-    public String getContent() {
-        return content;
-    }
-
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-
-    public String getImageUrl() {
-        return FileUrlUtils.toPublicUrl(imageUrl);
-    }
-
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = FileUrlUtils.normalizeStoredPath(imageUrl);
-    }
-
-
-    public User getUser() {
-        return user;
-    }
-
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-
-    public List<Like> getLikes() {
-        return likes;
-    }
-
-    public List<Tag> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<Tag> tags) {
-        this.tags = tags;
-    }
-
-    public List<Commente> getComments() {
-        return comments;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-
-    @Override
-    public String toString() {
-        return "Post [id=" + id + ", content=" + content + ", imageUrl=" + imageUrl + ", createdAt=" + createdAt + "]";
-    }
-
-
-    
-
-
-
-    
-
-
-    
-    
 
 
 
