@@ -1,16 +1,17 @@
 package com.example.demo.user.Service;
 
-import java.util.List;
 
 import com.example.demo.user.dto.UserRequest;
 import com.example.demo.user.dto.UserResponse;
 import com.example.demo.user.entity.Role;
 import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.service.JwtService;
+import com.example.demo.user.mapper.UserMapper;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -24,12 +25,9 @@ public class UserService {
     private final JwtService jtwService;
     private final UserRepository repository;
     private final GlobalHelperService globalHelperService;
-    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(); // comparar hash de senha
+    private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
-    // retorna uma lista de obejtos User
-    public List<User> getAllUsers(){
-        return repository.findAll();
-    }
 
     // retorna o usuario logado pelo email do token
     public User getMe() {
@@ -37,29 +35,27 @@ public class UserService {
 
     }
 
-    // criar usuario, retorna User e recebe um objeto User
+    // criar usuario
+    @Transactional
     public UserResponse createUser(UserRequest request){
         // instanciar o user
-       User user = new User();
+        User user = new User();
 
-       // set dos valores com base no request recebido
-       user.setNome(request.nome());
-       user.setUserName(request.userName());
-       user.setEmail(request.email());
+        // set dos valores com base no request recebido
+        user.setName(request.name());
+        user.setUserName(request.userName());
+        user.setEmail(request.email());
 
-       // os usarios novos nascem como USER
-       user.setRole(Role.USER);
-
-       // criptografar a senha
-        String senhaHash = encoder.encode(request.senha());
-        user.setSenha(senhaHash);
+        // os usarios novos nascem como USER
+        user.setRole(Role.USER);
+        user.setPassword(passwordEncoder.encode(request.password()));
 
         // cria profile automaticamente
         Profile profile = new Profile("", null, null, user);
         user.setProfile(profile);
 
-        // salva o user no banco
-        return repository.save(user);
+
+        return userMapper.toUserResponse(repository.save(user));
 
     }
                             

@@ -8,7 +8,7 @@ public record UserRequest(
 
         @NotBlank(message = "Nome obrigatório")
         @Size(min = 2, max = 40, message = "Nome deve ter entre 2 e 40 caracteres")
-        String nome,
+        String name,
 
         @NotBlank(message = "Username obrigatório")
         @Size(min = 3, max = 20, message = "Username deve ter entre 3 e 20 caracteres")
@@ -21,5 +21,5 @@ public record UserRequest(
 
         @NotBlank(message = "Senha obrigatória")
         @Size(min = 8, max = 64, message = "Senha deve ter entre 8 e 64 caracteres")
-        String senha
+        String password
 ){}
