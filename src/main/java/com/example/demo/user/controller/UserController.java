@@ -1,6 +1,6 @@
 package com.example.demo.user.controller;
 
-import com.example.demo.user.dto.UserDto;
+import com.example.demo.user.dto.UserRequest;
 import com.example.demo.user.repository.UserRepository;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,7 +51,7 @@ public class UserController {
 
     // POST
     @PostMapping
-    public ResponseEntity<User> createUser(@Valid @RequestBody UserDto user) {
+    public ResponseEntity<User> createUser(@Valid @RequestBody UserRequest user) {
         User createdUser = service.createUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }

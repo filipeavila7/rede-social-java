@@ -2,7 +2,8 @@ package com.example.demo.user.Service;
 
 import java.util.List;
 
-import com.example.demo.user.dto.UserDto;
+import com.example.demo.user.dto.UserRequest;
+import com.example.demo.user.dto.UserResponse;
 import com.example.demo.user.entity.Role;
 import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.service.JwtService;
@@ -37,20 +38,20 @@ public class UserService {
     }
 
     // criar usuario, retorna User e recebe um objeto User
-    public User createUser(UserDto dto){
+    public UserResponse createUser(UserRequest request){
         // instanciar o user
        User user = new User();
 
-       // set dos valores com base no dto recebido
-       user.setNome(dto.nome());
-       user.setUserName(dto.userName());
-       user.setEmail(dto.email());
+       // set dos valores com base no request recebido
+       user.setNome(request.nome());
+       user.setUserName(request.userName());
+       user.setEmail(request.email());
 
        // os usarios novos nascem como USER
        user.setRole(Role.USER);
 
        // criptografar a senha
-        String senhaHash = encoder.encode(dto.senha());
+        String senhaHash = encoder.encode(request.senha());
         user.setSenha(senhaHash);
 
         // cria profile automaticamente
