@@ -12,10 +12,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.example.demo.entity.Profile;
-import com.example.demo.entity.User;
+import com.example.demo.user.entity.User;
 import com.example.demo.repository.FollowRepository;
 import com.example.demo.repository.ProfileRepository;
-import com.example.demo.repository.UserRepository;
+import com.example.demo.user.repository.UserRepository;
 
 class ProfileServiceTest {
 

@@ -1,5 +1,6 @@
 package com.example.demo.entity;
 
+import com.example.demo.user.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.example.demo.util.FileUrlUtils;
 import jakarta.persistence.Column;

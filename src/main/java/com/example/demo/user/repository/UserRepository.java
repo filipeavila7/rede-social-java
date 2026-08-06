@@ -1,6 +1,6 @@
-package com.example.demo.repository;
+package com.example.demo.user.repository;
 
-import com.example.demo.entity.User; // importar a tabela de usuario
+import com.example.demo.user.entity.User; // importar a tabela de usuario
 import org.springframework.data.jpa.repository.JpaRepository; // importar a jparepository para herdar ela
 
 import java.util.List;

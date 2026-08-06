@@ -13,9 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.entity.Follow;
-import com.example.demo.entity.User;
+import com.example.demo.user.entity.User;
 import com.example.demo.repository.FollowRepository;
-import com.example.demo.repository.UserRepository;
+import com.example.demo.user.repository.UserRepository;
 
 @Service
 public class FollowService {

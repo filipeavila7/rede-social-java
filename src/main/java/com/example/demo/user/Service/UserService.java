@@ -1,10 +1,12 @@
-package com.example.demo.service;
+package com.example.demo.user.Service;
 
 import java.util.List;
 
-import com.example.demo.dto.UserDto;
-import com.example.demo.entity.Role;
-import com.example.demo.exeptions.user.UserNotFoundException;
+import com.example.demo.user.dto.UserDto;
+import com.example.demo.user.entity.Role;
+import com.example.demo.helpers.GlobalHelperService;
+import com.example.demo.service.JwtService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -12,21 +14,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.entity.Profile;
-import com.example.demo.entity.User;
-import com.example.demo.repository.UserRepository;
+import com.example.demo.user.entity.User;
+import com.example.demo.user.repository.UserRepository;
 
-@Service // definir que é uma regra de negocio
+@Service
+@RequiredArgsConstructor
 public class UserService {
     private final JwtService jtwService;
     private final UserRepository repository;
+    private final GlobalHelperService globalHelperService;
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(); // comparar hash de senha
-
-    //No Spring, injeção de dependência é o que permite que você “use” um objeto sem precisar instanciá-lo com new, deixando o próprio Spring cuidar da criação e do ciclo de vida dele.
-    // injeção do repository
-    public UserService(UserRepository repository, JwtService jtwService) {
-        this.repository = repository;
-        this.jtwService = jtwService;
-    }
 
     // retorna uma lista de obejtos User
     public List<User> getAllUsers(){
@@ -34,11 +31,9 @@ public class UserService {
     }
 
     // retorna o usuario logado pelo email do token
-    public User getMe(String email) {
-        User user = repository.findByEmail(email)
-                .orElseThrow(UserNotFoundException::new);
+    public User getMe() {
+        return globalHelperService.getLoggedUser();
 
-        return user;
     }
 
     // criar usuario, retorna User e recebe um objeto User

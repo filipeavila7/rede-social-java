@@ -8,11 +8,12 @@ import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
+import com.example.demo.user.Service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import com.example.demo.entity.User;
-import com.example.demo.repository.UserRepository;
+import com.example.demo.user.entity.User;
+import com.example.demo.user.repository.UserRepository;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;

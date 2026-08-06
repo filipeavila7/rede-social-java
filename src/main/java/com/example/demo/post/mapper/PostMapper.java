@@ -1,6 +1,6 @@
 package com.example.demo.post.mapper;
 
-import com.example.demo.dto.UserResponse;
+import com.example.demo.user.dto.UserResponse;
 import com.example.demo.post.dto.PostDetaisResponse;
 import com.example.demo.post.dto.PostResponse;
 import com.example.demo.post.entity.Post;

@@ -11,10 +11,10 @@ import org.springframework.web.server.ResponseStatusException;
 import com.example.demo.dto.ConversationResponse;
 import com.example.demo.entity.Conversation;
 import com.example.demo.entity.Message;
-import com.example.demo.entity.User;
+import com.example.demo.user.entity.User;
 import com.example.demo.repository.ConversationRepository;
 import com.example.demo.repository.MessageRepository;
-import com.example.demo.repository.UserRepository;
+import com.example.demo.user.repository.UserRepository;
 
 @Service
 public class ConversationService {

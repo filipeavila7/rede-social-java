@@ -1,7 +1,11 @@
-package com.example.demo.entity;
+package com.example.demo.user.entity;
 
 import java.util.List;
 
+import com.example.demo.entity.Commente;
+import com.example.demo.entity.Follow;
+import com.example.demo.entity.Like;
+import com.example.demo.entity.Profile;
 import com.example.demo.post.entity.Post;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;

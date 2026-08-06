@@ -6,7 +6,7 @@ import java.util.List;
 import com.example.demo.dto.CommentResponse;
 import com.example.demo.dto.NotificationRealtimeResponse;
 import com.example.demo.dto.PostSummaryResponse;
-import com.example.demo.dto.UserResponse;
+import com.example.demo.user.dto.UserResponse;
 import com.example.demo.entity.Notification;
 import com.example.demo.repository.NotificationRepository;
 import org.springframework.http.HttpStatus;
@@ -16,10 +16,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.entity.Commente;
 import com.example.demo.post.entity.Post;
-import com.example.demo.entity.User;
+import com.example.demo.user.entity.User;
 import com.example.demo.repository.CommentRepository;
 import com.example.demo.post.repository.PostRepository;
-import com.example.demo.repository.UserRepository;
+import com.example.demo.user.repository.UserRepository;
 
 @Service
 public class CommentService {

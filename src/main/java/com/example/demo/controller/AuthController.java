@@ -1,7 +1,5 @@
 package com.example.demo.controller;
 
-import java.security.Provider.Service;
-
 import com.example.demo.dto.ForgotPasswordRequest;
 import com.example.demo.dto.ResetPasswordRequest;
 import com.example.demo.service.AuthService;
@@ -10,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.requests.LoginRequest;
 import com.example.demo.requests.LoginResponse;
-import com.example.demo.service.UserService;
+import com.example.demo.user.Service.UserService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

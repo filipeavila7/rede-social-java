@@ -1,6 +1,7 @@
 package com.example.demo.entity;
 
 import com.example.demo.post.entity.Post;
+import com.example.demo.user.entity.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

@@ -1,6 +1,6 @@
 package com.example.demo.post.dto;
 
-import com.example.demo.dto.UserResponse;
+import com.example.demo.user.dto.UserResponse;
 import com.example.demo.entity.Tag;
 
 import java.time.LocalDateTime;

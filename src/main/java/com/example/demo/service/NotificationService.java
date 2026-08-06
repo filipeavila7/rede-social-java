@@ -2,14 +2,12 @@ package com.example.demo.service;
 
 import com.example.demo.dto.NotificationGetResponse;
 import com.example.demo.entity.Notification;
-import com.example.demo.entity.User;
+import com.example.demo.user.entity.User;
 import com.example.demo.exeptions.user.UserNotFoundException;
 import com.example.demo.repository.NotificationRepository;
-import com.example.demo.repository.UserRepository;
-import org.springframework.http.HttpStatus;
+import com.example.demo.user.repository.UserRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 

@@ -3,7 +3,6 @@ package com.example.demo.post.service;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import com.example.demo.exeptions.post.PostNotFoundException;
 import com.example.demo.exeptions.tag.TagConflictException;
 import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.post.dto.PostRequest;
@@ -19,12 +18,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.post.entity.Post;
-import com.example.demo.entity.User;
+import com.example.demo.user.entity.User;
 
 @Service
 @RequiredArgsConstructor

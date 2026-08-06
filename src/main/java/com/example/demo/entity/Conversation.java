@@ -3,6 +3,7 @@ package com.example.demo.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.example.demo.user.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;

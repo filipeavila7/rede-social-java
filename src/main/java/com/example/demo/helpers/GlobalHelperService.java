@@ -1,12 +1,12 @@
 package com.example.demo.helpers;
 
-import com.example.demo.entity.User;
+import com.example.demo.user.entity.User;
 import com.example.demo.exeptions.post.PostConflictException;
 import com.example.demo.exeptions.post.PostNotFoundException;
 import com.example.demo.exeptions.user.UserNotFoundException;
 import com.example.demo.post.entity.Post;
 import com.example.demo.post.repository.PostRepository;
-import com.example.demo.repository.UserRepository;
+import com.example.demo.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;

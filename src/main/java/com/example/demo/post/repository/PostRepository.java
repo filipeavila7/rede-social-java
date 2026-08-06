@@ -1,6 +1,6 @@
 package com.example.demo.post.repository;
 
-import com.example.demo.entity.User;
+import com.example.demo.user.entity.User;
 import com.example.demo.post.entity.Post;
 
 import java.util.List;

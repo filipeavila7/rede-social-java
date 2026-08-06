@@ -11,10 +11,10 @@ import org.springframework.web.server.ResponseStatusException;
 import com.example.demo.dto.FollowingProfileResponse;
 import com.example.demo.dto.ProfileResponse;
 import com.example.demo.entity.Profile;
-import com.example.demo.entity.User;
+import com.example.demo.user.entity.User;
 import com.example.demo.repository.FollowRepository;
 import com.example.demo.repository.ProfileRepository;
-import com.example.demo.repository.UserRepository;
+import com.example.demo.user.repository.UserRepository;
 import com.example.demo.util.FileUrlUtils;
 
 @Service
