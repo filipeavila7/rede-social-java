@@ -1,19 +1,17 @@
 package com.example.demo.user.Service;
 
 
+import com.example.demo.user.dto.UpdateUserRequest;
 import com.example.demo.user.dto.UserRequest;
 import com.example.demo.user.dto.UserResponse;
 import com.example.demo.user.entity.Role;
 import com.example.demo.helpers.GlobalHelperService;
-import com.example.demo.service.JwtService;
 import com.example.demo.user.mapper.UserMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+
 
 import com.example.demo.entity.Profile;
 import com.example.demo.user.entity.User;
@@ -22,8 +20,7 @@ import com.example.demo.user.repository.UserRepository;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final JwtService jtwService;
-    private final UserRepository repository;
+    private final UserRepository userRepository;
     private final GlobalHelperService globalHelperService;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
@@ -55,78 +52,34 @@ public class UserService {
         user.setProfile(profile);
 
 
-        return userMapper.toUserResponse(repository.save(user));
+        return userMapper.toUserResponse(userRepository.save(user));
 
     }
                             
 
-    // excluir usuario
-    // retorna void pois o delete não precisa retornar nada na controller apenas 204
-    public void deleteUser(Long id){
-        String email = (String) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
-        User user = repository.findByEmail(email);
-
-        if (!user.getId().equals(id)){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não pode apagar outro usuário");
-        }
-        if (!repository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
-        }
-        repository.deleteById(id);
+    // próprio usuario se deletar
+    public void deleteUser(){
+        userRepository.delete(globalHelperService.getLoggedUser());
     }
 
+    // eidtar usuario
+    public UserResponse updateUser(UpdateUserRequest request){ // recebr id e o objetodo usuario atulzado
+        User loggedUser = globalHelperService.getLoggedUser();
 
-    // editar
-    public User uptadeUser(Long id, User userAtualizado){ // recebr id e o objetodo usuario atulzado
-        String email = (String) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
-        User user = repository.findByEmail(email);
-
-        if (!user.getId().equals(id)){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não pode editar outro usuário");
+        if (request.userName() != null){
+            loggedUser.setUserName(request.userName());
         }
 
-        // atualiza apenas os campos enviados para não sobrescrever com null
-        if (userAtualizado.getNome() != null && !userAtualizado.getNome().isBlank()) {
-            user.setNome(userAtualizado.getNome());
+        if (request.name() != null){
+            loggedUser.setName(request.name());
         }
 
-        if (userAtualizado.getEmail() != null && !userAtualizado.getEmail().isBlank()) {
-            user.setEmail(userAtualizado.getEmail());
+        if (request.password() != null){
+            loggedUser.setPassword(passwordEncoder.encode(request.password()));
         }
 
-        if (userAtualizado.getUserName() != null && !userAtualizado.getUserName().isBlank()) {
-            user.setUserName(userAtualizado.getUserName());
-        }
+        return userMapper.toUserResponse(userRepository.save(loggedUser));
 
-        // gera o hash de novo
-        if (userAtualizado.getSenha() != null && !userAtualizado.getSenha().isBlank()) {
-            user.setSenha(encoder.encode(userAtualizado.getSenha()));
-        }
-
-
-        return repository.save(user); // salva no banco
-
-    }
-
-
-    public String login(String email, String senha){
-        // buscar usuario pelo email
-        User user = repository.findByEmail(email);
-
-        // caso não exista o email
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
-        }
-
-        // compara a senha digitada com a senha criptografada
-        if (!encoder.matches(senha, user.getSenha())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Senha inválida");
-        }   
-        
-        // gerar o token com o email existente
-        return jtwService.gerarToken(user);
     }
 
 
