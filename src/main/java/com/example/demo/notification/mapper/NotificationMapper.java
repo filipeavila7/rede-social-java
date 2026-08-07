@@ -13,7 +13,7 @@ public class NotificationMapper {
                 n.getSender().getName(),
                 n.getSender().getUserName(),
                 n.getSender().getProfile().getImageUrlProfile(),
-                n.getPost() != null ? n.getPost().getId() : null,
+                n.getPost() != null ?  n.getPost().getId() : null,
                 n.getContent(),
                 n.getCreatedAt()
         );

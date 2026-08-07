@@ -1,6 +1,7 @@
 package com.example.demo.notification.service;
 
 import com.example.demo.dto.NotificationGetResponse;
+import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.notification.dto.NotificationRealtimeResponse;
 import com.example.demo.notification.entity.Notification;
 import com.example.demo.notification.entity.NotificationType;
@@ -23,6 +24,7 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
     private final NotificationMapper notificationMapper;
+    private final GlobalHelperService globalHelperService;
 
 
     public List<NotificationGetResponse> getMyNotifications() {
@@ -77,8 +79,8 @@ public class NotificationService {
         notificationRepository.deleteAll(toDelete);
     }
 
-
-    public NotificationRealtimeResponse createNotification(
+    // criar notificações que tem post (COMMENT E LIKE)
+    public NotificationRealtimeResponse createPostNotification(
             User loggedUser, User receiver, Post post, NotificationType type, String content) {
 
         // só notifica se não for o próprio post
@@ -86,20 +88,19 @@ public class NotificationService {
             return null;
         }
 
-            // cria a notificação
-            Notification notification = new Notification();
-            notification.setType(type);
-            notification.setContent(content);
-            notification.setCreatedAt(LocalDateTime.now());
-            notification.setIsRead(false);
-            notification.setSender(loggedUser);
-            notification.setReceiver(receiver);
-            notification.setPost(post);
+        // cria a notificação
+        Notification notification = globalHelperService.buildNotification(
+                loggedUser, receiver, type, content
+        );
 
-            notificationRepository.save(notification);
+        // relaciona com post
+        notification.setPost(post);
 
-            // cria dto de notificação para enviar via webSocket
-            return notificationMapper.toNotificationRealtimeResponse(notification);
+        // salva
+        notificationRepository.save(notification);
+
+        // cria dto de notificação para enviar via webSocket
+        return notificationMapper.toNotificationRealtimeResponse(notification);
 
 
     }
