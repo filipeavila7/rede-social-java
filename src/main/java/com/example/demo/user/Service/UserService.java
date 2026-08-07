@@ -26,11 +26,16 @@ public class UserService {
     private final UserMapper userMapper;
 
 
-    // retorna o usuario logado pelo email do token
-    public User getMe() {
-        return globalHelperService.getLoggedUser();
+    // ========== GET ==========
+
+    // retorna os dados do usuario logado
+    public UserResponse getMe() {
+        return userMapper.toUserResponse(globalHelperService.getLoggedUser()) ;
 
     }
+
+
+    // ========== POST ==========
 
     // criar usuario
     @Transactional
@@ -55,15 +60,12 @@ public class UserService {
         return userMapper.toUserResponse(userRepository.save(user));
 
     }
-                            
 
-    // próprio usuario se deletar
-    public void deleteUser(){
-        userRepository.delete(globalHelperService.getLoggedUser());
-    }
+
+    // ========== PUT ==========
 
     // eidtar usuario
-    public UserResponse updateUser(UpdateUserRequest request){ // recebr id e o objetodo usuario atulzado
+    public UserResponse updateUser(UpdateUserRequest request){
         User loggedUser = globalHelperService.getLoggedUser();
 
         if (request.userName() != null){
@@ -80,6 +82,13 @@ public class UserService {
 
         return userMapper.toUserResponse(userRepository.save(loggedUser));
 
+    }
+
+    // ========== DELETE ==========
+
+    // próprio usuario se deletar
+    public void deleteUser(){
+        userRepository.delete(globalHelperService.getLoggedUser());
     }
 
 

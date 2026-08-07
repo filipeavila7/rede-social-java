@@ -1,7 +1,10 @@
 package com.example.demo.user.controller;
 
+import com.example.demo.user.dto.UpdateUserRequest;
 import com.example.demo.user.dto.UserRequest;
+import com.example.demo.user.dto.UserResponse;
 import com.example.demo.user.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,51 +25,40 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/users") // rota base para todos os endpoints
 public class UserController {
-    private final UserRepository userRepository;
+
     private final UserService service;
 
-    // injeção da service no construtor
-    public UserController(UserService service, UserRepository userRepository) {
-        this.service = service;
-        this.userRepository = userRepository;
-    }
 
-    // GET
-    @GetMapping // ResponseEntity para retornar uma resposta http completa
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = service.getAllUsers();
-        return ResponseEntity.ok(users);
-    }
+    // ========== GET ==========
 
-    // GET /users/me
     @GetMapping("/me")
-    public ResponseEntity<User> getMe() {
-        String email = (String) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
-        return ResponseEntity.ok(service.getMe(email));
+    public ResponseEntity<UserResponse> getMe() {
+        return ResponseEntity.ok(service.getMe());
     }
 
-    // POST
-    @PostMapping
-    public ResponseEntity<User> createUser(@Valid @RequestBody UserRequest user) {
-        User createdUser = service.createUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+    // ========== POST ==========
+
+    @PostMapping("/new")
+    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.createUser(request));
     }
 
-    // DELETE /users/{id}
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        service.deleteUser(id);
+    // ========== DELETE ==========
+
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> deleteUser() {
+        service.deleteUser();
         return ResponseEntity.noContent().build();
     }
 
-    // PUT /users/{id}
-    @PutMapping("/{id}")
-    public ResponseEntity<User> uptadeUser(@PathVariable Long id, @RequestBody User user) {
-        User usuarioAtualizado = service.uptadeUser(id, user);
-        return ResponseEntity.ok(usuarioAtualizado);
+    // ========== PUT ==========
+
+    @PutMapping("/me")
+    public ResponseEntity<UserResponse> uptadeUser(@Valid @RequestBody UpdateUserRequest request) {
+        return ResponseEntity.ok(service.updateUser(request));
     }
 }
