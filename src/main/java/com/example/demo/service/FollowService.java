@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.demo.dto.FollowingProfileResponse;
-import com.example.demo.dto.NotificationRealtimeResponse;
+import com.example.demo.notification.dto.NotificationRealtimeResponse;
 import com.example.demo.notification.entity.Notification;
 import com.example.demo.repository.NotificationRepository;
 import org.springframework.http.HttpStatus;

@@ -1,8 +1,10 @@
 package com.example.demo.notification.service;
 
 import com.example.demo.dto.NotificationGetResponse;
-import com.example.demo.dto.NotificationRealtimeResponse;
+import com.example.demo.notification.dto.NotificationRealtimeResponse;
 import com.example.demo.notification.entity.Notification;
+import com.example.demo.notification.entity.NotificationType;
+import com.example.demo.notification.mapper.NotificationMapper;
 import com.example.demo.post.entity.Post;
 import com.example.demo.user.entity.User;
 import com.example.demo.exeptions.user.UserNotFoundException;
@@ -20,6 +22,7 @@ import java.util.List;
 public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+    private final NotificationMapper notificationMapper;
 
 
     public List<NotificationGetResponse> getMyNotifications() {
@@ -27,7 +30,6 @@ public class NotificationService {
                 .getAuthentication().getPrincipal();
         User user = userRepository.findByEmail(email)
                 .orElseThrow(UserNotFoundException::new);
-
 
 
         List<Notification> notifications =
@@ -76,37 +78,30 @@ public class NotificationService {
     }
 
 
-    public NotificationRealtimeResponse createNotification(User loggedUser, Post post){
-        // só notifica se não for o próprio post
-        if (!post.getUser().getId().equals(loggedUser.getId())) {
+    public NotificationRealtimeResponse createNotification(
+            User loggedUser, User receiver, Post post, NotificationType type, String content) {
 
-            // salva a notificação no banco
+        // só notifica se não for o próprio post
+        if (post.getUser().getId().equals(loggedUser.getId())) {
+            return null;
+        }
+
+            // cria a notificação
             Notification notification = new Notification();
-            notification.setType("COMMENT");
-            notification.setContent(loggedUser.getName() + " comentou: " + comment.getContent());
+            notification.setType(type);
+            notification.setContent(content);
             notification.setCreatedAt(LocalDateTime.now());
             notification.setIsRead(false);
             notification.setSender(loggedUser);
-            notification.setReceiver(post.getUser());
+            notification.setReceiver(receiver);
             notification.setPost(post);
 
             notificationRepository.save(notification);
 
-            // cria a notificação para enviar via webSocket
-            NotificationRealtimeResponse dto =
-                    new NotificationRealtimeResponse(
-                            "COMMENT",
-                            user.getId(),
-                            user.getNome(),
-                            user.getUserName(),
-                            user.getProfile() != null
-                                    ? user.getProfile().getImageUrlProfile()
-                                    : null,
-                            postId,
-                            null,
-                            null,
-                            notification.getContent(),
-                            LocalDateTime.now()
-                    );
+            // cria dto de notificação para enviar via webSocket
+            return notificationMapper.toNotificationRealtimeResponse(notification);
+
+
     }
+
 }

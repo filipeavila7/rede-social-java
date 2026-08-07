@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 import com.example.demo.dto.ConversationUpdateResponse;
 import com.example.demo.dto.MessageResponse;
-import com.example.demo.dto.NotificationRealtimeResponse;
+import com.example.demo.notification.dto.NotificationRealtimeResponse;
 import com.example.demo.dto.UnreadCountResponse;
 import com.example.demo.entity.Conversation;
 import com.example.demo.entity.Message;

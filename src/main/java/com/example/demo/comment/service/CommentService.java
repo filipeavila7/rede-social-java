@@ -6,7 +6,7 @@ import java.util.List;
 import com.example.demo.comment.dto.CommentRequest;
 import com.example.demo.comment.mapper.CommentMapper;
 import com.example.demo.dto.CommentResponse;
-import com.example.demo.dto.NotificationRealtimeResponse;
+import com.example.demo.notification.dto.NotificationRealtimeResponse;
 import com.example.demo.post.dto.PostSummaryResponse;
 import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.service.WebSocketService;

@@ -1,7 +1,8 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.ConversationUpdateResponse;
-import com.example.demo.dto.NotificationRealtimeResponse;
+import com.example.demo.notification.dto.NotificationChatRealtimeResponse;
+import com.example.demo.notification.dto.NotificationRealtimeResponse;
 import com.example.demo.dto.MessageResponse;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -23,8 +24,15 @@ public class WebSocketService {
         );
     }
 
-    // TUDO QUE NÃO É CHAT (LIKE, MESSAGE, READ, FOLLOW, ETC)
+    // notificações do tipo (LIKE, FOLLOW, COMMENT)
     public void sendNotificationToUser(Long userId, NotificationRealtimeResponse notification) {
+        messagingTemplate.convertAndSend(
+                "/topic/notifications/" + userId,
+                notification
+        );
+    }
+
+    public void sendChatNotificationToUser(Long userId, NotificationChatRealtimeResponse notification){
         messagingTemplate.convertAndSend(
                 "/topic/notifications/" + userId,
                 notification
