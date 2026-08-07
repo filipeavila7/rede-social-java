@@ -1,7 +1,7 @@
-package com.example.demo.service;
+package com.example.demo.notification.service;
 
 import com.example.demo.dto.NotificationGetResponse;
-import com.example.demo.entity.Notification;
+import com.example.demo.notification.entity.Notification;
 import com.example.demo.user.entity.User;
 import com.example.demo.exeptions.user.UserNotFoundException;
 import com.example.demo.repository.NotificationRepository;

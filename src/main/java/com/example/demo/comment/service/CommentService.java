@@ -11,7 +11,7 @@ import com.example.demo.post.dto.PostSummaryResponse;
 import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.service.WebSocketService;
 import com.example.demo.user.dto.UserResponse;
-import com.example.demo.entity.Notification;
+import com.example.demo.notification.entity.Notification;
 import com.example.demo.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,7 +23,6 @@ import com.example.demo.comment.entity.Comment;
 import com.example.demo.post.entity.Post;
 import com.example.demo.user.entity.User;
 import com.example.demo.comment.repository.CommentRepository;
-import com.example.demo.post.repository.PostRepository;
 import com.example.demo.user.repository.UserRepository;
 
 @RequiredArgsConstructor
