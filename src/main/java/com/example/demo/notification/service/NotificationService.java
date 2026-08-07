@@ -79,6 +79,8 @@ public class NotificationService {
         notificationRepository.deleteAll(toDelete);
     }
 
+    // TODO criar metodos para notificações de mensagens no chat e de novos seguidores e arrumar essa service bizarra
+
     // criar notificações que tem post (COMMENT E LIKE)
     public NotificationRealtimeResponse createPostNotification(
             User loggedUser, User receiver, Post post, NotificationType type, String content) {
