@@ -23,7 +23,8 @@ public class Notification {
     private Long id;
 
     @Column(nullable = false)
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private NotificationType type;
 
     @Column(nullable = false)
     private String content;
