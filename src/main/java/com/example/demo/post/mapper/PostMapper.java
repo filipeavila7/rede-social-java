@@ -1,5 +1,6 @@
 package com.example.demo.post.mapper;
 
+import com.example.demo.post.dto.PostSummaryResponse;
 import com.example.demo.user.dto.UserResponse;
 import com.example.demo.post.dto.PostDetaisResponse;
 import com.example.demo.post.dto.PostResponse;
@@ -24,11 +25,11 @@ public class PostMapper {
 
         return new PostDetaisResponse(
                 post.getId(),
-                post.getContent(),
+                post.getTitle(),
                 post.getImageUrl(),
                 new UserResponse(
                         post.getUser().getId(),
-                        post.getUser().getNome(),
+                        post.getUser().getName(),
                         post.getUser().getProfile().getImageUrlProfile(),
                         post.getUser().getUserName()
                 ),
@@ -44,17 +45,26 @@ public class PostMapper {
     public PostResponse toPostResponse(Post post){
         return new PostResponse(
                 post.getId(),
-                post.getContent(),
+                post.getTitle(),
                 post.getImageUrl(),
                 new UserResponse(
                         post.getUser().getId(),
-                        post.getUser().getNome(),
+                        post.getUser().getName(),
                         post.getUser().getProfile().getImageUrlProfile(),
                         post.getUser().getUserName()
                 ),
                 post.getCreatedAt(),
                 post.getDescription(),
                 post.getTags()
+        );
+
+
+    }
+
+    public PostSummaryResponse toPostSumaryResponse(Post p){
+        return new PostSummaryResponse(
+                p.getId(),
+                p.getTitle()
         );
     }
 

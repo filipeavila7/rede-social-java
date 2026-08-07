@@ -3,9 +3,11 @@ package com.example.demo.comment.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.example.demo.comment.dto.CommentRequest;
+import com.example.demo.comment.mapper.CommentMapper;
 import com.example.demo.dto.CommentResponse;
 import com.example.demo.dto.NotificationRealtimeResponse;
-import com.example.demo.dto.PostSummaryResponse;
+import com.example.demo.post.dto.PostSummaryResponse;
 import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.service.WebSocketService;
 import com.example.demo.user.dto.UserResponse;
@@ -29,43 +31,43 @@ import com.example.demo.user.repository.UserRepository;
 public class CommentService {
     public final CommentRepository commentRepository;
     public final UserRepository userRepository;
-    public final PostRepository postRepository;
     public final WebSocketService webSocketService;
     public final NotificationRepository notificationRepository;
     public final GlobalHelperService  globalHelperService;
+    private final CommentMapper commentMapper;
+
 
 
     // criar comentario em um post
-    public Comment createCommente(Long postId, Comment novoComentario) {
-        // pegar email do user logado
-        String email = (String) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
+    public CommentResponse createCommente(Long postId, CommentRequest request) {
+        // pegar user logado
+        User loggedUser = globalHelperService.getLoggedUser();
 
-        User user = userRepository.findByEmail(email);
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não encontrado");
-        }
+        // encontrar o post
+        Post post = globalHelperService.findPostById(postId);
 
-        // encontrar o post pelo id passado
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post não encontrado"));
+        // cria o objeto de comentário
+        Comment comment = new Comment();
 
-        // fk key de user e post
-        novoComentario.setPost(post);
-        novoComentario.setUser(user);
+        // cria o relacionamento
+        comment.setPost(post);
+        comment.setUser(loggedUser);
 
-        Comment saveComment = commentRepository.save(novoComentario);
+        comment.setContent(request.content());
+
+        // salva no banco
+        Comment saveComment = commentRepository.save(comment);
 
         // só notifica se não for o próprio post
-        if (!post.getUser().getId().equals(user.getId())) {
+        if (!post.getUser().getId().equals(loggedUser.getId())) {
 
             // salva a notificação no banco
             Notification notification = new Notification();
             notification.setType("COMMENT");
-            notification.setContent(user.getNome() + " comentou: " + novoComentario.getContent());
+            notification.setContent(loggedUser.getName() + " comentou: " + comment.getContent());
             notification.setCreatedAt(LocalDateTime.now());
             notification.setIsRead(false);
-            notification.setSender(user);
+            notification.setSender(loggedUser);
             notification.setReceiver(post.getUser());
             notification.setPost(post);
 
