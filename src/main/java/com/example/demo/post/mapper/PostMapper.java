@@ -4,7 +4,7 @@ import com.example.demo.user.dto.UserResponse;
 import com.example.demo.post.dto.PostDetaisResponse;
 import com.example.demo.post.dto.PostResponse;
 import com.example.demo.post.entity.Post;
-import com.example.demo.repository.CommentRepository;
+import com.example.demo.comment.repository.CommentRepository;
 import com.example.demo.repository.LikeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

@@ -1,16 +1,20 @@
 package com.example.demo.post.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.NonNull;
 
 import java.util.List;
 
 public record PostRequest(
-        @NonNull
-        String content,
+        @NotBlank
+        @Size(max = 40)
+        String title,
 
+        // opcional
         String description,
 
-        @NonNull
+        @NotBlank
         String imageUrl,
 
         List<Long> tagIds

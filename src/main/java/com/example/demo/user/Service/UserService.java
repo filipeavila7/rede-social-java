@@ -84,6 +84,10 @@ public class UserService {
 
     }
 
+
+    // metodo para tornar o usuário um artista
+
+
     // ========== DELETE ==========
 
     // próprio usuario se deletar

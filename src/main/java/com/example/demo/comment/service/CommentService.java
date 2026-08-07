@@ -1,4 +1,4 @@
-package com.example.demo.service;
+package com.example.demo.comment.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -6,21 +6,25 @@ import java.util.List;
 import com.example.demo.dto.CommentResponse;
 import com.example.demo.dto.NotificationRealtimeResponse;
 import com.example.demo.dto.PostSummaryResponse;
+import com.example.demo.helpers.GlobalHelperService;
+import com.example.demo.service.WebSocketService;
 import com.example.demo.user.dto.UserResponse;
 import com.example.demo.entity.Notification;
 import com.example.demo.repository.NotificationRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.example.demo.entity.Commente;
+import com.example.demo.comment.entity.Comment;
 import com.example.demo.post.entity.Post;
 import com.example.demo.user.entity.User;
-import com.example.demo.repository.CommentRepository;
+import com.example.demo.comment.repository.CommentRepository;
 import com.example.demo.post.repository.PostRepository;
 import com.example.demo.user.repository.UserRepository;
 
+@RequiredArgsConstructor
 @Service
 public class CommentService {
     public final CommentRepository commentRepository;
@@ -28,18 +32,11 @@ public class CommentService {
     public final PostRepository postRepository;
     public final WebSocketService webSocketService;
     public final NotificationRepository notificationRepository;
+    public final GlobalHelperService  globalHelperService;
 
 
-    public CommentService(CommentRepository commentRepository, UserRepository userRepository, PostRepository postRepository, WebSocketService webSocketService, NotificationRepository notificationRepository) {
-        this.commentRepository = commentRepository;
-        this.userRepository = userRepository;
-        this.postRepository = postRepository;
-        this.webSocketService = webSocketService;
-        this.notificationRepository = notificationRepository;
-    }
-
-    // criar comentario em um post a partir do postId com user loogaado
-    public Commente createCommente(Long postId, Commente novoComentario) {
+    // criar comentario em um post
+    public Comment createCommente(Long postId, Comment novoComentario) {
         // pegar email do user logado
         String email = (String) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
@@ -57,7 +54,7 @@ public class CommentService {
         novoComentario.setPost(post);
         novoComentario.setUser(user);
 
-        Commente saveComment = commentRepository.save(novoComentario);
+        Comment saveComment = commentRepository.save(novoComentario);
 
         // só notifica se não for o próprio post
         if (!post.getUser().getId().equals(user.getId())) {
@@ -114,7 +111,7 @@ public class CommentService {
 
     // deletar um comentario do user logado passando o id do comentario
     public void deleteCommente(Long commentId) {
-        Commente comment = commentRepository.findById(commentId)
+        Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Comentário não encontrado"));
 
         // pegar email do user logado
@@ -133,7 +130,7 @@ public class CommentService {
 
     }
 
-    public CommentResponse toCommentResponse(Commente comment) {
+    public CommentResponse toCommentResponse(Comment comment) {
         return new CommentResponse(
                 comment.getId(),
                 comment.getContent(),

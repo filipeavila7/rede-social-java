@@ -3,6 +3,7 @@ package com.example.demo.post.service;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import com.example.demo.comment.repository.CommentRepository;
 import com.example.demo.exeptions.tag.TagConflictException;
 import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.post.dto.PostRequest;
@@ -150,8 +151,8 @@ public class PostService {
                 .flatMap(post -> {
                     List<String> resultados = new ArrayList<>();
 
-                    if (post.getContent() != null) {
-                        resultados.add(post.getContent());
+                    if (post.getTitle() != null) {
+                        resultados.add(post.getTitle());
                     }
 
                     post.getTags().forEach(tag -> resultados.add(tag.getName()));
@@ -196,7 +197,7 @@ public class PostService {
 
         // cria o post
         Post post = new Post();
-        post.setContent(request.content());
+        post.setTitle(request.title());
         post.setDescription(request.description());
         post.setImageUrl(request.imageUrl());
         post.setCreatedAt(LocalDateTime.now());
@@ -209,7 +210,7 @@ public class PostService {
     // ========== PUT ==========
 
     // editar post
-    // WARNING - esse metodo possivelmente sera removido
+    // TODO - esse metodo possivelmente sera removido
     public Post updatePost(Long postId, Post postAtualizado) {
         // busca o post
         Post post = globalHelperService.findPostById(postId);
@@ -220,7 +221,7 @@ public class PostService {
         // verifica se o user logado é o dono do post
         globalHelperService.validatePostOwnership(post, loggedUser);
 
-        post.setContent(postAtualizado.getContent());
+        post.setTitle(postAtualizado.getTitle());
         post.setImageUrl(postAtualizado.getImageUrl());
         post.setDescription(postAtualizado.getDescription());
 

@@ -3,17 +3,13 @@ package com.example.demo.post.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.example.demo.entity.Commente;
+import com.example.demo.comment.entity.Comment;
 import com.example.demo.entity.Like;
 import com.example.demo.entity.Tag;
 import com.example.demo.user.entity.User;
-import com.example.demo.util.FileUrlUtils;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,7 +27,7 @@ public class Post {
     private Long id;
 
     @Column(nullable = false)
-    private String content;
+    private String title;
 
     @Column(nullable = false)
     private String imageUrl;
@@ -58,7 +54,7 @@ public class Post {
 
     // um post tem varios comentarios
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    private List<Commente> comments;
+    private List<Comment> comments;
 
 
     // tabela intermediária que relaciona post com tag (post_tags) -> post_id | tag_id

@@ -5,8 +5,8 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.entity.Commente;
-import com.example.demo.service.CommentService;
+import com.example.demo.comment.entity.Comment;
+import com.example.demo.comment.service.CommentService;
 
 import java.util.List;
 
@@ -17,8 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
 
 
 @RestController
@@ -36,8 +34,8 @@ public class CommenteController {
     // /{postId}/comments
     // recebe o objeto do comentario e o id do post para comentar
     @PostMapping("/{postId}/comments")
-    public ResponseEntity<Commente> createCommente(@PathVariable Long postId, @Valid @RequestBody Commente commente) {
-        Commente created = service.createCommente(postId, commente);
+    public ResponseEntity<Comment> createCommente(@PathVariable Long postId, @Valid @RequestBody Comment commente) {
+        Comment created = service.createCommente(postId, commente);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 

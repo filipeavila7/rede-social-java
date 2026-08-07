@@ -2,18 +2,13 @@ package com.example.demo.user.entity;
 
 import java.util.List;
 
-import com.example.demo.entity.Commente;
+import com.example.demo.comment.entity.Comment;
 import com.example.demo.entity.Follow;
 import com.example.demo.entity.Like;
 import com.example.demo.entity.Profile;
 import com.example.demo.post.entity.Post;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -77,7 +72,7 @@ public class User {
 
     // um usuario tem varios comentarios
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Commente> comments;
+    private List<Comment> comments;
 
 
     // um usuario so pode ter um perfil
