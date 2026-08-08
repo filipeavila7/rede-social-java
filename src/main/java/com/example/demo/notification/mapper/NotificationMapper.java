@@ -1,5 +1,6 @@
 package com.example.demo.notification.mapper;
 
+import com.example.demo.dto.NotificationGetResponse;
 import com.example.demo.notification.dto.NotificationChatResponse;
 import com.example.demo.notification.dto.NotificationFollowResponse;
 import com.example.demo.notification.dto.NotificationPostResponse;
@@ -48,6 +49,23 @@ public class NotificationMapper {
                         n.getSender().getProfile().getImageUrlProfile() : null,
                 n.getContent(),
                 n.getCreatedAt()
+        );
+    }
+
+    public NotificationGetResponse toNotificationGetResponse(Notification n){
+        return new NotificationGetResponse(
+                n.getId(),
+                n.getType(),
+                n.getContent(),
+                n.getIsRead(),
+                n.getCreatedAt(),
+                n.getSender().getId(),
+                n.getSender().getName(),
+                n.getSender().getUserName(),
+                n.getSender().getProfile().getImageUrlProfile() != null ?
+                        n.getSender().getProfile().getImageUrlProfile() : null,
+                n.getPost() != null ? n.getPost().getId() : null
+
         );
     }
 }

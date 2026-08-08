@@ -1,10 +1,12 @@
 package com.example.demo.dto;
 
+import com.example.demo.notification.entity.NotificationType;
+
 import java.time.LocalDateTime;
 
 public record NotificationGetResponse(
         Long id,
-        String type,
+        NotificationType type,
         String content,
         Boolean isRead,
         LocalDateTime createdAt,

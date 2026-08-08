@@ -14,6 +14,8 @@ import com.example.demo.exeptions.user.UserNotFoundException;
 import com.example.demo.repository.NotificationRepository;
 import com.example.demo.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -28,40 +30,11 @@ public class NotificationService {
     private final GlobalHelperService globalHelperService;
     private final WebSocketService webSocketService;
 
-
-    public List<NotificationGetResponse> getMyNotifications() {
-        String email = (String) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(UserNotFoundException::new);
-
-
-        List<Notification> notifications =
-                notificationRepository
-                        .findByReceiverIdOrderByCreatedAtDesc(user.getId());
-
-        return notifications.stream().map(notification -> {
-
-            NotificationGetResponse dto = new NotificationGetResponse(
-                    notification.getId(),
-                    notification.getType(),
-                    notification.getContent(),
-                    notification.getIsRead(),
-                    notification.getCreatedAt(),
-                    notification.getSender().getId(),
-                    notification.getSender().getNome(),
-                    notification.getSender().getUserName(),
-                    notification.getSender().getProfile() != null
-                            ? notification.getSender().getProfile().getImageUrlProfile()
-                            : null,
-                    notification.getPost() != null
-                            ? notification.getPost().getId()
-                            : null
-            );
-
-            return dto;
-
-        }).toList();
+    // buscar as notificações do usuario logado
+    public Page<NotificationGetResponse> getMyNotifications(Pageable pageable) {
+        return notificationRepository.
+                findByReceiverIdOrderByCreatedAtDesc(globalHelperService.getLoggedUser().getId(), pageable)
+                .map(notificationMapper::toNotificationGetResponse);
     }
 
 

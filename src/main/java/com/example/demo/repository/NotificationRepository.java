@@ -1,6 +1,8 @@
 package com.example.demo.repository;
 
 import com.example.demo.notification.entity.Notification;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -14,7 +16,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
             String type
     );
     List<Notification> findByIdInAndReceiverId(List<Long> ids, Long receiverId);
-    List<Notification> findByReceiverIdOrderByCreatedAtDesc(Long receiverId);
+    Page<Notification> findByReceiverIdOrderByCreatedAtDesc(Long receiverId, Pageable pageable);
     List<Notification> findByReceiverIdAndIsReadFalse(Long receiverId);
 
 }
