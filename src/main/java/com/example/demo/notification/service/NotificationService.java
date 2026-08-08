@@ -19,13 +19,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
     private final NotificationRepository notificationRepository;
-    private final UserRepository userRepository;
     private final NotificationMapper notificationMapper;
     private final GlobalHelperService globalHelperService;
     private final WebSocketService webSocketService;
@@ -39,22 +40,20 @@ public class NotificationService {
 
 
     public void deleteNotifications(List<Long> ids) {
+        Set<Long> uniqueIds = new HashSet<>(ids);
 
-        String email = (String) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
-
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(UserNotFoundException::new);
+        if (uniqueIds.size() != ids.size()) {
+            throw new IllegalArgumentException("IDs duplicados");
+        }
 
         List<Notification> toDelete =
-                notificationRepository.findByIdInAndReceiverId(ids, user.getId());
+                notificationRepository.findByIdInAndReceiverId(ids,
+                        globalHelperService.getLoggedUser().getId());
+
 
         notificationRepository.deleteAll(toDelete);
     }
 
-    // TODO criar metodos para notificações de mensagens no chat e de novos seguidores e arrumar essa service bizarra
 
     // criar notificações que tem post (COMMENT E LIKE) e ja envia via webSocket
     public void createPostNotification(
