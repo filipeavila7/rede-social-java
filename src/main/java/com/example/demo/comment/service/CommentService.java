@@ -11,6 +11,8 @@ import com.example.demo.post.dto.PostSummaryResponse;
 import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.user.dto.UserResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,7 @@ public class CommentService {
     private final CommentMapper commentMapper;
     private final NotificationService notificationService;
 
+    // TODO pro futuro, criar funcionalidae de responder comentarios em um post e curtir comentarios
 
     // criar comentario em um post
     public CommentResponse createCommente(Long postId, CommentRequest request) {
@@ -64,11 +67,9 @@ public class CommentService {
     }
 
     // listar todos os comentarios de um post passando o id dele
-    public List<CommentResponse> getAllPostCommentes(Long postId) {
-        return commentRepository.findByPostIdOrderByCreatedAtDesc(postId)
-                .stream()
-                .map(this::toCommentResponse)
-                .toList();
+    public Page<CommentResponse> getAllPostCommentes(Long postId, Pageable pageable) {
+        return commentRepository.findByPostIdOrderByCreatedAtDesc(postId, pageable)
+                .map(commentMapper::toCommentResponse);
 
     }
 
