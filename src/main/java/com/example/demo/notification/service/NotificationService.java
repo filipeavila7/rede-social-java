@@ -2,11 +2,13 @@ package com.example.demo.notification.service;
 
 import com.example.demo.dto.NotificationGetResponse;
 import com.example.demo.helpers.GlobalHelperService;
-import com.example.demo.notification.dto.NotificationRealtimeResponse;
+import com.example.demo.notification.dto.NotificationChatResponse;
+import com.example.demo.notification.dto.NotificationPostResponse;
 import com.example.demo.notification.entity.Notification;
 import com.example.demo.notification.entity.NotificationType;
 import com.example.demo.notification.mapper.NotificationMapper;
 import com.example.demo.post.entity.Post;
+import com.example.demo.service.WebSocketService;
 import com.example.demo.user.entity.User;
 import com.example.demo.exeptions.user.UserNotFoundException;
 import com.example.demo.repository.NotificationRepository;
@@ -15,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -25,6 +26,7 @@ public class NotificationService {
     private final UserRepository userRepository;
     private final NotificationMapper notificationMapper;
     private final GlobalHelperService globalHelperService;
+    private final WebSocketService webSocketService;
 
 
     public List<NotificationGetResponse> getMyNotifications() {
@@ -81,13 +83,13 @@ public class NotificationService {
 
     // TODO criar metodos para notificações de mensagens no chat e de novos seguidores e arrumar essa service bizarra
 
-    // criar notificações que tem post (COMMENT E LIKE)
-    public NotificationRealtimeResponse createPostNotification(
+    // criar notificações que tem post (COMMENT E LIKE) e ja envia via webSocket
+    public void createPostNotification(
             User loggedUser, User receiver, Post post, NotificationType type, String content) {
 
         // só notifica se não for o próprio post
         if (post.getUser().getId().equals(loggedUser.getId())) {
-            return null;
+            return;
         }
 
         // cria a notificação
@@ -101,10 +103,27 @@ public class NotificationService {
         // salva
         notificationRepository.save(notification);
 
-        // cria dto de notificação para enviar via webSocket
-        return notificationMapper.toNotificationRealtimeResponse(notification);
-
-
+        // enviar notificação via webSocket
+        webSocketService.sendPostNotificationToUser(receiver.getId(),
+                notificationMapper.toNotificationPostResponse(notification));
     }
+
+    // notificações de mensagens do chat, não salva no banco
+    public NotificationChatResponse createChatNotification(
+            User loggedUser, User receiver, NotificationType type, String content,
+            Long conversationId, Long messageId
+    ){
+        // cria a notificação
+        Notification notification = globalHelperService.buildNotification(
+                loggedUser, receiver, type, content
+        );
+
+        // envia a notificação via webSocket
+        webSocketService.sendChatNotificationToUser(receiver.getId(),
+                notificationMapper.toNotificationChatResponse(notification, conversationId, messageId));
+    }
+
+
+
 
 }

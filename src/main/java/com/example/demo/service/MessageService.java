@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 import com.example.demo.dto.ConversationUpdateResponse;
 import com.example.demo.dto.MessageResponse;
-import com.example.demo.notification.dto.NotificationRealtimeResponse;
+import com.example.demo.notification.dto.NotificationPostResponse;
 import com.example.demo.dto.UnreadCountResponse;
 import com.example.demo.entity.Conversation;
 import com.example.demo.entity.Message;
@@ -126,8 +126,8 @@ public class MessageService {
         // =========================
         // NOTIFICAÇÃO GLOBAL
         // =========================
-        NotificationRealtimeResponse notification =
-                new NotificationRealtimeResponse(
+        NotificationPostResponse notification =
+                new NotificationPostResponse(
                         "MESSAGE",
                         sender.getId(),
                         sender.getNome(),
@@ -205,8 +205,8 @@ public class MessageService {
 
             Long senderId = updated.get(0).getSender().getId();
 
-            NotificationRealtimeResponse readNotification =
-                    new NotificationRealtimeResponse(
+            NotificationPostResponse readNotification =
+                    new NotificationPostResponse(
                             "READ",
                             me.getId(),
                             me.getNome(),

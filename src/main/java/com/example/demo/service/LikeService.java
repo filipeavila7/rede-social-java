@@ -1,6 +1,6 @@
 package com.example.demo.service;
 
-import com.example.demo.notification.dto.NotificationRealtimeResponse;
+import com.example.demo.notification.dto.NotificationPostResponse;
 import com.example.demo.notification.entity.Notification;
 import com.example.demo.repository.NotificationRepository;
 import org.springframework.http.HttpStatus;
@@ -87,8 +87,8 @@ public class LikeService {
                 notificationRepository.save(notification);
 
                 // cria a notificação para enviar via webSocket
-                NotificationRealtimeResponse dto =
-                        new NotificationRealtimeResponse(
+                NotificationPostResponse dto =
+                        new NotificationPostResponse(
                                 "LIKE",
                                 user.getId(),
                                 user.getNome(),

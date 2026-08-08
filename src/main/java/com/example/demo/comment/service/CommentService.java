@@ -5,7 +5,7 @@ import java.util.List;
 import com.example.demo.comment.dto.CommentRequest;
 import com.example.demo.comment.mapper.CommentMapper;
 import com.example.demo.dto.CommentResponse;
-import com.example.demo.notification.dto.NotificationRealtimeResponse;
+import com.example.demo.notification.dto.NotificationPostResponse;
 import com.example.demo.notification.entity.NotificationType;
 import com.example.demo.notification.service.NotificationService;
 import com.example.demo.post.dto.PostSummaryResponse;
@@ -57,15 +57,12 @@ public class CommentService {
         // conteudo da notificação
         String content = loggedUser.getName() + " comentou no seu post: " + comment.getContent();
 
-        NotificationRealtimeResponse notification = notificationService.createPostNotification(
+        // cria a notificação e ja envia via webSocket
+        notificationService.createPostNotification(
                 loggedUser, post.getUser(), post, NotificationType.COMMENT,
                 content
         );
 
-        // enviar notificação via webSocket
-        if (notification != null){
-            webSocketService.sendNotificationToUser(post.getUser().getId(), notification);
-        }
 
         return commentMapper.toCommentResponse(saveComment);
 

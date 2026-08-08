@@ -4,8 +4,7 @@ import com.example.demo.notification.entity.NotificationType;
 
 import java.time.LocalDateTime;
 
-public record NotificationRealtimeResponse(
-
+public record NotificationChatResponse(
         NotificationType type,
 
         Long senderId,
@@ -16,11 +15,12 @@ public record NotificationRealtimeResponse(
 
         String senderPhoto,
 
-        Long postId,
+        Long conversationId,
+
+        Long messageId,
 
         String content,
 
         LocalDateTime createdAt
-
 ) {
 }

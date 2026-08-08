@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.demo.dto.FollowingProfileResponse;
-import com.example.demo.notification.dto.NotificationRealtimeResponse;
+import com.example.demo.notification.dto.NotificationPostResponse;
 import com.example.demo.notification.entity.Notification;
 import com.example.demo.repository.NotificationRepository;
 import org.springframework.http.HttpStatus;
@@ -80,8 +80,8 @@ public class FollowService {
         notificationRepository.save(notification);
 
         // cria a notificação para enviar via webSocket
-        NotificationRealtimeResponse dto =
-                new NotificationRealtimeResponse(
+        NotificationPostResponse dto =
+                new NotificationPostResponse(
                         "FOLLOW",
                         follower.getId(),
                         follower.getNome(),
