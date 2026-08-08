@@ -33,6 +33,17 @@ public class CommentService {
 
     // TODO pro futuro, criar funcionalidae de responder comentarios em um post e curtir comentarios
 
+    // ========== GET ==========
+
+    // listar todos os comentarios de um post passando o id dele
+    public Page<CommentResponse> getAllPostCommentes(Long postId, Pageable pageable) {
+        return commentRepository.findByPostIdOrderByCreatedAtDesc(postId, pageable)
+                .map(commentMapper::toCommentResponse);
+
+    }
+
+    // ========== POST ==========
+
     // criar comentario em um post
     public CommentResponse createCommente(Long postId, CommentRequest request) {
         // pegar user logado
@@ -66,12 +77,7 @@ public class CommentService {
 
     }
 
-    // listar todos os comentarios de um post passando o id dele
-    public Page<CommentResponse> getAllPostCommentes(Long postId, Pageable pageable) {
-        return commentRepository.findByPostIdOrderByCreatedAtDesc(postId, pageable)
-                .map(commentMapper::toCommentResponse);
-
-    }
+    // ========== DELETE ==========
 
     // deletar um comentario do user logado passando o id do comentario
     public void deleteCommente(Long commentId) {
