@@ -2,19 +2,20 @@ package com.example.demo.service;
 
 import com.example.demo.dto.ConversationUpdateResponse;
 import com.example.demo.notification.dto.NotificationChatResponse;
+import com.example.demo.notification.dto.NotificationFollowResponse;
 import com.example.demo.notification.dto.NotificationPostResponse;
 import com.example.demo.dto.MessageResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class WebSocketService {
 
     private final SimpMessagingTemplate messagingTemplate;
 
-    public WebSocketService(SimpMessagingTemplate messagingTemplate) {
-        this.messagingTemplate = messagingTemplate;
-    }
+
 
     // CHAT (conversa)
     public void sendMessageToConversation(Long conversationId, MessageResponse response) {
@@ -33,6 +34,13 @@ public class WebSocketService {
     }
 
     public void sendChatNotificationToUser(Long userId, NotificationChatResponse notification){
+        messagingTemplate.convertAndSend(
+                "/topic/notifications/" + userId,
+                notification
+        );
+    }
+
+    public void sendFollowNotificationToUser(Long userId, NotificationFollowResponse notification){
         messagingTemplate.convertAndSend(
                 "/topic/notifications/" + userId,
                 notification

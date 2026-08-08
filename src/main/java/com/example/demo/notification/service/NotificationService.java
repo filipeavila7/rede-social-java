@@ -108,8 +108,9 @@ public class NotificationService {
                 notificationMapper.toNotificationPostResponse(notification));
     }
 
+
     // notificações de mensagens do chat, não salva no banco
-    public NotificationChatResponse createChatNotification(
+    public void createChatNotification(
             User loggedUser, User receiver, NotificationType type, String content,
             Long conversationId, Long messageId
     ){
@@ -124,6 +125,23 @@ public class NotificationService {
     }
 
 
+    // criar notificação de novo seguidor
+    public void createFollowNotification(
+            User loggedUser, User receiver, NotificationType type, String content
+    ){
+        // cria a notificação
+        Notification notification = globalHelperService.buildNotification(
+                loggedUser, receiver, type, content
+        );
 
+        // salva
+        notificationRepository.save(notification);
+
+
+        // envia a notificação via webSocket
+        webSocketService.sendFollowNotificationToUser(receiver.getId(),
+                notificationMapper.toNotificationFollowResponse(notification));
+
+    }
 
 }

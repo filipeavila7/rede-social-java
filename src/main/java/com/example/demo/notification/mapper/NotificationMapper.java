@@ -1,6 +1,7 @@
 package com.example.demo.notification.mapper;
 
 import com.example.demo.notification.dto.NotificationChatResponse;
+import com.example.demo.notification.dto.NotificationFollowResponse;
 import com.example.demo.notification.dto.NotificationPostResponse;
 import com.example.demo.notification.entity.Notification;
 import org.springframework.stereotype.Component;
@@ -32,6 +33,19 @@ public class NotificationMapper {
                         n.getSender().getProfile().getImageUrlProfile() : null,
                 conversationId,
                 messageId,
+                n.getContent(),
+                n.getCreatedAt()
+        );
+    }
+
+    public NotificationFollowResponse toNotificationFollowResponse(Notification n){
+        return new NotificationFollowResponse(
+                n.getType(),
+                n.getSender().getId(),
+                n.getSender().getName(),
+                n.getSender().getUserName(),
+                n.getSender().getProfile().getImageUrlProfile() != null ?
+                        n.getSender().getProfile().getImageUrlProfile() : null,
                 n.getContent(),
                 n.getCreatedAt()
         );
