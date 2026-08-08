@@ -5,12 +5,10 @@ import java.util.List;
 import com.example.demo.comment.dto.CommentRequest;
 import com.example.demo.comment.mapper.CommentMapper;
 import com.example.demo.dto.CommentResponse;
-import com.example.demo.notification.dto.NotificationPostResponse;
 import com.example.demo.notification.entity.NotificationType;
 import com.example.demo.notification.service.NotificationService;
 import com.example.demo.post.dto.PostSummaryResponse;
 import com.example.demo.helpers.GlobalHelperService;
-import com.example.demo.service.WebSocketService;
 import com.example.demo.user.dto.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,11 +25,9 @@ import com.example.demo.comment.repository.CommentRepository;
 @Service
 public class CommentService {
     public final CommentRepository commentRepository;
-    public final WebSocketService webSocketService;
     public final GlobalHelperService  globalHelperService;
     private final CommentMapper commentMapper;
     private final NotificationService notificationService;
-
 
 
     // criar comentario em um post
@@ -63,7 +59,6 @@ public class CommentService {
                 content
         );
 
-
         return commentMapper.toCommentResponse(saveComment);
 
     }
@@ -79,43 +74,13 @@ public class CommentService {
 
     // deletar um comentario do user logado passando o id do comentario
     public void deleteCommente(Long commentId) {
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Comentário não encontrado"));
 
-        // pegar email do user logado
-        String email = (String) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
-
-        // caso o email do usuario do comentario e o email do logado seja diferente,
-        // retorna erro
-        if (!comment.getUser().getEmail().equals(email)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não pode apagar este comentário");
-        }
-        
+        // verifica se o usuario é dono do comentario
+        Comment comment = globalHelperService.validateCommentOwnership(
+                commentId, globalHelperService.getLoggedUser());
 
         commentRepository.delete(comment);
 
-
     }
 
-    public CommentResponse toCommentResponse(Comment comment) {
-        return new CommentResponse(
-                comment.getId(),
-                comment.getContent(),
-                comment.getCreatedAt(),
-                new UserResponse(
-                        comment.getUser().getId(),
-                        comment.getUser().getNome(),
-                        comment.getUser().getProfile() != null
-                                ? comment.getUser().getProfile().getImageUrlProfile()
-                                : null,
-                        comment.getUser().getUserName()
-                ),
-                new PostSummaryResponse(
-                        comment.getPost().getId(),
-                        comment.getPost().getContent(),
-                        comment.getPost().getImageUrl()
-                )
-        );
-    }
 }

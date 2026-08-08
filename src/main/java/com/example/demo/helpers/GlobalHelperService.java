@@ -1,5 +1,8 @@
 package com.example.demo.helpers;
 
+import com.example.demo.comment.entity.Comment;
+import com.example.demo.comment.repository.CommentRepository;
+import com.example.demo.exeptions.comment.CommentConflict;
 import com.example.demo.notification.entity.Notification;
 import com.example.demo.notification.entity.NotificationType;
 import com.example.demo.user.entity.User;
@@ -21,6 +24,7 @@ import java.time.LocalDateTime;
 public class GlobalHelperService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
 
     // pegar usuario logado
     public User getLoggedUser() {
@@ -35,14 +39,18 @@ public class GlobalHelperService {
     // validar se o post pertence ao usario logado
     public Post validatePostOwnership(Post post, User user){
        return postRepository.findByUserAndId(user, post.getId())
-               .orElseThrow(()-> new PostConflictException("Esse post não pertence a voçê"));
+               .orElseThrow(()-> new PostConflictException("Esse post não pertence a você"));
     }
-
 
     // buscar post por id
     public Post findPostById(Long postId){
         return postRepository.findById(postId)
                 .orElseThrow(PostNotFoundException::new);
+    }
+
+    public Comment validateCommentOwnership(Long commentId, User user){
+        return commentRepository.findByIdAndUserId(commentId, user.getId())
+                .orElseThrow(()-> new CommentConflict("Esse comentário não pertence a você"));
     }
 
     // metodo para criar o objeto de notificações rapidamente
