@@ -1,9 +1,9 @@
-package com.example.demo.controller;
+package com.example.demo.like.controller;
 
 import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.like.entity.Like;
-import com.example.demo.service.LikeService;
+import com.example.demo.like.service.LikeService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

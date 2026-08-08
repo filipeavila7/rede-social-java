@@ -2,7 +2,9 @@ package com.example.demo.helpers;
 
 import com.example.demo.comment.entity.Comment;
 import com.example.demo.comment.repository.CommentRepository;
-import com.example.demo.exeptions.comment.CommentConflict;
+import com.example.demo.exeptions.comment.CommentConflictException;
+import com.example.demo.exeptions.like.LikeConflictException;
+import com.example.demo.like.repository.LikeRepository;
 import com.example.demo.notification.entity.Notification;
 import com.example.demo.notification.entity.NotificationType;
 import com.example.demo.user.entity.User;
@@ -25,6 +27,7 @@ public class GlobalHelperService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final LikeRepository likeRepository;
 
     // pegar usuario logado
     public User getLoggedUser() {
@@ -50,8 +53,16 @@ public class GlobalHelperService {
 
     public Comment validateCommentOwnership(Long commentId, User user){
         return commentRepository.findByIdAndUserId(commentId, user.getId())
-                .orElseThrow(()-> new CommentConflict("Esse comentário não pertence a você"));
+                .orElseThrow(()-> new CommentConflictException("Esse comentário não pertence a você"));
     }
+
+    public void existsLikeInPost(Long userId, Long postId){
+        if (likeRepository.existsByUserIdAndPostId(userId, postId)){
+            throw new LikeConflictException("Você ja curtiu esse post");
+        }
+    }
+
+
 
     // metodo para criar o objeto de notificações rapidamente
     public Notification buildNotification(

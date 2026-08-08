@@ -2,19 +2,14 @@ package com.example.demo.like.entity;
 
 import com.example.demo.post.entity.Post;
 import com.example.demo.user.entity.User;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.querydsl.QSort;
+
+import java.time.LocalDateTime;
 
 @Setter
 @Getter
@@ -31,6 +26,15 @@ public class Like {
     @GeneratedValue(strategy = GenerationType.IDENTITY) 
     private Long id;
 
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+
     // relacionamentos
 
     @ManyToOne
@@ -40,5 +44,7 @@ public class Like {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+
 
 }
