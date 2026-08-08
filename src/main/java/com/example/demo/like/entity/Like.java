@@ -1,4 +1,4 @@
-package com.example.demo.entity;
+package com.example.demo.like.entity;
 
 import com.example.demo.post.entity.Post;
 import com.example.demo.user.entity.User;
@@ -10,7 +10,16 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.data.querydsl.QSort;
 
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(
     name = "likes",
@@ -18,52 +27,18 @@ import jakarta.persistence.UniqueConstraint;
     uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "post_id"})
 )
 public class Like {
-    @Id // delcarar que sera um id no banco
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) 
     private Long id;
 
+    // relacionamentos
 
-    // fk de post, Muitos Likes podem se relacionar com um mesmo Post, mas cada Like pertence a exatamente um Post.
     @ManyToOne
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-    // fk de user, muitos likes pertecem a um user
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-    public Like() {
-    }
-
-    public Like(Post post, User user) {
-        this.post = post;
-        this.user = user;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-
-    public Post getPost() {
-        return post;
-    }
-
-    public void setPost(Post post) {
-        this.post = post;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    
-
-    
 
 }

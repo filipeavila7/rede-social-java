@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.example.demo.entity.Like;
+import com.example.demo.like.entity.Like;
 
 public interface LikeRepository extends JpaRepository<Like, Long> {
     boolean existsByUserIdAndPostId(Long userId, Long postId); // verifica se ja existe curtida do usuario naquele post, retorna um boleano

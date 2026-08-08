@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.demo.comment.entity.Comment;
-import com.example.demo.entity.Like;
+import com.example.demo.like.entity.Like;
 import com.example.demo.entity.Tag;
 import com.example.demo.user.entity.User;
 import com.fasterxml.jackson.annotation.JsonProperty;

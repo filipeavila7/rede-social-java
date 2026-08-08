@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.example.demo.comment.entity.Comment;
 import com.example.demo.entity.Follow;
-import com.example.demo.entity.Like;
+import com.example.demo.like.entity.Like;
 import com.example.demo.entity.Profile;
 import com.example.demo.post.entity.Post;
 

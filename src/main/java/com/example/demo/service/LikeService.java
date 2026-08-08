@@ -8,7 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.example.demo.entity.Like;
+import com.example.demo.like.entity.Like;
 import com.example.demo.post.entity.Post;
 import com.example.demo.user.entity.User;
 import com.example.demo.repository.LikeRepository;
