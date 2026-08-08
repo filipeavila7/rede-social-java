@@ -8,6 +8,7 @@ import com.example.demo.dto.CommentResponse;
 import com.example.demo.notification.entity.NotificationType;
 import com.example.demo.notification.service.NotificationService;
 import com.example.demo.helpers.GlobalHelperService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +41,7 @@ public class CommentService {
     // ========== POST ==========
 
     // criar comentario em um post
+    @Transactional
     public CommentResponse createCommente(Long postId, CommentRequest request) {
         // pegar user logado
         User loggedUser = globalHelperService.getLoggedUser();
@@ -56,9 +58,6 @@ public class CommentService {
 
         comment.setContent(request.content());
 
-        // salva no banco
-        Comment saveComment = commentRepository.save(comment);
-
         // conteudo da notificação
         String content = loggedUser.getName() + " comentou no seu post: " + comment.getContent();
 
@@ -68,7 +67,7 @@ public class CommentService {
                 content
         );
 
-        return commentMapper.toCommentResponse(saveComment);
+        return commentMapper.toCommentResponse(commentRepository.save(comment));
 
     }
 

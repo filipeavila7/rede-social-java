@@ -9,6 +9,7 @@ import com.example.demo.notification.entity.NotificationType;
 import com.example.demo.notification.service.NotificationService;
 import com.example.demo.repository.NotificationRepository;
 import com.example.demo.service.WebSocketService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,7 +36,8 @@ public class LikeService {
 
 
     // curtir post pelo id do post com o user logado
-    public LikeResponse likePost(Long postId) {
+    @Transactional
+    public LikeResponse createLike(Long postId) {
         // pega o user logado
         User loggedUser = globalHelperService.getLoggedUser();
 
