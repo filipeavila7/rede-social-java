@@ -78,20 +78,20 @@ public class PostController {
 
     @GetMapping("/user/me")
     public ResponseEntity<Page<PostDetaisResponse>> getPostByUser(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "6") int size
+            @PageableDefault(size = 12)
+            Pageable pageable
     ) {
-        return ResponseEntity.ok(service.getMyPosts(page, size));
+        return ResponseEntity.ok(service.getMyPosts(pageable));
     }
 
-
+    // ver posts de outros usuarios
     @GetMapping("/user")
     public ResponseEntity<Page<PostDetaisResponse>> getPostsByUserName(
             @RequestParam String userName,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "6") int size
+            @PageableDefault(size = 12)
+            Pageable pageable
     ) {
-        return ResponseEntity.ok(service.getPostsByUserName(userName, page, size));
+        return ResponseEntity.ok(service.getPostsByUserName(userName, pageable));
     }
 
 
@@ -103,6 +103,7 @@ public class PostController {
 
 
     // retorna todos os likes e comentarios de um post pelo seu id
+    // TODO - POSSÍVEL ROTA REDUNDANTE
     @GetMapping("/{postId}/stats")
     public ResponseEntity<Map<String, Long>> getPostStats(@PathVariable Long postId) {
         return ResponseEntity.ok(service.getPostStats(postId));

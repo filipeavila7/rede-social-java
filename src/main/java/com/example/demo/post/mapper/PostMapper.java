@@ -1,5 +1,6 @@
 package com.example.demo.post.mapper;
 
+import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.post.dto.PostSummaryResponse;
 import com.example.demo.user.dto.UserResponse;
 import com.example.demo.post.dto.PostDetaisResponse;
@@ -7,32 +8,27 @@ import com.example.demo.post.dto.PostResponse;
 import com.example.demo.post.entity.Post;
 import com.example.demo.comment.repository.CommentRepository;
 import com.example.demo.like.repository.LikeRepository;
+import com.example.demo.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class PostMapper {
-
-    private final LikeRepository likeRepository;
-    private final CommentRepository commentRepository;
+    private final UserMapper userMapper;
+    private final GlobalHelperService globalHelperService;
 
     public PostDetaisResponse toPostDetaisResponse(Post post, Long loggedUserId) {
 
-        long likesCount = likeRepository.countByPostId(post.getId());
-        long commentsCount = commentRepository.countByPostId(post.getId());
-        boolean likedByMe = likeRepository.existsByUserIdAndPostId(loggedUserId, post.getId());
+        long likesCount = globalHelperService.countLikeByPostId(post.getId());
+        long commentsCount = globalHelperService.countCommentBypostId(post.getId());
+        boolean likedByMe = globalHelperService.existsLikeInPost(loggedUserId, post.getId());
 
         return new PostDetaisResponse(
                 post.getId(),
                 post.getTitle(),
                 post.getImageUrl(),
-                new UserResponse(
-                        post.getUser().getId(),
-                        post.getUser().getName(),
-                        post.getUser().getProfile().getImageUrlProfile(),
-                        post.getUser().getUserName()
-                ),
+                userMapper.toUserResponse(post.getUser()),
                 post.getCreatedAt(),
                 post.getDescription(),
                 post.getTags(),
@@ -47,12 +43,7 @@ public class PostMapper {
                 post.getId(),
                 post.getTitle(),
                 post.getImageUrl(),
-                new UserResponse(
-                        post.getUser().getId(),
-                        post.getUser().getName(),
-                        post.getUser().getProfile().getImageUrlProfile(),
-                        post.getUser().getUserName()
-                ),
+                userMapper.toUserResponse(post.getUser()),
                 post.getCreatedAt(),
                 post.getDescription(),
                 post.getTags()

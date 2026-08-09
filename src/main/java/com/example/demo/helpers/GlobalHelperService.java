@@ -53,24 +53,37 @@ public class GlobalHelperService {
                 .orElseThrow(PostNotFoundException::new);
     }
 
+    // verifica se o usuario é dono do comentário
     public Comment validateCommentOwnership(Long commentId, User user){
         return commentRepository.findByIdAndUserId(commentId, user.getId())
                 .orElseThrow(()-> new CommentConflictException("Esse comentário não pertence a você"));
     }
 
+    public Long countCommentBypostId(Long postId){
+        return commentRepository.countByPostId(postId);
+    }
+
+    // verifica se existe registro de like no post
     public void verifyLikeInPost(Long userId, Long postId){
         if (likeRepository.existsByUserIdAndPostId(userId, postId)){
             throw new LikeConflictException("Você ja curtiu esse post");
         }
     }
 
+    // retorna um boleano caso exista curtida ou não
     public boolean existsLikeInPost(Long userId, Long postId){
         return likeRepository.existsByUserIdAndPostId(userId, postId);
     }
 
+    // retorna like existente
     public Like findLikeByUserIdAndPostId(Long userId, Long postId){
         return likeRepository.findByUserIdAndPostId(userId, postId)
                 .orElseThrow(LikeNotFoundException::new);
+    }
+
+    // contar quantos likes um post tem
+    public Long countLikeByPostId(Long postId){
+        return likeRepository.countByPostId(postId);
     }
 
 

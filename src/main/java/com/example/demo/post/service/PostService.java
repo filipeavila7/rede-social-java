@@ -63,10 +63,8 @@ public class PostService {
 
 
     // posts do usuario logado
-    public Page<PostDetaisResponse> getMyPosts(int page, int size) {
+    public Page<PostDetaisResponse> getMyPosts(Pageable pageable) {
         User user = globalHelperService.getLoggedUser();
-
-        Pageable pageable = PageRequest.of(page, size);
 
         return postRepository
                 .findByUserIdOrderByCreatedAtDesc(user.getId(), pageable)
@@ -88,10 +86,8 @@ public class PostService {
 
 
     // posts de outro usuario
-    public Page<PostDetaisResponse> getPostsByUserName(String userName, int page, int size) {
+    public Page<PostDetaisResponse> getPostsByUserName(String userName, Pageable pageable) {
         User loggedUser = globalHelperService.getLoggedUser();
-
-        Pageable pageable = PageRequest.of(page, size);
 
         return postRepository
                 .findByUserUserNameOrderByCreatedAtDesc(userName, pageable)
@@ -104,6 +100,8 @@ public class PostService {
     }
 
     // stats isoladas
+    // TODO - POSSÍVEL METODO REDUNDANTE - a quantidade de likes e comentarios ja estão sendo retornados no dto
+    // de postDetais
     public Map<String, Long> getPostStats(Long postId) {
         long likes = likeRepository.countByPostId(postId);
         long comments = commentRepository.countByPostId(postId);
