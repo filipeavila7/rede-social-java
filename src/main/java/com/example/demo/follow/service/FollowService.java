@@ -12,6 +12,8 @@ import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.notification.entity.NotificationType;
 import com.example.demo.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -98,22 +100,17 @@ public class FollowService {
         return followRepository.countByFollowerId(userId);
     }
 
-    // pegar seguindo
-    public List<FollowingProfileResponse> getFollowing(Long userId) {
-        return followRepository.findByFollowerId(userId)
-                .stream()
-                .map(Follow::getFollowed)
-                .map(this::toFollowingProfileResponse)
-                .toList();
+    // pegar seguindo de outro usuario
+    public Page<FollowingProfileResponse> getFollowing(Long userId, Pageable pageable) {
+        return followRepository.findByFollowerId(userId, pageable)
+                .map(followMapper::toFollowingProfileResponse);
     }
 
-    // pegar seguidores
-    public List<FollowingProfileResponse> getFollowers(Long userId) {
-        return followRepository.findByFollowedId(userId)
-                .stream()
-                .map(Follow::getFollower)
-                .map(this::toFollowingProfileResponse)
-                .toList();
+    // pegar seguidores de outro de usuario
+    public Page<FollowingProfileResponse> getFollowers(Long userId, Pageable pageable) {
+        return followRepository.findByFollowedId(userId, pageable)
+                .map(followMapper::toFollowerProfileResponse);
+
     }
 
     // pegar seguindo do user logado

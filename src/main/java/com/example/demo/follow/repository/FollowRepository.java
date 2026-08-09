@@ -3,6 +3,8 @@ package com.example.demo.follow.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.demo.follow.entity.Follow;
@@ -14,8 +16,8 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
     long countByFollowedId(Long userId);  // seguidores
     long countByFollowerId(Long userId);  // seguindo
 
-    List<Follow> findByFollowerId(Long followerId); // lista de seguidores
-    List<Follow> findByFollowedId(Long followedId); // lista de quem segue
+    Page<Follow> findByFollowerId(Long followerId, Pageable pageable); // lista de seguidores
+    Page<Follow> findByFollowedId(Long followedId, Pageable pageable); // lista de quem segue
 
 
 }
