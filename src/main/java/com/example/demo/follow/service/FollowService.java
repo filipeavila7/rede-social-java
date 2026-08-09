@@ -4,9 +4,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.demo.dto.FollowingProfileResponse;
+import com.example.demo.exeptions.follow.FollowConflictException;
+import com.example.demo.exeptions.user.UserNotFoundException;
 import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.notification.dto.NotificationPostResponse;
 import com.example.demo.notification.entity.Notification;
+import com.example.demo.notification.entity.NotificationType;
+import com.example.demo.notification.service.NotificationService;
 import com.example.demo.repository.NotificationRepository;
 import com.example.demo.service.WebSocketService;
 import lombok.RequiredArgsConstructor;
@@ -24,75 +28,44 @@ import com.example.demo.user.repository.UserRepository;
 @RequiredArgsConstructor
 public class FollowService {
     private final FollowRepository followRepository;
-    private final UserRepository userRepository;
-    private final WebSocketService webSocketService;
-    private final NotificationRepository notificationRepository;
+    private final NotificationService notificationService;
     private final GlobalHelperService globalHelperService;
 
 
     // seguir usuario pelo id dele
     public Follow followUser(Long followedId) { // passar o id do usuario que quer seguir
-
+        // pegar user logado
         User loggedUser = globalHelperService.getLoggedUser();
 
-        // evitar o usuario seguir ele mesmo, caso o id dele seja igual ao passado no
-        // argumento
+        // evitar o usuario seguir ele mesmo
         if (loggedUser.getId().equals(followedId)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Você não pode seguir a si mesmo");
+            throw new FollowConflictException("Você não pode seguir a si mesmo");
         }
 
         // verifica se ele ja segue esse usuario
         if (followRepository.existsByFollowerIdAndFollowedId(loggedUser.getId(), followedId)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Você já segue esse usuário");
+            throw new FollowConflictException("Você ja segue esse usuário");
         }
 
-        // encontrar no banco o usuario que vai ser seguido pelo id do argumento
-        User followed = userRepository.findById(followedId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
+        // encontrar o usuario seguido
+        User followed = globalHelperService.findUserById(followedId);
 
-        // objeto de novo seguidor, passando quem seguiu e quem esta sendo seguido
-        Follow follow = new Follow(follower, followed);
+        // cria o relacionamento
+        Follow follow = new Follow();
 
+        follow.setFollower(loggedUser);
+        follow.setFollowed(followed);
 
         // salvar no banco
         Follow followSaved = followRepository.save(follow);
 
-        // salva a notificação no banco
-        Notification notification = new Notification();
-        notification.setType("FOLLOW");
-        notification.setContent(follower.getUserName() + " começou a seguiu você");
-        notification.setCreatedAt(LocalDateTime.now());
-        notification.setIsRead(false);
-        notification.setSender(follower);
-        notification.setReceiver(followed);
-        notification.setPost(null);
+        // conteydo da notificação
+        String content = loggedUser.getName() + " começou a seguir você";
 
-        notificationRepository.save(notification);
-
-        // cria a notificação para enviar via webSocket
-        NotificationPostResponse dto =
-                new NotificationPostResponse(
-                        "FOLLOW",
-                        follower.getId(),
-                        follower.getNome(),
-                        follower.getUserName(),
-                        follower.getProfile() != null
-                                ? follower.getProfile().getImageUrlProfile()
-                                : null,
-                        null,
-                        null,
-                        null,
-                        notification.getContent(),
-                        LocalDateTime.now()
-                );
-
-        // enviar notificação
-        webSocketService.sendNotificationToUser(
-                followedId,
-                dto
+        // cria a notificação
+        notificationService.createFollowNotification(
+                loggedUser, followed, NotificationType.FOLLOW, content
         );
-
-
 
         return followSaved;
 
@@ -145,7 +118,7 @@ public class FollowService {
         return followRepository.countByFollowerId(userId);
     }
 
-    // pegar seguidores e seguindo de outros seguidores
+    // pegar seguindo
     public List<FollowingProfileResponse> getFollowing(Long userId) {
         return followRepository.findByFollowerId(userId)
                 .stream()
@@ -154,6 +127,7 @@ public class FollowService {
                 .toList();
     }
 
+    // pegar seguidores
     public List<FollowingProfileResponse> getFollowers(Long userId) {
         return followRepository.findByFollowedId(userId)
                 .stream()
@@ -161,8 +135,8 @@ public class FollowService {
                 .map(this::toFollowingProfileResponse)
                 .toList();
     }
-    
-    // pegar seguidores e seguindo do user logado
+
+    // pegar seguindo do user logado
     public List<User> getMyFollowing() {
         String email = (String) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
@@ -178,6 +152,7 @@ public class FollowService {
                 .toList();
     }
 
+    // pegar seguidores do user logado
     public List<User> getMyFollowers() {
         String email = (String) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();

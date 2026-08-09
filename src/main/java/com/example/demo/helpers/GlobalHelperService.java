@@ -41,6 +41,11 @@ public class GlobalHelperService {
                 .orElseThrow(UserNotFoundException::new);
     }
 
+    public User findUserById(Long userId){
+        return userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+    }
+
     // validar se o post pertence ao usario logado
     public Post validatePostOwnership(Post post, User user){
        return postRepository.findByUserAndId(user, post.getId())
