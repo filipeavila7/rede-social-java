@@ -1,4 +1,4 @@
-package com.example.demo.dto;
+package com.example.demo.notification.dto;
 
 import com.example.demo.notification.entity.NotificationType;
 

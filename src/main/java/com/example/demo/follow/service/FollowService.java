@@ -1,4 +1,4 @@
-package com.example.demo.service;
+package com.example.demo.follow.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -7,14 +7,15 @@ import com.example.demo.dto.FollowingProfileResponse;
 import com.example.demo.notification.dto.NotificationPostResponse;
 import com.example.demo.notification.entity.Notification;
 import com.example.demo.repository.NotificationRepository;
+import com.example.demo.service.WebSocketService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.example.demo.entity.Follow;
+import com.example.demo.follow.entity.Follow;
 import com.example.demo.user.entity.User;
-import com.example.demo.repository.FollowRepository;
+import com.example.demo.follow.repository.FollowRepository;
 import com.example.demo.user.repository.UserRepository;
 
 @Service

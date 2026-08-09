@@ -1,7 +1,7 @@
-package com.example.demo.controller;
+package com.example.demo.notification.controller;
 
 
-import com.example.demo.dto.NotificationGetResponse;
+import com.example.demo.notification.dto.NotificationGetResponse;
 import com.example.demo.notification.service.NotificationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -1,22 +1,17 @@
 package com.example.demo.notification.service;
 
-import com.example.demo.dto.NotificationGetResponse;
+import com.example.demo.notification.dto.NotificationGetResponse;
 import com.example.demo.helpers.GlobalHelperService;
-import com.example.demo.notification.dto.NotificationChatResponse;
-import com.example.demo.notification.dto.NotificationPostResponse;
 import com.example.demo.notification.entity.Notification;
 import com.example.demo.notification.entity.NotificationType;
 import com.example.demo.notification.mapper.NotificationMapper;
 import com.example.demo.post.entity.Post;
 import com.example.demo.service.WebSocketService;
 import com.example.demo.user.entity.User;
-import com.example.demo.exeptions.user.UserNotFoundException;
 import com.example.demo.repository.NotificationRepository;
-import com.example.demo.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;

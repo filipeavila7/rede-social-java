@@ -1,11 +1,11 @@
-package com.example.demo.repository;
+package com.example.demo.follow.repository;
 
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.example.demo.entity.Follow;
+import com.example.demo.follow.entity.Follow;
 
 public interface FollowRepository extends JpaRepository<Follow, Long> {
     boolean existsByFollowerIdAndFollowedId(Long followerId, Long followedId); // verifca se ja existe seguidor

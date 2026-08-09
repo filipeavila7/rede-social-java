@@ -1,6 +1,6 @@
 package com.example.demo.notification.mapper;
 
-import com.example.demo.dto.NotificationGetResponse;
+import com.example.demo.notification.dto.NotificationGetResponse;
 import com.example.demo.notification.dto.NotificationChatResponse;
 import com.example.demo.notification.dto.NotificationFollowResponse;
 import com.example.demo.notification.dto.NotificationPostResponse;

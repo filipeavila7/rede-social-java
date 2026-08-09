@@ -1,12 +1,12 @@
-package com.example.demo.controller;
+package com.example.demo.follow.controller;
 
 import com.example.demo.dto.FollowingProfileResponse;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.entity.Follow;
+import com.example.demo.follow.entity.Follow;
 import com.example.demo.user.entity.User;
-import com.example.demo.service.FollowService;
+import com.example.demo.follow.service.FollowService;
 
 import java.util.List;
 
