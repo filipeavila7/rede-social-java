@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.example.demo.dto.FollowingProfileResponse;
 import com.example.demo.exeptions.follow.FollowConflictException;
+import com.example.demo.exeptions.user.UserNotFoundException;
 import com.example.demo.follow.dto.FollowResponse;
 import com.example.demo.follow.mapper.FollowMapper;
 import com.example.demo.helpers.GlobalHelperService;
@@ -66,20 +67,11 @@ public class FollowService {
 
     // deixar de seguir
     public void unfollowUser(Long followedId) {
+        User loggedUser = globalHelperService.getLoggedUser();
 
-        // pegar email do user logado
-        String email = (String) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
-
-        User follower = userRepository.findByEmail(email);
-        if (follower == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não encontrado");
-        }
-
-        // encoontrar seguidor pelo o id do user logado e o id do user que ele quer
-        // deixar de seguir
-        Follow follow = followRepository.findByFollowerIdAndFollowedId(follower.getId(), followedId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Follow não encontrado"));
+        // acha o usuario seguido
+        Follow follow = followRepository.findByFollowerIdAndFollowedId(loggedUser.getId(), followedId)
+                .orElseThrow(UserNotFoundException::new);
 
         followRepository.delete(follow);
 
@@ -87,16 +79,11 @@ public class FollowService {
 
     // remover um seguidor
     public void removeFollower(Long followerId) {
-        String email = (String) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
+        User loggedUser = globalHelperService.getLoggedUser();
 
-        User followed = userRepository.findByEmail(email);
-        if (followed == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não encontrado");
-        }
-        // buscar seguidor paa remover com base no user logado
-        Follow follow = followRepository.findByFollowerIdAndFollowedId(followerId, followed.getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Seguidor não encontrado"));
+        // busca o seguidor
+        Follow follow = followRepository.findByFollowerIdAndFollowedId(followerId, loggedUser.getId())
+                .orElseThrow(UserNotFoundException::new);
 
         followRepository.delete(follow);
     }
