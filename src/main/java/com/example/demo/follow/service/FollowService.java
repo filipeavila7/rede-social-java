@@ -114,46 +114,19 @@ public class FollowService {
     }
 
     // pegar seguindo do user logado
-    public List<User> getMyFollowing() {
-        String email = (String) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
+    public Page<FollowingProfileResponse> getMyFollowing(Pageable pageable) {
+        return followRepository.findByFollowerId(
+                globalHelperService.getLoggedUser().getId(), pageable)
+                .map(followMapper::toFollowingProfileResponse);
 
-        User me = userRepository.findByEmail(email);
-        if (me == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não encontrado");
-        }
-
-        return followRepository.findByFollowerId(me.getId())
-                .stream()
-                .map(Follow::getFollowed)
-                .toList();
     }
 
     // pegar seguidores do user logado
-    public List<User> getMyFollowers() {
-        String email = (String) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
+    public Page<FollowingProfileResponse> getMyFollowers(Pageable pageable) {
+        return followRepository.findByFollowedId(
+                globalHelperService.getLoggedUser().getId(), pageable)
+                .map(followMapper::toFollowerProfileResponse);
 
-        User me = userRepository.findByEmail(email);
-        if (me == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não encontrado");
-        }
-
-        return followRepository.findByFollowedId(me.getId())
-                .stream()
-                .map(Follow::getFollower)
-                .toList();
-    }
-
-
-    private FollowingProfileResponse toFollowingProfileResponse(User user) {
-        return new FollowingProfileResponse(
-                user.getId(),
-                user.getNome(),
-                user.getProfile() != null ? user.getProfile().getImageUrlProfile() : null,
-                user.getProfile() != null ? user.getProfile().getMessageStatus() : null,
-                user.getUserName()
-        );
     }
 
     public boolean amIFollowing(Long followedId) {
