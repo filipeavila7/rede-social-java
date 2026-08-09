@@ -29,11 +29,23 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class LikeService {
     public final LikeRepository likeRepository;
-    public final UserRepository userRepository;
     public final NotificationService notificationService;
     private final GlobalHelperService globalHelperService;
     private final LikeMapper likeMapper;
 
+
+    // ========== GET ==========
+
+    // true ou false, se existe curtida ou não
+    // TODO - POSSÍVEL METODO REDUNDANTE
+    public boolean hasUserLikedPost(Long postId) {
+        // verifica se existe like
+        return globalHelperService.existsLikeInPost(
+                globalHelperService.getLoggedUser().getId(), postId
+        );
+    }
+
+    // ========== POST ==========
 
     // curtir post pelo id do post com o user logado
     @Transactional
@@ -63,24 +75,18 @@ public class LikeService {
     }
 
 
-        // remover uma curtida
-        public void unlikePost (Long postId){
+    // ========== DELETE ==========
 
-            // pegar curtida existente pelo usuario logado no post curtido
-            Like like = globalHelperService.findLikeByUserIdAndPostId(
-                    globalHelperService.getLoggedUser().getId(), postId );
+    // remover uma curtida
+    @Transactional
+    public void unlikePost(Long postId) {
+        // pegar curtida existente pelo usuario logado no post curtido
+        Like like = globalHelperService.findLikeByUserIdAndPostId(
+                globalHelperService.getLoggedUser().getId(), postId);
 
-            likeRepository.delete(like);
-        }
-
-        // true ou false, se existe curtida ou não
-        public boolean hasUserLikedPost (Long postId){
-
-            // verifica se existe like
-            return globalHelperService.existsLikeInPost(
-                    globalHelperService.getLoggedUser().getId(), postId
-            );
-        }
-
-
+        likeRepository.delete(like);
     }
+
+
+
+}
