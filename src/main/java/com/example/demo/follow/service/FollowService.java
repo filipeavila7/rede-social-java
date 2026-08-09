@@ -1,18 +1,15 @@
 package com.example.demo.follow.service;
 
-import java.time.LocalDateTime;
+
 import java.util.List;
 
 import com.example.demo.dto.FollowingProfileResponse;
 import com.example.demo.exeptions.follow.FollowConflictException;
-import com.example.demo.exeptions.user.UserNotFoundException;
+import com.example.demo.follow.dto.FollowResponse;
+import com.example.demo.follow.mapper.FollowMapper;
 import com.example.demo.helpers.GlobalHelperService;
-import com.example.demo.notification.dto.NotificationPostResponse;
-import com.example.demo.notification.entity.Notification;
 import com.example.demo.notification.entity.NotificationType;
 import com.example.demo.notification.service.NotificationService;
-import com.example.demo.repository.NotificationRepository;
-import com.example.demo.service.WebSocketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,7 +19,6 @@ import org.springframework.web.server.ResponseStatusException;
 import com.example.demo.follow.entity.Follow;
 import com.example.demo.user.entity.User;
 import com.example.demo.follow.repository.FollowRepository;
-import com.example.demo.user.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -30,10 +26,10 @@ public class FollowService {
     private final FollowRepository followRepository;
     private final NotificationService notificationService;
     private final GlobalHelperService globalHelperService;
-
+    private final FollowMapper followMapper;
 
     // seguir usuario pelo id dele
-    public Follow followUser(Long followedId) { // passar o id do usuario que quer seguir
+    public FollowResponse followUser(Long followedId) { // passar o id do usuario que quer seguir
         // pegar user logado
         User loggedUser = globalHelperService.getLoggedUser();
 
@@ -56,9 +52,6 @@ public class FollowService {
         follow.setFollower(loggedUser);
         follow.setFollowed(followed);
 
-        // salvar no banco
-        Follow followSaved = followRepository.save(follow);
-
         // conteydo da notificação
         String content = loggedUser.getName() + " começou a seguir você";
 
@@ -67,7 +60,7 @@ public class FollowService {
                 loggedUser, followed, NotificationType.FOLLOW, content
         );
 
-        return followSaved;
+        return followMapper.toFollowResponse(followRepository.save(follow));
 
     }
 
