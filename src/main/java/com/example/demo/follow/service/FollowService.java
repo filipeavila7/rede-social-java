@@ -1,8 +1,6 @@
 package com.example.demo.follow.service;
 
 
-import java.util.List;
-
 import com.example.demo.dto.FollowingProfileResponse;
 import com.example.demo.exeptions.follow.FollowConflictException;
 import com.example.demo.exeptions.user.UserNotFoundException;
@@ -14,11 +12,7 @@ import com.example.demo.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-
 import com.example.demo.follow.entity.Follow;
 import com.example.demo.user.entity.User;
 import com.example.demo.follow.repository.FollowRepository;
@@ -32,7 +26,7 @@ public class FollowService {
     private final FollowMapper followMapper;
 
     // seguir usuario pelo id dele
-    public FollowResponse followUser(Long followedId) { // passar o id do usuario que quer seguir
+    public FollowResponse followUser(Long followedId) {
         // pegar user logado
         User loggedUser = globalHelperService.getLoggedUser();
 
@@ -129,17 +123,10 @@ public class FollowService {
 
     }
 
+    // boleano se segue o usuario ou não
     public boolean amIFollowing(Long followedId) {
-        String email = (String) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
-
-        User me = userRepository.findByEmail(email);
-
-        if (me == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não encontrado");
-        }
-
-        return followRepository.existsByFollowerIdAndFollowedId(me.getId(), followedId);
+        return followRepository.existsByFollowerIdAndFollowedId(
+                globalHelperService.getLoggedUser().getId(), followedId);
     }
 
 }
