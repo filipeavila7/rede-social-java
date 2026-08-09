@@ -4,10 +4,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.demo.dto.FollowingProfileResponse;
+import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.notification.dto.NotificationPostResponse;
 import com.example.demo.notification.entity.Notification;
 import com.example.demo.repository.NotificationRepository;
 import com.example.demo.service.WebSocketService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -19,41 +21,28 @@ import com.example.demo.follow.repository.FollowRepository;
 import com.example.demo.user.repository.UserRepository;
 
 @Service
+@RequiredArgsConstructor
 public class FollowService {
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
     private final WebSocketService webSocketService;
     private final NotificationRepository notificationRepository;
+    private final GlobalHelperService globalHelperService;
 
-
-    public FollowService(FollowRepository followRepository, UserRepository userRepository, WebSocketService webSocketService, NotificationRepository notificationRepository) {
-        this.followRepository = followRepository;
-        this.userRepository = userRepository;
-        this.webSocketService = webSocketService;
-        this.notificationRepository = notificationRepository;
-    }
 
     // seguir usuario pelo id dele
     public Follow followUser(Long followedId) { // passar o id do usuario que quer seguir
 
-        // pegar email do usuario logado
-        String email = (String) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
-
-        // encontrar ele no banco pelo email logado
-        User follower = userRepository.findByEmail(email);
-        if (follower == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não encontrado");
-        }
+        User loggedUser = globalHelperService.getLoggedUser();
 
         // evitar o usuario seguir ele mesmo, caso o id dele seja igual ao passado no
         // argumento
-        if (follower.getId().equals(followedId)) {
+        if (loggedUser.getId().equals(followedId)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Você não pode seguir a si mesmo");
         }
 
         // verifica se ele ja segue esse usuario
-        if (followRepository.existsByFollowerIdAndFollowedId(follower.getId(), followedId)) {
+        if (followRepository.existsByFollowerIdAndFollowedId(loggedUser.getId(), followedId)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Você já segue esse usuário");
         }
 

@@ -12,18 +12,25 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(
     name = "follows",   
     uniqueConstraints = @UniqueConstraint(columnNames = {"follower_id", "followed_id"}) // evitar seguidores repetidos
 )
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Follow {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
 
     // quem segue
     @ManyToOne
@@ -41,54 +48,4 @@ public class Follow {
     private LocalDateTime createdAt;
 
 
-    public Follow() {
-    }
-
-
-    public Follow(User follower, User followed) {
-        this.follower = follower;
-        this.followed = followed;
-        this.createdAt = LocalDateTime.now();
-    }
-
-
-    public Long getId() {
-        return id;
-    }
-
-
-    public User getFollower() {
-        return follower;
-    }
-
-
-    public void setFollower(User follower) {
-        this.follower = follower;
-    }
-
-
-    public User getFollowed() {
-        return followed;
-    }
-
-
-    public void setFollowed(User followed) {
-        this.followed = followed;
-    }
-
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-
-    
-    
-
-    
 }
