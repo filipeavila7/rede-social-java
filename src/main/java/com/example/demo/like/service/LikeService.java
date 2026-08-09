@@ -45,7 +45,7 @@ public class LikeService {
         Post post = globalHelperService.findPostById(postId);
 
         // verifica se existe curtida
-        globalHelperService.existsLikeInPost(loggedUser.getId(), postId);
+        globalHelperService.verifyLikeInPost(loggedUser.getId(), postId);
 
         // cria o like
         Like like = new Like();
@@ -65,34 +65,21 @@ public class LikeService {
 
         // remover uma curtida
         public void unlikePost (Long postId){
-            String email = (String) SecurityContextHolder.getContext()
-                    .getAuthentication().getPrincipal();
-
-            User user = userRepository.findByEmail(email);
-            if (user == null) {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não encontrado");
-            }
 
             // pegar curtida existente pelo usuario logado no post curtido
-            Like like = likeRepository.findByUserIdAndPostId(user.getId(), postId)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Curtida não encontrada"));
+            Like like = globalHelperService.findLikeByUserIdAndPostId(
+                    globalHelperService.getLoggedUser().getId(), postId );
 
             likeRepository.delete(like);
         }
 
-        // true ou false
+        // true ou false, se existe curtida ou não
         public boolean hasUserLikedPost (Long postId){
 
-            String email = (String) SecurityContextHolder.getContext()
-                    .getAuthentication().getPrincipal();
-
-            User user = userRepository.findByEmail(email);
-            if (user == null) {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não encontrado");
-            }
-
             // verifica se existe like
-            return likeRepository.existsByUserIdAndPostId(user.getId(), postId);
+            return globalHelperService.existsLikeInPost(
+                    globalHelperService.getLoggedUser().getId(), postId
+            );
         }
 
 

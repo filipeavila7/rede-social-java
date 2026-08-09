@@ -4,6 +4,8 @@ import com.example.demo.comment.entity.Comment;
 import com.example.demo.comment.repository.CommentRepository;
 import com.example.demo.exeptions.comment.CommentConflictException;
 import com.example.demo.exeptions.like.LikeConflictException;
+import com.example.demo.exeptions.like.LikeNotFoundException;
+import com.example.demo.like.entity.Like;
 import com.example.demo.like.repository.LikeRepository;
 import com.example.demo.notification.entity.Notification;
 import com.example.demo.notification.entity.NotificationType;
@@ -56,10 +58,19 @@ public class GlobalHelperService {
                 .orElseThrow(()-> new CommentConflictException("Esse comentário não pertence a você"));
     }
 
-    public void existsLikeInPost(Long userId, Long postId){
+    public void verifyLikeInPost(Long userId, Long postId){
         if (likeRepository.existsByUserIdAndPostId(userId, postId)){
             throw new LikeConflictException("Você ja curtiu esse post");
         }
+    }
+
+    public boolean existsLikeInPost(Long userId, Long postId){
+        return likeRepository.existsByUserIdAndPostId(userId, postId);
+    }
+
+    public Like findLikeByUserIdAndPostId(Long userId, Long postId){
+        return likeRepository.findByUserIdAndPostId(userId, postId)
+                .orElseThrow(LikeNotFoundException::new);
     }
 
 
