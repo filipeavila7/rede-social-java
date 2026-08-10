@@ -9,6 +9,7 @@ import com.example.demo.like.entity.Like;
 import com.example.demo.like.repository.LikeRepository;
 import com.example.demo.notification.entity.Notification;
 import com.example.demo.notification.entity.NotificationType;
+import com.example.demo.profile.entity.Profile;
 import com.example.demo.user.entity.User;
 import com.example.demo.exeptions.post.PostConflictException;
 import com.example.demo.exeptions.post.PostNotFoundException;
@@ -30,6 +31,12 @@ public class GlobalHelperService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final LikeRepository likeRepository;
+
+
+    // criar profile rapidamente
+    public void createProfile(User user){
+        user.setProfile(new Profile("", null, null, user));
+    }
 
     // pegar usuario logado
     public User getLoggedUser() {

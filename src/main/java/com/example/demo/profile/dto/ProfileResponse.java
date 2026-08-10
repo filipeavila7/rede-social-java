@@ -1,10 +1,10 @@
 
 package com.example.demo.profile.dto;
 
-// dados do perfil do usuario logado
+
 public record ProfileResponse(
-        Long id,
-        String nome,
+        Long userId,
+        String name,
         String bio,
         String imageUrlProfile,
         String messageStatus,

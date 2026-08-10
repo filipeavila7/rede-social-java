@@ -3,6 +3,8 @@ package com.example.demo.profile.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.example.demo.helpers.GlobalHelperService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -18,39 +20,26 @@ import com.example.demo.user.repository.UserRepository;
 import com.example.demo.util.FileUrlUtils;
 
 @Service
+@RequiredArgsConstructor
 public class ProfileService {
 
     private final ProfileRepository profileRepository;
     private final UserRepository userRepository;
-    private final FollowRepository followRepository;
+    private final GlobalHelperService globalHelperService;
 
-    public ProfileService(ProfileRepository profileRepository, UserRepository userRepository,
-            FollowRepository followRepository) {
-        this.profileRepository = profileRepository;
-        this.userRepository = userRepository;
-        this.followRepository = followRepository;
-    }
-
-    // Busca o perfil do usuario logado.
-    // Se nao existir, cria um perfil vazio e salva.
+    // Busca o perfil do usuario logado, se não existir, cria um perfil vazio e salva.
     public ProfileResponse getMyProfile() {
-        String email = (String) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
+        User loggedUser = globalHelperService.getLoggedUser();
 
-        User user = userRepository.findByEmail(email);
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario nao encontrado");
-        }
-
-        Profile profile = user.getProfile();
+        Profile profile = loggedUser.getProfile();
         if (profile == null) {
             profile = new Profile();
             profile.setBio("");
             profile.setImageUrlProfile(null);
             profile.setMessageStatus(null);
             profile.setMessageStatusCreatedAt(null);
-            profile.setUser(user);
-            user.setProfile(profile);
+            profile.setUser(loggedUser);
+            loggedUser.setProfile(profile);
             Profile saved = profileRepository.save(profile);
             return toResponse(user, saved);
         }
@@ -90,14 +79,11 @@ public class ProfileService {
 
     // Atualiza perfil do usuario logado.
     // Se o status veio vazio, apaga se veio preenchido, grava hora de criacao.
-    public Profile updateMyProfile(Profile profileAtualizado) {
-        String email = (String) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
-        User user = userRepository.findByEmail(email);
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario nao encontrado");
-        }
-        Profile profile = user.getProfile();
+    public ProfileResponse updateMyProfile(Profile profileAtualizado) {
+
+
+
+
         if (profile == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Perfil nao encontrado");
         }
@@ -127,62 +113,6 @@ public class ProfileService {
         return profileRepository.save(profile);
     }
 
-    // Lista perfis dos usuarios que o logado segue.
-    // Retorna apenas id, nome, foto e status (se ainda estiver valido).
-    public List<FollowingProfileResponse> getFollowingProfiles() {
-        String email = (String) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
-
-        User me = userRepository.findByEmail(email);
-        if (me == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario nao encontrado");
-        }
-
-        return followRepository.findByFollowerId(me.getId())
-                .stream()
-                .map(f -> {
-                    User u = f.getFollowed();
-                    Profile p = u.getProfile();
-                    String img = p != null ? p.getImageUrlProfile() : null;
-                    String status = p != null ? getActiveStatus(p) : null;
-                    return new FollowingProfileResponse(u.getId(), u.getNome(), img, status, u.getUserName());
-                })
-                .toList();
-    }
-
-    // Lista perfis dos usuarios que seguem o logado.
-    // Reaproveita o mesmo DTO usado no following.
-    public List<FollowingProfileResponse> getFollowersProfiles() {
-        String email = (String) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
-
-        User me = userRepository.findByEmail(email);
-        if (me == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario nao encontrado");
-        }
-
-        return followRepository.findByFollowedId(me.getId())
-                .stream()
-                .map(f -> {
-                    User u = f.getFollower();
-                    Profile p = u.getProfile();
-                    String img = p != null ? p.getImageUrlProfile() : null;
-                    String status = p != null ? getActiveStatus(p) : null;
-                    return new FollowingProfileResponse(u.getId(), u.getNome(), img, status, u.getUserName());
-                })
-                .toList();
-    }
-
-    private ProfileResponse toResponse(User user, Profile profile) {
-        return new ProfileResponse(
-                user.getNome(),
-                profile.getBio(),
-                profile.getImageUrlProfile(),
-                getActiveStatus(profile),
-                user.getUserName(),
-                user.getId()
-        );
-    }
 
     // Remove status expirado (mais de 24h) e salva a limpeza.
     private void clearExpiredStatus(Profile profile) {

@@ -53,9 +53,7 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(request.password()));
 
         // cria profile automaticamente
-        Profile profile = new Profile("", null, null, user);
-        user.setProfile(profile);
-
+        globalHelperService.createProfile(user);
 
         return userMapper.toUserResponse(userRepository.save(user));
 
@@ -85,7 +83,7 @@ public class UserService {
     }
 
 
-    // metodo para tornar o usuário um artista
+    // TODO - metodo para tornar o usuário um artista
 
 
     // ========== DELETE ==========
