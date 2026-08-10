@@ -16,7 +16,15 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(
     name = "conversations",
@@ -33,14 +41,11 @@ public class Conversation {
     private List<Message> messages;
 
 
-
-    // relacionar 2 usuários diferentes em uma conversa, como se fosse o contato de 2 users
-    // Usuáriio A
     @ManyToOne
     @JoinColumn(name = "user_a_id", nullable = false)
     private User userA;
 
-    // Usuário B
+
     @ManyToOne
     @JoinColumn(name = "user_b_id", nullable = false)
     private User userB;
@@ -50,49 +55,7 @@ public class Conversation {
     private LocalDateTime createdAt;
 
 
-    public Conversation() {
-    }
 
-
-    public Conversation(User userA, User userB) {
-        this.userA = userA;
-        this.userB = userB;
-        this.createdAt = LocalDateTime.now();
-    }
-
-
-    public Long getId() {
-        return id;
-    }
-
-    public User getUserA() {
-        return userA;
-    }
-
-
-    public void setUserA(User userA) {
-        this.userA = userA;
-    }
-
-
-    public User getUserB() {
-        return userB;
-    }
-
-
-    public void setUserB(User userB) {
-        this.userB = userB;
-    }
-
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
 
 
 
