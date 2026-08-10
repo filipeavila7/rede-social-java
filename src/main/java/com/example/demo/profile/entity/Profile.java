@@ -45,5 +45,10 @@ public class Profile {
     @JoinColumn(name = "user_id", unique = true, nullable = false)
     private User user;
 
-
+    public Profile(String bio, String imageUrlProfile, String messageStatus, User user) {
+        this.bio = bio;
+        this.imageUrlProfile = imageUrlProfile;
+        this.messageStatus = messageStatus;
+        this.user = user;
+    }
 }

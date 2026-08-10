@@ -99,7 +99,7 @@ public class ProfileService {
        }
 
         // só atualiza a foto quando vier uma URL persistível; preview blob do navegador não deve ir para o banco
-        String imageUrlProfile = profileAtualizado.getImageUrlProfile();
+        String imageUrlProfile = request.imageUrlProfile();
         if (imageUrlProfile != null) {
             String normalizedImageUrl = FileUrlUtils.normalizeStoredPath(imageUrlProfile);
             if (normalizedImageUrl != null && !normalizedImageUrl.contains("blob:")) {
@@ -108,16 +108,19 @@ public class ProfileService {
         }
 
         // atualiza o status
-        String status = profileAtualizado.getMessageStatus();
-        if (status != null && !status.isBlank()) {
-            profile.setMessageStatus(status);
-            profile.setMessageStatusCreatedAt(LocalDateTime.now());
-        } else {
-            profile.setMessageStatus(null);
-            profile.setMessageStatusCreatedAt(null);
+        String status = request.messageStatus();
+
+        if (status != null) {
+            if (!status.isBlank()) {
+                profile.setMessageStatus(status);
+                profile.setMessageStatusCreatedAt(LocalDateTime.now());
+            } else {
+                profile.setMessageStatus(null);
+                profile.setMessageStatusCreatedAt(null);
+            }
         }
 
-        return profileRepository.save(profile);
+        return profileMapper.toProfileResponse(profileRepository.save(profile));
     }
 
 

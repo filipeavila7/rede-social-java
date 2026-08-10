@@ -33,6 +33,7 @@ public class GlobalHelperService {
     private final LikeRepository likeRepository;
 
 
+
     // criar profile rapidamente
     public void createProfile(User user){
         user.setProfile(new Profile("", null, null, user));
