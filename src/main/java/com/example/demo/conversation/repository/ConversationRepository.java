@@ -1,11 +1,13 @@
-package com.example.demo.repository;
+package com.example.demo.conversation.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import com.example.demo.entity.Conversation;
+import com.example.demo.conversation.entity.Conversation;
 
 public interface ConversationRepository extends JpaRepository<Conversation, Long> {
 
@@ -14,7 +16,7 @@ public interface ConversationRepository extends JpaRepository<Conversation, Long
         WHERE c.userA.id = :userId OR c.userB.id = :userId
         ORDER BY c.createdAt DESC
     """)
-    List<Conversation> findAllByUserId(Long userId);
+    Page<Conversation> findAllByUserId(Long userId, Pageable pageable);
 
     @Query("""
         SELECT c FROM Conversation c

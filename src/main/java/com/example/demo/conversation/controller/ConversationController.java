@@ -1,13 +1,12 @@
-package com.example.demo.controller;
+package com.example.demo.conversation.controller;
 
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.demo.dto.ConversationResponse;
-import com.example.demo.entity.Conversation;
-import com.example.demo.service.ConversationService;
+import com.example.demo.conversation.dto.ConversationResponse;
+import com.example.demo.conversation.service.ConversationService;
 
 @RestController
 @RequestMapping("/conversations")

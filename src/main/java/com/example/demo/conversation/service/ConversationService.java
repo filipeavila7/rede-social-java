@@ -1,52 +1,38 @@
-package com.example.demo.service;
+package com.example.demo.conversation.service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.demo.helpers.GlobalHelperService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.example.demo.dto.ConversationResponse;
-import com.example.demo.entity.Conversation;
+import com.example.demo.conversation.dto.ConversationResponse;
+import com.example.demo.conversation.entity.Conversation;
 import com.example.demo.entity.Message;
 import com.example.demo.user.entity.User;
-import com.example.demo.repository.ConversationRepository;
+import com.example.demo.conversation.repository.ConversationRepository;
 import com.example.demo.repository.MessageRepository;
 import com.example.demo.user.repository.UserRepository;
 
 @Service
+@RequiredArgsConstructor
 public class ConversationService {
 
     private final MessageRepository messageRepository;
     private final ConversationRepository conversationRepository;
     private final UserRepository userRepository;
-
-    
-
-    
-
-
-    public ConversationService(MessageRepository messageRepository, ConversationRepository conversationRepository,
-            UserRepository userRepository) {
-        this.messageRepository = messageRepository;
-        this.conversationRepository = conversationRepository;
-        this.userRepository = userRepository;
-    }
+    private final GlobalHelperService globalHelperService;
 
 
     // retorna todas as conversas do usuario logado
-    public List<Conversation> getMyConversations() {
-        String email = (String) SecurityContextHolder.getContext()
-            .getAuthentication().getPrincipal();
-
-        User me = userRepository.findByEmail(email);
-        if (me == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não encontrado");
-        }
-
-        return conversationRepository.findAllByUserIdOrderByLastMessage(me.getId());
+    public Page<ConversationResponse> getMyConversations(Pageable pageable) {
+        return conversationRepository.findAllByUserIdOrderByLastMessage(globalHelperService.getLoggedUser());
     }
 
 
