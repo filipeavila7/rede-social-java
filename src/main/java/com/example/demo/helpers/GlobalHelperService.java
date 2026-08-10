@@ -33,6 +33,16 @@ public class GlobalHelperService {
     private final LikeRepository likeRepository;
 
 
+    // TODO - provavelmente usar esse metodo na service de follow
+    // Retorna o status apenas se estiver dentro de 24h.
+    public String getActiveStatus(Profile profile) {
+        String status = profile.getMessageStatus();
+        if (status == null) return null;
+        LocalDateTime createdAt = profile.getMessageStatusCreatedAt();
+        if (createdAt == null) return null;
+        return createdAt.isBefore(LocalDateTime.now().minusHours(24)) ? null : status;
+    }
+
 
     // criar profile rapidamente
     public void createProfile(User user){

@@ -66,7 +66,7 @@ public class ProfileService {
                 .toList();
     }
 
-    // Busca o perfil de outro usuario pelo email.
+    // Busca o perfil de outro usuario pelo userName.
     // Aplica a mesma regra de expirar o status.
     public ProfileResponse getProfileByUserName(String userName) {
 
@@ -141,12 +141,5 @@ public class ProfileService {
         }
     }
 
-    // Retorna o status apenas se estiver dentro de 24h.
-    private String getActiveStatus(Profile profile) {
-        String status = profile.getMessageStatus();
-        if (status == null) return null;
-        LocalDateTime createdAt = profile.getMessageStatusCreatedAt();
-        if (createdAt == null) return null;
-        return createdAt.isBefore(LocalDateTime.now().minusHours(24)) ? null : status;
-    }
+
 }
