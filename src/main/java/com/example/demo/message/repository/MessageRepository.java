@@ -1,4 +1,4 @@
-package com.example.demo.repository;
+package com.example.demo.message.repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.example.demo.entity.Message;
+import com.example.demo.message.entity.Message;
 import org.springframework.data.jpa.repository.Query;
 
 public interface MessageRepository extends JpaRepository<Message, Long> {

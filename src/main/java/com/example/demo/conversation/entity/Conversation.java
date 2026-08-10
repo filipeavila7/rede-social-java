@@ -3,7 +3,7 @@ package com.example.demo.conversation.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.example.demo.entity.Message;
+import com.example.demo.message.entity.Message;
 import com.example.demo.user.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

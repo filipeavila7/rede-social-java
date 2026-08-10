@@ -6,15 +6,16 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.example.demo.profile.service.ProfileService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.example.demo.entity.Profile;
+import com.example.demo.profile.entity.Profile;
 import com.example.demo.user.entity.User;
 import com.example.demo.follow.repository.FollowRepository;
-import com.example.demo.repository.ProfileRepository;
+import com.example.demo.profile.repository.ProfileRepository;
 import com.example.demo.user.repository.UserRepository;
 
 class ProfileServiceTest {

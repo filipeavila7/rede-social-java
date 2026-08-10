@@ -13,7 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
-import com.example.demo.entity.Profile;
+import com.example.demo.profile.entity.Profile;
 import com.example.demo.user.entity.User;
 import com.example.demo.user.repository.UserRepository;
 

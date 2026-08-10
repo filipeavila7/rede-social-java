@@ -1,4 +1,4 @@
-package com.example.demo.controller;
+package com.example.demo.profile.controller;
 
 import java.util.List;
 
@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.FollowingProfileResponse;
-import com.example.demo.dto.ProfileResponse;
-import com.example.demo.entity.Profile;
-import com.example.demo.service.ProfileService;
+import com.example.demo.profile.dto.ProfileResponse;
+import com.example.demo.profile.entity.Profile;
+import com.example.demo.profile.service.ProfileService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestBody;

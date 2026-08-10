@@ -4,7 +4,7 @@ import com.example.demo.dto.ConversationUpdateResponse;
 import com.example.demo.notification.dto.NotificationChatResponse;
 import com.example.demo.notification.dto.NotificationFollowResponse;
 import com.example.demo.notification.dto.NotificationPostResponse;
-import com.example.demo.dto.MessageResponse;
+import com.example.demo.message.dto.MessageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;

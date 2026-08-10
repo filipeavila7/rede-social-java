@@ -1,4 +1,4 @@
-package com.example.demo.dto;
+package com.example.demo.message.dto;
 
 // DTO para devolver mensagens com dados do remetente (nome e foto).
 public record MessageResponse(

@@ -1,4 +1,4 @@
-package com.example.demo.service;
+package com.example.demo.profile.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -9,11 +9,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.dto.FollowingProfileResponse;
-import com.example.demo.dto.ProfileResponse;
-import com.example.demo.entity.Profile;
+import com.example.demo.profile.dto.ProfileResponse;
+import com.example.demo.profile.entity.Profile;
 import com.example.demo.user.entity.User;
 import com.example.demo.follow.repository.FollowRepository;
-import com.example.demo.repository.ProfileRepository;
+import com.example.demo.profile.repository.ProfileRepository;
 import com.example.demo.user.repository.UserRepository;
 import com.example.demo.util.FileUrlUtils;
 

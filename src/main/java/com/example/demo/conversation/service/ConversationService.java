@@ -49,7 +49,7 @@ public class ConversationService {
         // encontra o outro usuario
         User other = globalHelperService.findUserById(otherUserId);
 
-        // verifica se ja existe uma conversation entre eles, se não existir, cria uma
+        // verifica se ja existe uma conversation entre eles, se não existir, cria uma nova
         Conversation conversation = conversationRepository
                 .findBetweenUsers(loggedUser.getId(), other.getId())
                 .orElseGet(() -> conversationRepository.save(new Conversation(loggedUser, other)));

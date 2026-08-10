@@ -1,4 +1,4 @@
-package com.example.demo.service;
+package com.example.demo.message.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -8,15 +8,16 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.example.demo.dto.ConversationUpdateResponse;
-import com.example.demo.dto.MessageResponse;
+import com.example.demo.message.dto.MessageResponse;
 import com.example.demo.notification.dto.NotificationPostResponse;
 import com.example.demo.dto.UnreadCountResponse;
 import com.example.demo.conversation.entity.Conversation;
-import com.example.demo.entity.Message;
-import com.example.demo.entity.Profile;
+import com.example.demo.message.entity.Message;
+import com.example.demo.profile.entity.Profile;
+import com.example.demo.service.WebSocketService;
 import com.example.demo.user.entity.User;
 import com.example.demo.conversation.repository.ConversationRepository;
-import com.example.demo.repository.MessageRepository;
+import com.example.demo.message.repository.MessageRepository;
 import com.example.demo.user.repository.UserRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

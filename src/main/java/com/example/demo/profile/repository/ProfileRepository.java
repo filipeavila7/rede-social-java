@@ -1,8 +1,8 @@
-package com.example.demo.repository;
+package com.example.demo.profile.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.example.demo.entity.Profile;
+import com.example.demo.profile.entity.Profile;
 
 import java.util.List;
 

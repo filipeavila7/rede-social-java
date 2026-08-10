@@ -7,9 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.demo.dto.MessageResponse;
-import com.example.demo.entity.Message;
-import com.example.demo.service.MessageService;
+import com.example.demo.message.dto.MessageResponse;
+import com.example.demo.message.entity.Message;
+import com.example.demo.message.service.MessageService;
 
 @RestController
 @RequestMapping("/messages")
