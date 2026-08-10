@@ -1,8 +1,6 @@
 package com.example.demo.profile.entity;
 
 import com.example.demo.user.entity.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.example.demo.util.FileUrlUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,10 +9,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
 @Entity
 @Table(name = "profile")
 public class Profile {
@@ -24,14 +29,12 @@ public class Profile {
     private Long id;
 
     @Column
-    @Size(max = 200)
     private String bio;
     
     @Column
     private String imageUrlProfile;
 
     @Column
-    @Size(max = 20)
     private String messageStatus;
 
     @Column
@@ -39,78 +42,8 @@ public class Profile {
 
 
     @OneToOne
-    @JsonIgnore
     @JoinColumn(name = "user_id", unique = true, nullable = false)
     private User user;
 
 
-    public Profile() {
-    }
-
-
-
-
-    public Profile(String bio, String imageUrlProfile, String messageStatus, User user) {
-        this.bio = bio;
-        this.imageUrlProfile = imageUrlProfile;
-        this.messageStatus = messageStatus;
-        this.user = user;
-    }
-
-
-    public Long getId() {
-        return id;
-    }
-
-
-    public String getBio() {
-        return bio;
-    }
-
-
-    public void setBio(String bio) {
-        this.bio = bio;
-    }
-
-
-    public String getImageUrlProfile() {
-        return FileUrlUtils.toPublicUrl(imageUrlProfile);
-    }
-
-
-    public void setImageUrlProfile(String imageUrlProfile) {
-        this.imageUrlProfile = FileUrlUtils.normalizeStoredPath(imageUrlProfile);
-    }
-
-
-    public User getUser() {
-        return user;
-    }
-
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-
-    public String getMessageStatus() {
-        return messageStatus;
-    }
-
-
-    public void setMessageStatus(String messageStatus) {
-        this.messageStatus = messageStatus;
-    }
-
-    public LocalDateTime getMessageStatusCreatedAt() {
-        return messageStatusCreatedAt;
-    }
-
-    public void setMessageStatusCreatedAt(LocalDateTime messageStatusCreatedAt) {
-        this.messageStatusCreatedAt = messageStatusCreatedAt;
-    }
-
-
-
-    
 }
