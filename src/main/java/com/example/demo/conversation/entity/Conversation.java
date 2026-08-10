@@ -63,13 +63,12 @@ public class Conversation {
     private LocalDateTime lastMessageAt;
 
 
+    public Conversation(User userA, User userB) {
+        this.userA = userA;
+        this.userB = userB;
+        this.createdAt = LocalDateTime.now();
+    }
 
 
-
-
-
-    
-
-    
 
 }

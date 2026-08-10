@@ -29,6 +29,9 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 public class MessageService {
 
+    // TODO - a entidade de conversation possui campos de ultima mensagen e a data da ultima emnsagen
+    // TODO - no post de mensagens criar o set
+
     private final MessageRepository messageRepository;
     private final ConversationRepository conversationRepository;
     private final UserRepository userRepository;

@@ -1,7 +1,5 @@
 package com.example.demo.conversation.repository;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,7 +23,7 @@ public interface ConversationRepository extends JpaRepository<Conversation, Long
         GROUP BY c.id
         ORDER BY MAX(m.createdAt) DESC
     """)
-    List<Conversation> findAllByUserIdOrderByLastMessage(Long userId);
+    Page<Conversation> findAllByUserIdOrderByLastMessage(Long userId, Pageable pageable);
 
     @Query("""
         SELECT c FROM Conversation c
