@@ -1,37 +1,34 @@
 package com.example.demo.conversation.controller;
 
-import java.util.List;
 
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.conversation.dto.ConversationResponse;
 import com.example.demo.conversation.service.ConversationService;
 
+@RequiredArgsConstructor
 @RestController
-@RequestMapping("/conversations")
+@RequestMapping("/conversation")
 public class ConversationController {
 
     private final ConversationService service;
 
-    public ConversationController(ConversationService service) {
-        this.service = service;
-    }
 
-    // GET /conversations/me
-    @GetMapping("/me")
-    public ResponseEntity<List<ConversationResponse>> getMyContacts() {
-    return ResponseEntity.ok(service.getMyContacts());
+    @GetMapping("/my")
+    public ResponseEntity<Page<ConversationResponse>> getMyContacts(
+            @PageableDefault(size = 12)
+            Pageable pageable
+    ) {
+    return ResponseEntity.ok(service.getMyConversations(pageable));
 }
 
-    // GET /conversations/contacts (alias para /me)
-    @GetMapping("/contacts")
-    public ResponseEntity<List<ConversationResponse>> getMyContactsAlias() {
-        return ResponseEntity.ok(service.getMyContacts());
-    }
-
-    // POST /conversations/{otherUserId}
-    @PostMapping("/open/{otherUserId}")
+    @PostMapping("/new/{otherUserId}")
     public ResponseEntity<ConversationResponse> openConversation(@PathVariable Long otherUserId){
         return ResponseEntity.ok(service.openConversation(otherUserId));
     }
