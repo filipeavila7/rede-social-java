@@ -8,6 +8,8 @@ import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.profile.dto.ProfileUpdateRequest;
 import com.example.demo.profile.mapper.ProfileMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -27,7 +29,6 @@ import com.example.demo.util.FileUrlUtils;
 public class ProfileService {
 
     private final ProfileRepository profileRepository;
-    private final UserRepository userRepository;
     private final GlobalHelperService globalHelperService;
     private final ProfileMapper profileMapper;
 
@@ -53,33 +54,29 @@ public class ProfileService {
         return profileMapper.toProfileResponse(profile);
     }
 
-    // metodo para pesquisar usuarios pelo userName
-    public List<ProfileResponse> searchProfiles(String termo) {
-        if (termo == null || termo.trim().isEmpty()) {
-            return List.of();
+    // pesquisar usuarios pelo userName
+    public Page<ProfileResponse> searchProfiles(String termo, Pageable pageable) {
+        if (termo == null || termo.isBlank()) {
+            return Page.empty(pageable);
         }
-        // retorna uma profileResponse so com os campos que queremos
         return profileRepository
-                .findByUser_userNameContainingIgnoreCase(termo.trim())
-                .stream()
-                .map(profile -> toResponse(profile.getUser(), profile))
-                .toList();
+                .findByUser_userNameContainingIgnoreCase(termo.trim(), pageable)
+                .map(profileMapper::toProfileResponse);
+
     }
 
     // Busca o perfil de outro usuario pelo userName.
     // Aplica a mesma regra de expirar o status.
     public ProfileResponse getProfileByUserName(String userName) {
 
-        User user = userRepository.findByuserName(userName).orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.NOT_FOUND, "Usuario nao encontrado"
-        ));
+        User user = globalHelperService.findByUserName(userName);
 
-        Profile profile = user.getProfile();
-        if (profile == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Perfil nao encontrado");
-        }
+        Profile profile = profileRepository.findByUserId(user.getId())
+                        .orElseThrow(ProfileNotFoundException::new);
+
         clearExpiredStatus(profile);
-        return toResponse(user, profile);
+
+        return profileMapper.toProfileResponse(profile);
     }
 
     // Atualiza perfil do usuario logado.

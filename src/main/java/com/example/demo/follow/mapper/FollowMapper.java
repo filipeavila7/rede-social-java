@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class FollowMapper {
     private final UserMapper userMapper;
+    private final GlobalHelperService globalHelperService;
 
     public FollowResponse toFollowResponse(Follow f){
         return new FollowResponse(
@@ -28,7 +29,7 @@ public class FollowMapper {
                 user.getId(),
                 user.getName(),
                 user.getProfile().getImageUrlProfile(),
-                user.getProfile().getMessageStatus(),
+                globalHelperService.getActiveStatus(user.getProfile()),
                 user.getUserName()
         );
     }
@@ -40,7 +41,7 @@ public class FollowMapper {
                 user.getId(),
                 user.getName(),
                 user.getProfile().getImageUrlProfile(),
-                user.getProfile().getMessageStatus(),
+                globalHelperService.getActiveStatus(user.getProfile()),
                 user.getUserName()
         );
     }
