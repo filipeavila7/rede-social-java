@@ -14,7 +14,7 @@ import com.example.demo.dto.UnreadCountResponse;
 import com.example.demo.conversation.entity.Conversation;
 import com.example.demo.message.entity.Message;
 import com.example.demo.profile.entity.Profile;
-import com.example.demo.service.WebSocketService;
+import com.example.demo.websocket.WebSocketService;
 import com.example.demo.user.entity.User;
 import com.example.demo.conversation.repository.ConversationRepository;
 import com.example.demo.message.repository.MessageRepository;

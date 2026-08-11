@@ -86,7 +86,7 @@ public class PasswordResetTokenService {
     // =========================
     // 2 - REDEFINIR SENHA
     // =========================
-    public void redefinirSenha(String token, String novaSenha) {
+    public void resetPassword(String token, String novaSenha) {
 
         // busca token no banco
         PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token)

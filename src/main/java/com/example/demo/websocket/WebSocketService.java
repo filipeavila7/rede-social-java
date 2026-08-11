@@ -1,4 +1,4 @@
-package com.example.demo.service;
+package com.example.demo.websocket;
 
 import com.example.demo.dto.ConversationUpdateResponse;
 import com.example.demo.notification.dto.NotificationChatResponse;

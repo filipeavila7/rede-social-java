@@ -23,28 +23,6 @@ public class AuthController {
         return ResponseEntity.ok(service.login(request));
     }
 
-    @PostMapping("/forgot-password")
-    public ResponseEntity<Void> forgotPassword(
-            @RequestBody ForgotPasswordRequest request
-    ) {
-        service.solicitarReset(request.email());
-        return ResponseEntity.ok().build();
-    }
 
-    @PostMapping("/resend-token")
-    public ResponseEntity<Void> resendToken(
-            @RequestBody ForgotPasswordRequest request
-    ) {
-        service.reenviarEmail(request.email());
-        return ResponseEntity.ok().build();
-    }
-
-    @PostMapping("/reset-password")
-    public ResponseEntity<Void> resetPassword(
-            @RequestBody ResetPasswordRequest request
-    ) {
-        service.resetPassword(request.token(), request.novaSenha());
-        return ResponseEntity.ok().build();
-    }
 
 }

@@ -6,7 +6,7 @@ import com.example.demo.notification.entity.Notification;
 import com.example.demo.notification.entity.NotificationType;
 import com.example.demo.notification.mapper.NotificationMapper;
 import com.example.demo.post.entity.Post;
-import com.example.demo.service.WebSocketService;
+import com.example.demo.websocket.WebSocketService;
 import com.example.demo.user.entity.User;
 import com.example.demo.notification.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
