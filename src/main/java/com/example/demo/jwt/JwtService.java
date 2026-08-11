@@ -1,4 +1,4 @@
-package com.example.demo.service;
+package com.example.demo.jwt;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
