@@ -3,7 +3,6 @@ package com.example.demo.auth.service;
 import com.example.demo.auth.dto.LoginRequest;
 import com.example.demo.auth.dto.LoginResponse;
 import com.example.demo.helpers.GlobalHelperService;
-import com.example.demo.repository.PasswordResetTokenRepository;
 import com.example.demo.service.JwtService;
 import com.example.demo.user.entity.User;
 import lombok.RequiredArgsConstructor;

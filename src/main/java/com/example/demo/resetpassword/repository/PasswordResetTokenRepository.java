@@ -1,4 +1,4 @@
-package com.example.demo.repository;
+package com.example.demo.resetpassword.repository;
 
 import com.example.demo.resetpassword.entity.PasswordResetToken;
 import com.example.demo.user.entity.User;

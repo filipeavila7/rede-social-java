@@ -1,8 +1,13 @@
 package com.example.demo.resetpassword.service;
 
+import com.example.demo.email.service.EmailService;
+import com.example.demo.helpers.GlobalHelperService;
+import com.example.demo.resetpassword.repository.PasswordResetTokenRepository;
 import com.example.demo.resetpassword.entity.PasswordResetToken;
 import com.example.demo.user.entity.User;
+import com.example.demo.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -12,6 +17,12 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class PasswordResetTokenService {
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final GlobalHelperService globalHelperService;
+    private final UserRepository userRepository;
+    private final EmailService emailService;
+    private final PasswordEncoder passwordEncoder;
+
     // =========================
     // 1 - SOLICITAR RESET SENHA
     // =========================
@@ -90,13 +101,13 @@ public class PasswordResetTokenService {
         User user = resetToken.getUser();
 
         // criptografa nova senha
-        user.setPassword(encoder.encode(novaSenha));
+        user.setPassword(passwordEncoder.encode(novaSenha));
 
         // salva nova senha
         userRepository.save(user);
 
         // invalida token após uso
-        tokenRepository.delete(resetToken);
+        passwordResetTokenRepository.delete(resetToken);
     }
 
     // =========================
@@ -104,7 +115,7 @@ public class PasswordResetTokenService {
     // =========================
     public void reenviarEmail(String email) {
 
-        User user = userRepository.findByEmail(email);
+        User user = globalHelperService.findUserByEmail(email);
 
         if (user == null) {
             throw new RuntimeException("Usuário não encontrado");
