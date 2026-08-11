@@ -18,22 +18,31 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
 
-    private final String secret = System.getenv("JWT_SECRET");
+    private static final long EXPIRATION = 60 * 60 * 1000L;
 
-    private final SecretKey key = Keys.hmacShaKeyFor(
-            (secret != null ? secret : "fallback-dev-secret-com-mais-de-32-caracteres-123")
-                    .getBytes(StandardCharsets.UTF_8)
-    );
+    private final SecretKey key;
+
+    public JwtService() {
+        String secret = System.getenv("JWT_SECRET");
+
+        if (secret == null || secret.isBlank()) {
+            throw new IllegalStateException("JWT_SECRET não configurada");
+        }
+
+        key = Keys.hmacShaKeyFor(
+                secret.getBytes(StandardCharsets.UTF_8)
+        );
+    }
 
     public String extrairEmail(String token) {
         return extrairClaims(token).getSubject();
     }
 
-    public String extrairRole(String token){
+    public String extrairRole(String token) {
         return extrairClaims(token).get("role", String.class);
     }
 
-    private Claims extrairClaims(String token){
+    private Claims extrairClaims(String token) {
         return Jwts.parser()
                 .verifyWith(key)
                 .build()
@@ -42,7 +51,6 @@ public class JwtService {
     }
 
     public String gerarToken(User user) {
-
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", user.getRole().name());
 
@@ -50,7 +58,7 @@ public class JwtService {
                 .claims(claims)
                 .subject(user.getEmail())
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
+                .expiration(new Date(System.currentTimeMillis() + EXPIRATION))
                 .signWith(key)
                 .compact();
     }

@@ -62,6 +62,11 @@ public class GlobalHelperService {
                 .orElseThrow(UserNotFoundException::new);
     }
 
+    public User findUserByEmail(String email){
+        return userRepository.findByEmail(email)
+                .orElseThrow(UserNotFoundException::new);
+    }
+
     public Profile getProfileByUserId(Long userId){
         return profileRepository.findByUserId(userId)
                 .orElseThrow(ProfileNotFoundException::new);

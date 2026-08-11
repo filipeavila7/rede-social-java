@@ -34,7 +34,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         String auth = request.getHeader(HttpHeaders.AUTHORIZATION);
-        System.out.println("➡️ AUTH HEADER: " + auth);
 
         if (auth == null || !auth.toLowerCase().startsWith("bearer ")) {
             filterChain.doFilter(request, response);
@@ -42,40 +41,30 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         String token = auth.substring(7).trim();
-        System.out.println("➡️ TOKEN: " + token);
-
-        String email;
-        String role;
-
-
 
         try {
-            email = jwtService.extrairEmail(token);
-            role = jwtService.extrairRole(token);
+            String email = jwtService.extrairEmail(token);
+            String role = jwtService.extrairRole(token);
 
-            System.out.println("➡️ EMAIL: " + email);
-            System.out.println("➡️ ROLE: " + role);
+            if (email != null
+                    && role != null
+                    && SecurityContextHolder.getContext().getAuthentication() == null) {
+
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(
+                                email,
+                                null,
+                                List.of(new SimpleGrantedAuthority("ROLE_" + role))
+                        );
+
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+
         } catch (Exception ex) {
-            System.out.println("❌ TOKEN INVÁLIDO: " + ex.getMessage());
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        if (email != null) {
-
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(
-                            email,
-                            null,
-                            List.of(new SimpleGrantedAuthority("ROLE_" + role))
-                    );
-            System.out.println("➡️ SETANDO AUTH NO SECURITY CONTEXT");
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            System.out.println("➡️ AUTH FINAL: " + SecurityContextHolder.getContext().getAuthentication());
-            System.out.println("URI: " + request.getRequestURI());
-            System.out.println("AUTH: " + auth);
+            // Token inválido/expirado → continua sem autenticação
         }
 
         filterChain.doFilter(request, response);
     }
+
 }

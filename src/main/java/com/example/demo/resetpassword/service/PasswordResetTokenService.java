@@ -1,11 +1,8 @@
-package com.example.demo.service;
+package com.example.demo.resetpassword.service;
 
-import com.example.demo.entity.PasswordResetToken;
+import com.example.demo.resetpassword.entity.PasswordResetToken;
 import com.example.demo.user.entity.User;
-import com.example.demo.repository.PasswordResetTokenRepository;
-import com.example.demo.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -14,31 +11,19 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class AuthService {
-
-
-
-    private final UserRepository userRepository;
-    private final PasswordResetTokenRepository tokenRepository;
-    private final EmailService emailService;
-
-    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-
+public class PasswordResetTokenService {
     // =========================
     // 1 - SOLICITAR RESET SENHA
     // =========================
     public void solicitarReset(String email) {
 
         // busca usuário pelo email
-        User user = userRepository.findByEmail(email);
-
-        if (user == null) {
-            throw new RuntimeException("Usuário não encontrado");
-        }
+        User user = globalHelperService.findUserByEmail(email);
 
         // tenta buscar token já existente para esse usuário
         PasswordResetToken existingToken =
-                tokenRepository.findByUser(user);
+                passwordResetTokenRepository.findByUser(user);
+
 
         // =========================
         // COOLDOWN DE 1 MINUTO
@@ -78,7 +63,7 @@ public class AuthService {
         resetToken.setExpiracao(LocalDateTime.now().plusMinutes(15));
 
         // salva no banco (update ou insert)
-        tokenRepository.save(resetToken);
+        passwordResetTokenRepository.save(resetToken);
 
         // monta link de reset
         String link = "http://localhost:5173/reset-password?token=" + tokenValue;
@@ -93,7 +78,7 @@ public class AuthService {
     public void redefinirSenha(String token, String novaSenha) {
 
         // busca token no banco
-        PasswordResetToken resetToken = tokenRepository.findByToken(token)
+        PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token)
                 .orElseThrow(() -> new RuntimeException("Token inválido"));
 
         // verifica se expirou
@@ -105,7 +90,7 @@ public class AuthService {
         User user = resetToken.getUser();
 
         // criptografa nova senha
-        user.setSenha(encoder.encode(novaSenha));
+        user.setPassword(encoder.encode(novaSenha));
 
         // salva nova senha
         userRepository.save(user);
@@ -127,7 +112,7 @@ public class AuthService {
 
         // busca token válido (não expirado)
         Optional<PasswordResetToken> tokenOpt =
-                tokenRepository.findByUserAndExpiracaoAfter(
+                passwordResetTokenRepository.findByUserAndExpiracaoAfter(
                         user,
                         LocalDateTime.now()
                 );
@@ -161,7 +146,7 @@ public class AuthService {
         token.setUltimoEnvio(LocalDateTime.now());
 
         // salva alterações
-        tokenRepository.save(token);
+        passwordResetTokenRepository.save(token);
 
         // envia email
         String link =
