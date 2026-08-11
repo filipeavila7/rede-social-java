@@ -5,11 +5,13 @@ import com.example.demo.comment.repository.CommentRepository;
 import com.example.demo.exeptions.comment.CommentConflictException;
 import com.example.demo.exeptions.like.LikeConflictException;
 import com.example.demo.exeptions.like.LikeNotFoundException;
+import com.example.demo.exeptions.profile.ProfileNotFoundException;
 import com.example.demo.like.entity.Like;
 import com.example.demo.like.repository.LikeRepository;
 import com.example.demo.notification.entity.Notification;
 import com.example.demo.notification.entity.NotificationType;
 import com.example.demo.profile.entity.Profile;
+import com.example.demo.profile.repository.ProfileRepository;
 import com.example.demo.user.entity.User;
 import com.example.demo.exeptions.post.PostConflictException;
 import com.example.demo.exeptions.post.PostNotFoundException;
@@ -31,6 +33,7 @@ public class GlobalHelperService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final LikeRepository likeRepository;
+    private final ProfileRepository profileRepository;
 
 
     // TODO - provavelmente usar esse metodo na service de follow
@@ -59,11 +62,18 @@ public class GlobalHelperService {
                 .orElseThrow(UserNotFoundException::new);
     }
 
+    public Profile getProfileByUserId(Long userId){
+        return profileRepository.findByUserId(userId)
+                .orElseThrow(ProfileNotFoundException::new);
+    }
+
+    // pegar user pelo id
     public User findUserById(Long userId){
         return userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
     }
 
+    /// pegar user pelo yserName
     public User findByUserName(String userName){
         return userRepository.findByuserName(userName)
                 .orElseThrow(UserNotFoundException::new);

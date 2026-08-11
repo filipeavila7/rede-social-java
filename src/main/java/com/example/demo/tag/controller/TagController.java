@@ -1,11 +1,11 @@
-package com.example.demo.controller;
+package com.example.demo.tag.controller;
 
 import java.util.List;
 
 import org.springframework.web.bind.annotation.*;
 
-import com.example.demo.entity.Tag;
-import com.example.demo.repository.TagRepository;
+import com.example.demo.tag.entity.Tag;
+import com.example.demo.tag.repository.TagRepository;
 
 @RestController
 @RequestMapping("/tags")

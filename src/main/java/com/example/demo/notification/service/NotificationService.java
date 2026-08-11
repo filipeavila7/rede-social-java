@@ -8,7 +8,7 @@ import com.example.demo.notification.mapper.NotificationMapper;
 import com.example.demo.post.entity.Post;
 import com.example.demo.service.WebSocketService;
 import com.example.demo.user.entity.User;
-import com.example.demo.repository.NotificationRepository;
+import com.example.demo.notification.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

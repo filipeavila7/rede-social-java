@@ -1,7 +1,6 @@
 package com.example.demo.profile.service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import com.example.demo.exeptions.profile.ProfileNotFoundException;
 import com.example.demo.helpers.GlobalHelperService;
@@ -10,18 +9,12 @@ import com.example.demo.profile.mapper.ProfileMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
-import com.example.demo.dto.FollowingProfileResponse;
 import com.example.demo.profile.dto.ProfileResponse;
 import com.example.demo.profile.entity.Profile;
 import com.example.demo.user.entity.User;
-import com.example.demo.follow.repository.FollowRepository;
 import com.example.demo.profile.repository.ProfileRepository;
-import com.example.demo.user.repository.UserRepository;
 import com.example.demo.util.FileUrlUtils;
 
 @Service
@@ -71,8 +64,7 @@ public class ProfileService {
 
         User user = globalHelperService.findByUserName(userName);
 
-        Profile profile = profileRepository.findByUserId(user.getId())
-                        .orElseThrow(ProfileNotFoundException::new);
+        Profile profile = globalHelperService.getProfileByUserId(user.getId());
 
         clearExpiredStatus(profile);
 
@@ -86,8 +78,7 @@ public class ProfileService {
         User loggedUser = globalHelperService.getLoggedUser();
 
         // encontra a profile
-        Profile profile = profileRepository.findByUserId(loggedUser.getId())
-                .orElseThrow(ProfileNotFoundException::new);
+        Profile profile = globalHelperService.getProfileByUserId(loggedUser.getId());
 
 
         // atualiza a bio

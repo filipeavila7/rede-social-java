@@ -3,27 +3,16 @@ package com.example.demo.like.service;
 import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.like.dto.LikeResponse;
 import com.example.demo.like.mapper.LikeMapper;
-import com.example.demo.notification.dto.NotificationPostResponse;
-import com.example.demo.notification.entity.Notification;
 import com.example.demo.notification.entity.NotificationType;
 import com.example.demo.notification.service.NotificationService;
-import com.example.demo.repository.NotificationRepository;
-import com.example.demo.service.WebSocketService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.like.entity.Like;
 import com.example.demo.post.entity.Post;
 import com.example.demo.user.entity.User;
 import com.example.demo.like.repository.LikeRepository;
-import com.example.demo.post.repository.PostRepository;
-import com.example.demo.user.repository.UserRepository;
-
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor

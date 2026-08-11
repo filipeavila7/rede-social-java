@@ -1,7 +1,7 @@
-package com.example.demo.repository;
+package com.example.demo.tag.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import com.example.demo.entity.Tag;
+import com.example.demo.tag.entity.Tag;
 
 public interface TagRepository extends JpaRepository<Tag, Long> {
 }

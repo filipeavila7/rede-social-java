@@ -1,7 +1,7 @@
 package com.example.demo.post.dto;
 
 import com.example.demo.user.dto.UserResponse;
-import com.example.demo.entity.Tag;
+import com.example.demo.tag.entity.Tag;
 
 import java.time.LocalDateTime;
 import java.util.List;

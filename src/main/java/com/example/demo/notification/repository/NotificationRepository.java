@@ -1,4 +1,4 @@
-package com.example.demo.repository;
+package com.example.demo.notification.repository;
 
 import com.example.demo.notification.entity.Notification;
 import org.springframework.data.domain.Page;
