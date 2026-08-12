@@ -51,14 +51,13 @@ public class MessageService {
 
 
     // verifica se o id do user é igual a do user a ou b na conversation
+    // TODO - POSSIVEL METODO REDUNDATE - a repository de achar conversation ja garante que pertence aquele usuario
     private boolean belongsToConversation(Conversation c, User u) {
         return u.getId().equals(c.getUserA().getId()) ||
                 u.getId().equals(c.getUserB().getId());
     }
 
-    // =========================
-    // SEND MESSAGE
-    // =========================
+    // enviar mensagem
     @Transactional
     public MessageResponse sendMessage(Long receiverId, MessageRequest request) {
         // quem esta enviando é o user logado
@@ -96,29 +95,23 @@ public class MessageService {
         conversation.setLastMessage(request.textMessage());
         conversation.setLastMessageAt(message.getCreatedAt());
 
-        // saçva mensagem e conversation
+        // salva mensagem e conversation
         MessageResponse response = messageMapper.toMessageResponse(messageRepository.save(message));
         conversationRepository.save(conversation);
 
-        // =========================
-        // CHAT REALTIME (MENSAGEM)
-        // =========================
+       // manda mensagem em tempo real
         webSocketService.sendMessageToConversation(
                 conversation.getId(),
                 response
         );
 
-        // =========================
-        // NOTIFICAÇÃO GLOBAL
-        // =========================
+        // cria notificação
         notificationService.createChatNotification(
                 sender, receiver, NotificationType.MESSAGE, request.textMessage(), conversation.getId(),
                 message.getId());
 
 
-        // =========================
-        // UPDATE DE CONVERSA (NOVO)
-        // =========================
+        // update de conversa
         ConversationUpdateResponse convUpdate =
                 new ConversationUpdateResponse(
                         conversation.getId(),
@@ -127,15 +120,15 @@ public class MessageService {
                         sender.getId()
                 );
 
+        // atualiza pros 2 usuarios na conversa
         webSocketService.sendConversationUpdate(sender.getId(), convUpdate);
         webSocketService.sendConversationUpdate(receiver.getId(), convUpdate);
 
         return response;
     }
 
-    // =========================
-    // MARK AS READ
-    // =========================
+    // ler mensagens
+    @Transactional
     public void markConversationAsRead(Long conversationId) {
 
         User loggedUser = globalHelperService.getLoggedUser();
@@ -153,48 +146,37 @@ public class MessageService {
             );
         }
 
+        Long otherUserId;
+
+        if (conversation.getUserA().getId().equals(loggedUser.getId())) {
+            otherUserId = conversation.getUserB().getId();
+        } else {
+            otherUserId = conversation.getUserA().getId();
+        }
+
         List<Message> messages =
-                messageRepository.findByConversationIdOrderByCreatedAtAsc(conversationId);
+                messageRepository.findByConversationIdAndSenderIdAndReadAtIsNull(
+                        conversationId,
+                        otherUserId
+                );
 
-        List<Message> updated = new ArrayList<>();
-
-        for (Message msg : messages) {
-
-            boolean isOtherUser = !msg.getSender().getId().equals(me.getId());
-
-            if (isOtherUser && msg.getReadAt() == null) {
-                msg.setReadAt(LocalDateTime.now());
-                updated.add(msg);
-            }
+        if (messages.isEmpty()) {
+            return;
         }
 
-        if (!updated.isEmpty()) {
+        LocalDateTime now = LocalDateTime.now();
 
-            messageRepository.saveAll(updated);
+        messages.forEach(message -> message.setReadAt(now));
 
-            Long senderId = updated.get(0).getSender().getId();
+        messageRepository.saveAll(messages);
 
-            NotificationPostResponse readNotification =
-                    new NotificationPostResponse(
-                            "READ",
-                            me.getId(),
-                            me.getNome(),
-                            me.getUserName(),
-                            me.getProfile() != null
-                                    ? me.getProfile().getImageUrlProfile()
-                                    : null,
-                            null,
-                            conversationId,
-                            null,
-                            null,
-                            LocalDateTime.now()
-                    );
-
-            webSocketService.sendNotificationToUser(
-                    senderId,
-                    readNotification
-            );
-        }
+        notificationService.sendMessageReadNotification(
+                loggedUser,
+                otherUserId,
+                conversationId,
+                now,
+                NotificationType.READ
+        );
     }
 
     // =========================

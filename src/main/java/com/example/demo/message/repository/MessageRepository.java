@@ -15,6 +15,11 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     Page<Message> findByConversationIdOrderByCreatedAtDesc(Long conversationId, Pageable pageable);
     Optional<Message> findFirstByConversationIdOrderByCreatedAtDesc(Long conversationId); // lista ultima messagem enviada
 
+    List<Message> findByConversationIdAndSenderIdAndReadAtIsNull(
+            Long conversationId,
+            Long senderId
+    );
+
     @Query("""
     SELECT m.conversation.id, COUNT(m)
     FROM Message m

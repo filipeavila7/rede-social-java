@@ -1,5 +1,6 @@
 package com.example.demo.notification.service;
 
+import com.example.demo.message.dto.MessageReadResponse;
 import com.example.demo.notification.dto.NotificationGetResponse;
 import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.notification.entity.Notification;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -109,6 +111,28 @@ public class NotificationService {
         webSocketService.sendFollowNotificationToUser(receiver.getId(),
                 notificationMapper.toNotificationFollowResponse(notification));
 
+    }
+
+
+    // notificação em tempo real quando as mensagens são lidas
+    public void sendMessageReadNotification(
+            User reader,
+            Long receiverId,
+            Long conversationId,
+            LocalDateTime readAt,
+            NotificationType type
+    ) {
+        MessageReadResponse response = new MessageReadResponse(
+                type,
+                conversationId,
+                reader.getId(),
+                readAt
+        );
+
+        webSocketService.sendMessageReadToUser(
+                receiverId,
+                response
+        );
     }
 
 }

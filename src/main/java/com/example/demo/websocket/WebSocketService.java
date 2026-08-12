@@ -1,6 +1,7 @@
 package com.example.demo.websocket;
 
 import com.example.demo.message.dto.ConversationUpdateResponse;
+import com.example.demo.message.dto.MessageReadResponse;
 import com.example.demo.notification.dto.NotificationChatResponse;
 import com.example.demo.notification.dto.NotificationFollowResponse;
 import com.example.demo.notification.dto.NotificationPostResponse;
@@ -15,7 +16,16 @@ public class WebSocketService {
 
     private final SimpMessagingTemplate messagingTemplate;
 
-
+    // ler mensagens em tempo real
+    public void sendMessageReadToUser(
+            Long userId,
+            MessageReadResponse response
+    ) {
+        messagingTemplate.convertAndSend(
+                "/topic/notifications/" + userId,
+                response
+        );
+    }
 
     // CHAT (conversa)
     public void sendMessageToConversation(Long conversationId, MessageResponse response) {
@@ -24,6 +34,8 @@ public class WebSocketService {
                 response
         );
     }
+
+
 
     // notificações do tipo (LIKE, COMMENT)
     public void sendPostNotificationToUser(Long userId, NotificationPostResponse notification) {
