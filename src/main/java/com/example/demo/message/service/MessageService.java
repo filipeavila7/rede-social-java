@@ -26,6 +26,7 @@ import com.example.demo.message.repository.MessageRepository;
 import com.example.demo.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -133,11 +134,7 @@ public class MessageService {
 
         User loggedUser = globalHelperService.getLoggedUser();
 
-        Conversation conversation = conversationRepository.findById(conversationId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Conversa não encontrada"
-                ));
+        Conversation conversation = globalHelperService.getConversationById(conversationId);
 
         if (!belongsToConversation(conversation, loggedUser)) {
             throw new ResponseStatusException(
@@ -182,22 +179,16 @@ public class MessageService {
     // =========================
     // GET MESSAGES
     // =========================
-
-    public List<MessageResponse> getMessages(
+    public Page<MessageResponse> getMessages(
             Long conversationId,
-            int page,
-            int size
+            Pageable pageable
     ) {
 
-        User me = getLoggedUser();
+        User loggedUser = globalHelperService.getLoggedUser();
 
-        Conversation conversation = conversationRepository.findById(conversationId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Conversa não encontrada"
-                ));
+        Conversation conversation = globalHelperService.getConversationById(conversationId);
 
-        if (!belongsToConversation(conversation, me)) {
+        if (!belongsToConversation(conversation, loggedUser)) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
                     "Você não pertence a essa conversa"
@@ -206,35 +197,23 @@ public class MessageService {
 
         markConversationAsRead(conversationId);
 
-        Pageable pageable = PageRequest.of(
-                page,
-                size,
-                Sort.by(Sort.Direction.DESC, "createdAt")
-        );
+       return messageRepository.findByConversationIdOrderByCreatedAtDesc(
+                        conversationId,
+                        pageable
+                )
+                .map(messageMapper::toMessageResponse);
 
-        List<MessageResponse> messages = new ArrayList<>(
-                messageRepository
-                        .findByConversationIdOrderByCreatedAtDesc(
-                                conversationId,
-                                pageable
-                        )
-                        .stream()
-                        .map(this::toResponse)
-                        .toList()
-        );
-
-        // inverte para ficar em ordem correta no chat
-        Collections.reverse(messages);
-
-        return messages;
     }
 
     // =========================
     // UNREAD COUNT (BADGE)
     // =========================
+    // =========================
+// UNREAD COUNT (BADGE)
+// =========================
     public List<UnreadCountResponse> getUnreadConversations() {
 
-        User me = getLoggedUser();
+        User me = globalHelperService.getLoggedUser();
 
         List<Conversation> conversations =
                 conversationRepository.findAllByUserId(me.getId());
@@ -243,57 +222,28 @@ public class MessageService {
             return List.of();
         }
 
-        List<Long> ids = conversations.stream()
+        List<Long> conversationIds = conversations.stream()
                 .map(Conversation::getId)
                 .toList();
 
         List<Object[]> result =
-                messageRepository.countUnreadByConversations(ids, me.getId());
+                messageRepository.countUnreadByConversations(
+                        conversationIds,
+                        me.getId()
+                );
 
         Map<Long, Long> countMap = result.stream()
                 .collect(Collectors.toMap(
-                        r -> (Long) r[0],
-                        r -> (Long) r[1],
-                        Long::sum
+                        row -> (Long) row[0],
+                        row -> (Long) row[1]
                 ));
 
         return conversations.stream()
-                .map(c -> new UnreadCountResponse(
-                        c.getId(),
-                        countMap.getOrDefault(c.getId(), 0L)
+                .map(conversation -> new UnreadCountResponse(
+                        conversation.getId(),
+                        countMap.getOrDefault(conversation.getId(), 0L)
                 ))
                 .toList();
     }
 
-    // =========================
-    // MAPPER
-    // =========================
-    private MessageResponse toResponse(Message message) {
-
-        User sender = message.getSender();
-        Profile profile = sender.getProfile();
-
-        String photo = profile != null
-                ? profile.getImageUrlProfile()
-                : null;
-
-        String createdAt = message.getCreatedAt() != null
-                ? message.getCreatedAt().toString()
-                : null;
-
-        String readAt = message.getReadAt() != null
-                ? message.getReadAt().toString()
-                : null;
-
-        return new MessageResponse(
-                message.getId(),
-                message.getConversation().getId(),
-                sender.getId(),
-                sender.getNome(),
-                photo,
-                message.getContent(),
-                createdAt,
-                readAt
-        );
-    }
 }

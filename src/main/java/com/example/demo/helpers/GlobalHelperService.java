@@ -22,8 +22,10 @@ import com.example.demo.post.entity.Post;
 import com.example.demo.post.repository.PostRepository;
 import com.example.demo.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 
@@ -55,6 +57,15 @@ public class GlobalHelperService {
                 .findBetweenUsers(sender.getId(), receiver.getId())
                 .orElseGet(() -> conversationRepository.save(
                         new Conversation(sender, receiver)
+                ));
+    }
+
+    // pega conversation pelo id
+    public Conversation getConversationById(Long conversationId){
+        return conversationRepository.findById(conversationId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Conversa não encontrada"
                 ));
     }
 

@@ -3,6 +3,7 @@ package com.example.demo.message.controller;
 import java.util.List;
 
 import com.example.demo.message.dto.UnreadCountResponse;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,7 @@ public class MessageController {
     @PostMapping("/{receiverId}")
     public ResponseEntity<MessageResponse> sendMessage(
         @PathVariable Long receiverId,
-        @RequestBody Message body
+        @Valid @RequestBody Message body
     ) {
         MessageResponse created = service.sendMessage(receiverId, body.getContent());
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
