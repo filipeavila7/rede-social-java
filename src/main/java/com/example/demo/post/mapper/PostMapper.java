@@ -9,6 +9,7 @@ import com.example.demo.post.entity.Post;
 import com.example.demo.comment.repository.CommentRepository;
 import com.example.demo.like.repository.LikeRepository;
 import com.example.demo.user.mapper.UserMapper;
+import com.example.demo.util.FileUrlUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 public class PostMapper {
     private final UserMapper userMapper;
     private final GlobalHelperService globalHelperService;
+    private final FileUrlUtils fileUrlUtils;
 
     public PostDetaisResponse toPostDetaisResponse(Post post, Long loggedUserId) {
 
@@ -27,7 +29,7 @@ public class PostMapper {
         return new PostDetaisResponse(
                 post.getId(),
                 post.getTitle(),
-                post.getImageUrl(),
+                fileUrlUtils.toPublicUrl(post.getImageUrl()),
                 userMapper.toUserResponse(post.getUser()),
                 post.getCreatedAt(),
                 post.getDescription(),
@@ -42,7 +44,7 @@ public class PostMapper {
         return new PostResponse(
                 post.getId(),
                 post.getTitle(),
-                post.getImageUrl(),
+                fileUrlUtils.toPublicUrl(post.getImageUrl()),
                 userMapper.toUserResponse(post.getUser()),
                 post.getCreatedAt(),
                 post.getDescription(),

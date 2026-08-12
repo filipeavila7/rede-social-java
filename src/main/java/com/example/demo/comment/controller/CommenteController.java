@@ -1,7 +1,7 @@
 package com.example.demo.comment.controller;
 
 import com.example.demo.comment.dto.CommentRequest;
-import com.example.demo.dto.CommentResponse;
+import com.example.demo.comment.dto.CommentResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

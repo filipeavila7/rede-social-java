@@ -1,7 +1,7 @@
 package com.example.demo.follow.service;
 
 
-import com.example.demo.dto.FollowingProfileResponse;
+import com.example.demo.follow.dto.FollowingProfileResponse;
 import com.example.demo.exeptions.follow.FollowConflictException;
 import com.example.demo.exeptions.user.UserNotFoundException;
 import com.example.demo.follow.dto.FollowResponse;

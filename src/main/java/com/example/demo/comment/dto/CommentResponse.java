@@ -1,4 +1,4 @@
-package com.example.demo.dto;
+package com.example.demo.comment.dto;
 
 import com.example.demo.post.dto.PostSummaryResponse;
 import com.example.demo.user.dto.UserResponse;

@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.dto.FollowingProfileResponse;
+import com.example.demo.follow.dto.FollowingProfileResponse;
 import com.example.demo.profile.dto.ProfileResponse;
 import com.example.demo.profile.entity.Profile;
 import com.example.demo.profile.service.ProfileService;

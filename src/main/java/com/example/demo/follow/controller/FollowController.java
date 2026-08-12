@@ -1,6 +1,6 @@
 package com.example.demo.follow.controller;
 
-import com.example.demo.dto.FollowingProfileResponse;
+import com.example.demo.follow.dto.FollowingProfileResponse;
 import com.example.demo.follow.dto.FollowResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

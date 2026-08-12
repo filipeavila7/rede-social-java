@@ -1,13 +1,13 @@
 package com.example.demo.util;
 
+import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+@Component
 public final class FileUrlUtils {
 
-    private FileUrlUtils() {
-    }
 
     public static String normalizeStoredPath(String url) {
         if (url == null) {
@@ -49,7 +49,7 @@ public final class FileUrlUtils {
         return "/" + value;
     }
 
-    public static String toPublicUrl(String storedPath) {
+    public String toPublicUrl(String storedPath) {
         String normalized = normalizeStoredPath(storedPath);
         if (normalized == null) {
             return null;

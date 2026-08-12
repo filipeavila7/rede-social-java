@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.example.demo.dto.ConversationUpdateResponse;
+import com.example.demo.message.dto.ConversationUpdateResponse;
 import com.example.demo.message.dto.MessageResponse;
 import com.example.demo.notification.dto.NotificationPostResponse;
-import com.example.demo.dto.UnreadCountResponse;
+import com.example.demo.message.dto.UnreadCountResponse;
 import com.example.demo.conversation.entity.Conversation;
 import com.example.demo.message.entity.Message;
 import com.example.demo.profile.entity.Profile;

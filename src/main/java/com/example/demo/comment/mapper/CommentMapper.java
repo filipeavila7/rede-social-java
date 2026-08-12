@@ -1,7 +1,7 @@
 package com.example.demo.comment.mapper;
 
 import com.example.demo.comment.entity.Comment;
-import com.example.demo.dto.CommentResponse;
+import com.example.demo.comment.dto.CommentResponse;
 import com.example.demo.post.mapper.PostMapper;
 import com.example.demo.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;

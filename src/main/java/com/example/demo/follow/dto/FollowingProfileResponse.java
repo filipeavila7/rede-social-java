@@ -1,4 +1,4 @@
-package com.example.demo.dto;
+package com.example.demo.follow.dto;
 
 // dados do perfil dos usuários seguidos
 public record FollowingProfileResponse(

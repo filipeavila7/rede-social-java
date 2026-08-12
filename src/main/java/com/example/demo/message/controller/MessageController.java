@@ -2,7 +2,7 @@ package com.example.demo.message.controller;
 
 import java.util.List;
 
-import com.example.demo.dto.UnreadCountResponse;
+import com.example.demo.message.dto.UnreadCountResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

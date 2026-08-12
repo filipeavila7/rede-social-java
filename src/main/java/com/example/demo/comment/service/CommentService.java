@@ -4,7 +4,7 @@ package com.example.demo.comment.service;
 
 import com.example.demo.comment.dto.CommentRequest;
 import com.example.demo.comment.mapper.CommentMapper;
-import com.example.demo.dto.CommentResponse;
+import com.example.demo.comment.dto.CommentResponse;
 import com.example.demo.notification.entity.NotificationType;
 import com.example.demo.notification.service.NotificationService;
 import com.example.demo.helpers.GlobalHelperService;

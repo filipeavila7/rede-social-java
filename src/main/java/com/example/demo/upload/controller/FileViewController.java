@@ -1,4 +1,4 @@
-package com.example.demo.controller;
+package com.example.demo.upload.controller;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

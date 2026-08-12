@@ -1,11 +1,12 @@
 package com.example.demo.follow.mapper;
 
-import com.example.demo.dto.FollowingProfileResponse;
+import com.example.demo.follow.dto.FollowingProfileResponse;
 import com.example.demo.follow.dto.FollowResponse;
 import com.example.demo.follow.entity.Follow;
 import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.user.entity.User;
 import com.example.demo.user.mapper.UserMapper;
+import com.example.demo.util.FileUrlUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Component;
 public class FollowMapper {
     private final UserMapper userMapper;
     private final GlobalHelperService globalHelperService;
-
+    private final FileUrlUtils fileUrlUtils;
     public FollowResponse toFollowResponse(Follow f){
         return new FollowResponse(
                 userMapper.toUserResponse(f.getFollowed()),
@@ -28,7 +29,7 @@ public class FollowMapper {
         return new FollowingProfileResponse(
                 user.getId(),
                 user.getName(),
-                user.getProfile().getImageUrlProfile(),
+                fileUrlUtils.toPublicUrl(user.getProfile().getImageUrlProfile()),
                 globalHelperService.getActiveStatus(user.getProfile()),
                 user.getUserName()
         );
@@ -40,7 +41,7 @@ public class FollowMapper {
         return new FollowingProfileResponse(
                 user.getId(),
                 user.getName(),
-                user.getProfile().getImageUrlProfile(),
+                fileUrlUtils.toPublicUrl(user.getProfile().getImageUrlProfile()),
                 globalHelperService.getActiveStatus(user.getProfile()),
                 user.getUserName()
         );

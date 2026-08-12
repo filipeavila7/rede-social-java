@@ -1,7 +1,7 @@
 package com.example.demo.resetpassword.controller;
 
-import com.example.demo.dto.ForgotPasswordRequest;
-import com.example.demo.dto.ResetPasswordRequest;
+import com.example.demo.resetpassword.dto.ForgotPasswordRequest;
+import com.example.demo.resetpassword.dto.ResetPasswordRequest;
 import com.example.demo.resetpassword.service.PasswordResetTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
