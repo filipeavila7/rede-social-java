@@ -3,6 +3,9 @@ package com.example.demo.notification.controller;
 
 import com.example.demo.notification.dto.NotificationGetResponse;
 import com.example.demo.notification.service.NotificationService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,9 +22,12 @@ public class NotificationController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<NotificationGetResponse>> getMyNotifications(){
+    public ResponseEntity<Page<NotificationGetResponse>> getMyNotifications(
+            @PageableDefault(size = 12)
+            Pageable pageable
+    ){
 
-        return ResponseEntity.ok(notificationService.getMyNotifications());
+        return ResponseEntity.ok(notificationService.getMyNotifications(pageable));
     }
 
     @DeleteMapping

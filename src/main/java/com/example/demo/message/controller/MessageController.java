@@ -2,8 +2,13 @@ package com.example.demo.message.controller;
 
 import java.util.List;
 
+import com.example.demo.message.dto.MessageRequest;
 import com.example.demo.message.dto.UnreadCountResponse;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,41 +19,34 @@ import com.example.demo.message.service.MessageService;
 
 @RestController
 @RequestMapping("/messages")
+@RequiredArgsConstructor
 public class MessageController {
 
     private final MessageService service;
 
-    public MessageController(MessageService service) {
-        this.service = service;
-    }
-
-    // POST /messages/{receiverId}
-    // enviar mensagem
     @PostMapping("/{receiverId}")
     public ResponseEntity<MessageResponse> sendMessage(
         @PathVariable Long receiverId,
-        @Valid @RequestBody Message body
+        @Valid @RequestBody MessageRequest request
     ) {
-        MessageResponse created = service.sendMessage(receiverId, body.getContent());
+        MessageResponse created = service.sendMessage(receiverId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    // GET /messages/conversation/{conversationId}
-    // listar todas as mensagens de uma conversa
+
     @GetMapping("/{conversationId}/messages")
-    public List<MessageResponse> getMessages(
+    public ResponseEntity<Page<MessageResponse>> getMessages(
             @PathVariable Long conversationId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
-    ) {
-        System.out.println("ENTROU NO ENDPOINT");
-        return service.getMessages(conversationId, page, size);
+            @PageableDefault(size = 50)
+            Pageable pageable
+    ){
+        return ResponseEntity.ok(service.getMessages(conversationId, pageable));
     }
 
 
     @GetMapping("/conversations/unread")
-    public List<UnreadCountResponse> getUnread() {
-        return service.getUnreadConversations();
+    public ResponseEntity<List<UnreadCountResponse>> getUnread() {
+        return ResponseEntity.ok(service.getUnreadConversations());
     }
 
 
