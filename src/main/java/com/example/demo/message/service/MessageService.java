@@ -7,18 +7,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.message.dto.ConversationUpdateResponse;
+import com.example.demo.message.dto.MessageRequest;
 import com.example.demo.message.dto.MessageResponse;
+import com.example.demo.message.mapper.MessageMapper;
 import com.example.demo.notification.dto.NotificationPostResponse;
 import com.example.demo.message.dto.UnreadCountResponse;
 import com.example.demo.conversation.entity.Conversation;
 import com.example.demo.message.entity.Message;
+import com.example.demo.notification.entity.NotificationType;
+import com.example.demo.notification.service.NotificationService;
 import com.example.demo.profile.entity.Profile;
 import com.example.demo.websocket.WebSocketService;
 import com.example.demo.user.entity.User;
 import com.example.demo.conversation.repository.ConversationRepository;
 import com.example.demo.message.repository.MessageRepository;
 import com.example.demo.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -28,47 +35,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
+@RequiredArgsConstructor
 public class MessageService {
 
-    // TODO - a entidade de conversation possui campos de ultima mensagen e a data da ultima emnsagen
+    // TODO - a entidade de conversation possui campos de ultima mensagem e a data da ultima mensagem
     // TODO - no post de mensagens criar o set
 
     private final MessageRepository messageRepository;
     private final ConversationRepository conversationRepository;
-    private final UserRepository userRepository;
+    private final NotificationService notificationService;
     private final WebSocketService webSocketService;
+    private final GlobalHelperService globalHelperService;
+    private final MessageMapper messageMapper;
 
-    public MessageService(
-            MessageRepository messageRepository,
-            ConversationRepository conversationRepository,
-            UserRepository userRepository,
-            WebSocketService webSocketService
-    ) {
-        this.messageRepository = messageRepository;
-        this.conversationRepository = conversationRepository;
-        this.userRepository = userRepository;
-        this.webSocketService = webSocketService;
-    }
 
-    // =========================
-    // AUTH USER
-    // =========================
-    private User getLoggedUser() {
-        String email = (String) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
 
-        User user = userRepository.findByEmail(email);
-
-        if (user == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
-                    "Usuário não encontrado"
-            );
-        }
-
-        return user;
-    }
-
+    // verifica se o id do user é igual a do user a ou b na conversation
     private boolean belongsToConversation(Conversation c, User u) {
         return u.getId().equals(c.getUserA().getId()) ||
                 u.getId().equals(c.getUserB().getId());
@@ -77,17 +59,15 @@ public class MessageService {
     // =========================
     // SEND MESSAGE
     // =========================
-    public MessageResponse sendMessage(Long receiverId, String content) {
+    @Transactional
+    public MessageResponse sendMessage(Long receiverId, MessageRequest request) {
+        // quem esta enviando é o user logado
+        User sender = globalHelperService.getLoggedUser();
 
-        if (content == null || content.trim().isEmpty()) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Conteúdo vazio"
-            );
-        }
+        // procura o usuario que ta recebendo
+        User receiver = globalHelperService.findUserById(receiverId);
 
-        User sender = getLoggedUser();
-
+        // se eles forem iguais lança exceção
         if (sender.getId().equals(receiverId)) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
@@ -95,18 +75,10 @@ public class MessageService {
             );
         }
 
-        User receiver = userRepository.findById(receiverId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Usuário não encontrado"
-                ));
+        // acha coversation ou cria caso ainda não exista
+        Conversation conversation = globalHelperService.findConversationOrNew(sender, receiver);
 
-        Conversation conversation = conversationRepository
-                .findBetweenUsers(sender.getId(), receiver.getId())
-                .orElseGet(() -> conversationRepository.save(
-                        new Conversation(sender, receiver)
-                ));
-
+        // caso o usuario não pertença aquela conversa
         if (!belongsToConversation(conversation, sender)) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
@@ -114,10 +86,19 @@ public class MessageService {
             );
         }
 
-        Message message = new Message(conversation, sender, content);
-        Message saved = messageRepository.save(message);
+        // cria a mensagem
+        Message message = new Message();
+        message.setContent(request.textMessage());
+        message.setConversation(conversation);
+        message.setSender(sender);
 
-        MessageResponse response = toResponse(saved);
+        // ultima mensagem e hora da ultima mensagem
+        conversation.setLastMessage(request.textMessage());
+        conversation.setLastMessageAt(message.getCreatedAt());
+
+        // saçva mensagem e conversation
+        MessageResponse response = messageMapper.toMessageResponse(messageRepository.save(message));
+        conversationRepository.save(conversation);
 
         // =========================
         // CHAT REALTIME (MENSAGEM)
@@ -130,26 +111,10 @@ public class MessageService {
         // =========================
         // NOTIFICAÇÃO GLOBAL
         // =========================
-        NotificationPostResponse notification =
-                new NotificationPostResponse(
-                        "MESSAGE",
-                        sender.getId(),
-                        sender.getNome(),
-                        sender.getUserName(),
-                        sender.getProfile() != null
-                                ? sender.getProfile().getImageUrlProfile()
-                                : null,
-                        null,
-                        conversation.getId(),
-                        saved.getId(),
-                        content,
-                        LocalDateTime.now()
-                );
+        notificationService.createChatNotification(
+                sender, receiver, NotificationType.MESSAGE, request.textMessage(), conversation.getId(),
+                message.getId());
 
-        webSocketService.sendNotificationToUser(
-                receiver.getId(),
-                notification
-        );
 
         // =========================
         // UPDATE DE CONVERSA (NOVO)
@@ -157,8 +122,8 @@ public class MessageService {
         ConversationUpdateResponse convUpdate =
                 new ConversationUpdateResponse(
                         conversation.getId(),
-                        saved.getContent(),
-                        saved.getCreatedAt(),
+                        message.getContent(),
+                        message.getCreatedAt(),
                         sender.getId()
                 );
 
@@ -173,7 +138,7 @@ public class MessageService {
     // =========================
     public void markConversationAsRead(Long conversationId) {
 
-        User me = getLoggedUser();
+        User loggedUser = globalHelperService.getLoggedUser();
 
         Conversation conversation = conversationRepository.findById(conversationId)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -181,7 +146,7 @@ public class MessageService {
                         "Conversa não encontrada"
                 ));
 
-        if (!belongsToConversation(conversation, me)) {
+        if (!belongsToConversation(conversation, loggedUser)) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
                     "Você não pertence a essa conversa"

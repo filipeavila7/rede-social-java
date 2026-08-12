@@ -2,6 +2,8 @@ package com.example.demo.helpers;
 
 import com.example.demo.comment.entity.Comment;
 import com.example.demo.comment.repository.CommentRepository;
+import com.example.demo.conversation.entity.Conversation;
+import com.example.demo.conversation.repository.ConversationRepository;
 import com.example.demo.exeptions.comment.CommentConflictException;
 import com.example.demo.exeptions.like.LikeConflictException;
 import com.example.demo.exeptions.like.LikeNotFoundException;
@@ -34,6 +36,7 @@ public class GlobalHelperService {
     private final CommentRepository commentRepository;
     private final LikeRepository likeRepository;
     private final ProfileRepository profileRepository;
+    private final ConversationRepository conversationRepository;
 
 
     // TODO - provavelmente usar esse metodo na service de follow
@@ -46,6 +49,14 @@ public class GlobalHelperService {
         return createdAt.isBefore(LocalDateTime.now().minusHours(24)) ? null : status;
     }
 
+    // procura uma conversation e caso não exista ele cria uma
+    public Conversation findConversationOrNew(User sender, User receiver){
+        return conversationRepository
+                .findBetweenUsers(sender.getId(), receiver.getId())
+                .orElseGet(() -> conversationRepository.save(
+                        new Conversation(sender, receiver)
+                ));
+    }
 
     // criar profile rapidamente
     public void createProfile(User user){

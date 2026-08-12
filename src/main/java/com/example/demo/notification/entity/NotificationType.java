@@ -3,5 +3,6 @@ package com.example.demo.notification.entity;
 public enum NotificationType {
     COMMENT,
     LIKE,
-    FOLLOW
+    FOLLOW,
+    MESSAGE
 }
