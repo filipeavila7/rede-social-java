@@ -17,13 +17,13 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // deleteById()
 
     // buscar por content e tag
-    Page<Post> findDistinctByContentContainingIgnoreCaseOrTagsNameContainingIgnoreCaseOrderByCreatedAtDesc(
+    Page<Post> findDistinctByTitleContainingIgnoreCaseOrTagsNameContainingIgnoreCaseOrderByCreatedAtDesc(
             String content,
             String tagName,
             Pageable pageable
     );
     //sugestões
-    List<Post> findTop8DistinctByContentContainingIgnoreCaseOrTagsNameContainingIgnoreCaseOrderByCreatedAtDesc(
+    List<Post> findTop8DistinctByTitleContainingIgnoreCaseOrTagsNameContainingIgnoreCaseOrderByCreatedAtDesc(
             String content,
             String tagName
     );

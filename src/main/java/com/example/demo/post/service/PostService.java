@@ -124,7 +124,7 @@ public class PostService {
         User loggedUser = globalHelperService.getLoggedUser();
 
         return postRepository
-                .findDistinctByContentContainingIgnoreCaseOrTagsNameContainingIgnoreCaseOrderByCreatedAtDesc(
+                .findDistinctByTitleContainingIgnoreCaseOrTagsNameContainingIgnoreCaseOrderByCreatedAtDesc(
                         busca,
                         busca,
                         pageable
@@ -141,7 +141,7 @@ public class PostService {
         }
 
         List<Post> posts = postRepository
-                .findTop8DistinctByContentContainingIgnoreCaseOrTagsNameContainingIgnoreCaseOrderByCreatedAtDesc(
+                .findTop8DistinctByTitleContainingIgnoreCaseOrTagsNameContainingIgnoreCaseOrderByCreatedAtDesc(
                         termo.trim(),
                         termo.trim()
                 );

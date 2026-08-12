@@ -2,7 +2,11 @@ package com.example.demo.profile.controller;
 
 import java.util.List;
 
+import com.example.demo.profile.dto.ProfileUpdateRequest;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,44 +29,33 @@ public class ProfileController {
         this.service = service;
     }
 
-    // GET
-    // /profiles/me perfil do usuario logado
+
     @GetMapping("/me")
     public ResponseEntity<ProfileResponse> getMyProfile() {
         // retronar os dados da profile do usuario em json
         return ResponseEntity.ok(service.getMyProfile());
     }
 
-    // GET /profiles/user?userName
+
     @GetMapping("/user")
     public ResponseEntity<ProfileResponse> getProfileByUserName(@RequestParam String userName) {
         return ResponseEntity.ok(service.getProfileByUserName(userName));
     }
 
-    // GET /profiles/following
-    @GetMapping("/following")
-    public ResponseEntity<List<FollowingProfileResponse>> getFollowingProfiles() {
-        return ResponseEntity.ok(service.getFollowingProfiles());
-    }
-
-    // GET /profiles/followers
-    @GetMapping("/followers")
-    public ResponseEntity<List<FollowingProfileResponse>> getFollowersProfiles() {
-        return ResponseEntity.ok(service.getFollowersProfiles());
-    }
 
     // GET /profiles/search
     @GetMapping("/search")
-    public ResponseEntity<List<ProfileResponse>> search(@RequestParam String q) {
-        return ResponseEntity.ok(service.searchProfiles(q));
+    public ResponseEntity<Page<ProfileResponse>> search(
+            @RequestParam String q,
+            @PageableDefault(12)
+            Pageable pageable) {
+        return ResponseEntity.ok(service.searchProfiles(q, pageable));
     }
 
     // PUT
     @PutMapping("me")
-    public ResponseEntity<Profile> uptadeMyProfile(@Valid @RequestBody Profile profile) {
-        Profile profileUpdate = service.updateMyProfile(profile);
-
-        return ResponseEntity.ok(profileUpdate);
+    public ResponseEntity<ProfileResponse> uptadeMyProfile(@Valid @RequestBody ProfileUpdateRequest request) {
+        return ResponseEntity.ok(service.updateMyProfile(request));
     }
 
 }

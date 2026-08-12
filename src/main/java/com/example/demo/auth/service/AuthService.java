@@ -20,7 +20,11 @@ public class AuthService {
 
     public LoginResponse login(LoginRequest request) {
 
+        System.out.println("EMAIL RECEBIDO: [" + request.email() + "]");
+
         User user = globalHelperService.findUserByEmail(request.email());
+
+        System.out.println("USUÁRIO ENCONTRADO: " + user.getEmail());
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
             throw new RuntimeException("Senha inválida");
