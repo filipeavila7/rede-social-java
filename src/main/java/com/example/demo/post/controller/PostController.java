@@ -38,21 +38,12 @@ public class PostController {
 
     // ========== GET ==========
 
-    @GetMapping()
-    public ResponseEntity<Page<PostDetaisResponse>> getAllPosts(
+    @GetMapping
+    public ResponseEntity<Page<PostDetaisResponse>> getFeed(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "12") int size,
-            @RequestParam(required = false) Long seed) {
-
-        long resolvedSeed = (seed != null) ? seed : Math.abs(new Random().nextLong() % 1_000_000);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Feed-Seed", String.valueOf(resolvedSeed));
-        headers.add("Access-Control-Expose-Headers", "X-Feed-Seed"); // ← ESSENCIAL pro front ler o header
-
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(service.getAllPosts(page, size, resolvedSeed));
+            @RequestParam(defaultValue = "12") int size
+    ) {
+        return ResponseEntity.ok(service.getFeed(page, size));
     }
 
     @GetMapping("/search")
