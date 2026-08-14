@@ -8,93 +8,89 @@ import com.example.demo.tag.entity.Tag;
 import com.example.demo.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserInterestService {
+
+    private static final double LIKE_WEIGHT = 5.0;
+    private static final double COMMENT_WEIGHT = 8.0;
+    private static final double SAVE_WEIGHT = 10.0;
+    private static final double SHARE_WEIGHT = 12.0;
+
     private final UserInterestRepository userInterestRepository;
 
-    public void registerInterest(
-            User user,
-            Post post,
-            InteractionType type,
-            Integer durationSeconds
-    ){
-        // calcula o score do tipo da interação
+    // usado para VIEW / SAVE / SHARE (interações registradas via UserInteraction)
+    @Transactional
+    public void registerInterest(User user, Post post, InteractionType type, Integer durationSeconds) {
         double score = calculateScore(type, durationSeconds);
-
-        for (Tag tag : post.getTags()){
-            UserInterest interest =
-                    userInterestRepository
-                            .findByUserIdAndTagId(user.getId(), tag.getId()) // procura se existe pontuação pra aquela tag
-                            .orElseGet(() -> createInterest(user, tag)); // se não existir, cria
-
-            // adciona pontuação
-            interest.setScore(
-                    interest.getScore() + score
-            );
+        if (score > 0) {
+            applyDelta(user, post, score);
         }
-
     }
 
-    // criar interesse quando não existir
+    // usado diretamente por LikeService / CommentService, com delta positivo ou negativo
+    @Transactional
+    public void applyDelta(User user, Post post, double delta) {
+        List<Tag> tags = post.getTags();
+        if (tags.isEmpty()) {
+            return;
+        }
+
+        List<Long> tagIds = tags.stream().map(Tag::getId).toList();
+
+        // busca em lote em vez de uma query por tag
+        Map<Long, UserInterest> existing = userInterestRepository
+                .findByUserIdAndTagIdIn(user.getId(), tagIds)
+                .stream()
+                .collect(Collectors.toMap(ui -> ui.getTag().getId(), ui -> ui));
+
+        LocalDateTime now = LocalDateTime.now();
+
+        for (Tag tag : tags) {
+            UserInterest interest = existing.getOrDefault(tag.getId(), createInterest(user, tag));
+
+            double newScore = Math.max(0, interest.getScore() + delta);
+            interest.setScore(newScore);
+            interest.setUpdatedAt(now);
+
+            userInterestRepository.save(interest);
+        }
+    }
+
     private UserInterest createInterest(User user, Tag tag) {
-
         UserInterest interest = new UserInterest();
-
         interest.setUser(user);
         interest.setTag(tag);
         interest.setScore(0.0);
         interest.setUpdatedAt(LocalDateTime.now());
-
         return interest;
     }
 
-    // calulcar pontuação de acordo com o tipo da interação
-    private double calculateScore(
-            InteractionType type,
-            Integer durationSeconds
-    ) {
-
+    private double calculateScore(InteractionType type, Integer durationSeconds) {
         return switch (type) {
-
             case VIEW -> calculateViewScore(durationSeconds);
-
-            case LIKE -> 5.0;
-
-            case COMMENT -> 8.0;
-
-            case SAVE -> 10.0;
-
-            case SHARE -> 12.0;
+            case SAVE -> SAVE_WEIGHT;
+            case SHARE -> SHARE_WEIGHT;
         };
     }
 
-    // metodo exclusivo para calcular o score da vizualização
     private double calculateViewScore(Integer durationSeconds) {
-
-        if (durationSeconds == null || durationSeconds < 10) {
-            return 0;
-        }
-
-        if (durationSeconds < 20) {
-            return 1;
-        }
-
-        if (durationSeconds < 40) {
-            return 2;
-        }
-
-        if (durationSeconds < 60) {
-            return 3;
-        }
-
-        if (durationSeconds < 120) {
-            return 4;
-        }
-
+        if (durationSeconds == null || durationSeconds < 10) return 0;
+        if (durationSeconds < 20) return 1;
+        if (durationSeconds < 40) return 2;
+        if (durationSeconds < 60) return 3;
+        if (durationSeconds < 120) return 4;
         return 5;
     }
+
+    // expostos para LikeService/CommentService usarem os mesmos pesos
+    public static double likeWeight() { return LIKE_WEIGHT; }
+    public static double commentWeight() { return COMMENT_WEIGHT; }
 }
