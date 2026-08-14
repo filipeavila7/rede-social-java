@@ -1,5 +1,6 @@
 package com.example.demo.post.controller;
 
+import com.example.demo.feed.service.FeedService;
 import com.example.demo.post.dto.PostRequest;
 import com.example.demo.post.dto.PostDetaisResponse;
 import com.example.demo.post.dto.PostResponse;
@@ -34,7 +35,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 public class PostController {
 
     public final PostService service;
-
+    public final FeedService feedService;
 
     // ========== GET ==========
 
@@ -43,7 +44,7 @@ public class PostController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size
     ) {
-        return ResponseEntity.ok(service.getFeed(page, size));
+        return ResponseEntity.ok(feedService.getFeed(page, size));
     }
 
     @GetMapping("/search")

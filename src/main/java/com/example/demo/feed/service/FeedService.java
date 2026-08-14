@@ -41,7 +41,7 @@ public class FeedService {
     private final GlobalHelperService globalHelperService;
 
     public Page<PostDetaisResponse> getFeed(int page, int size) {
-        User loggedUser = globalHelperService.getLoggedUser();
+        User loggedUser = globalHelperService.getLoggedUserOrNull();
 
         List<Post> candidates = fetchCandidatePool();
 
