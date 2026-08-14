@@ -8,7 +8,7 @@ import java.util.List;
 
 public record PostDetaisResponse(
         Long id,
-        String content,
+        String title,
         String imageUrl,
         UserResponse user,
         LocalDateTime createdAt,
