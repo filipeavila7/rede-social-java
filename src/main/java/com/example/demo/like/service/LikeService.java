@@ -1,5 +1,6 @@
 package com.example.demo.like.service;
 
+import com.example.demo.feed.interest.service.UserInterestService;
 import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.like.dto.LikeResponse;
 import com.example.demo.like.mapper.LikeMapper;
@@ -21,7 +22,7 @@ public class LikeService {
     public final NotificationService notificationService;
     private final GlobalHelperService globalHelperService;
     private final LikeMapper likeMapper;
-
+    private final UserInterestService userInterestService;
 
     // ========== GET ==========
 
@@ -39,41 +40,39 @@ public class LikeService {
     // curtir post pelo id do post com o user logado
     @Transactional
     public LikeResponse createLike(Long postId) {
-        // pega o user logado
         User loggedUser = globalHelperService.getLoggedUser();
-
-        // encontra o post
         Post post = globalHelperService.findPostById(postId);
 
-        // verifica se existe curtida
         globalHelperService.verifyLikeInPost(loggedUser.getId(), postId);
 
-        // cria o like
         Like like = new Like();
         like.setPost(post);
         like.setUser(loggedUser);
 
-        // content da notificação
-        String content = loggedUser.getName() + " curtiu o seu post";
+        LikeResponse response = likeMapper.toLikeResponse(likeRepository.save(like));
 
-        // cria a notificação
+        // atualiza o perfil de interesse com o peso do like
+        userInterestService.applyDelta(loggedUser, post, UserInterestService.likeWeight());
+
+        String content = loggedUser.getName() + " curtiu o seu post";
         notificationService.createPostNotification(
                 loggedUser, post.getUser(), post, NotificationType.LIKE, content);
 
-        return likeMapper.toLikeResponse(likeRepository.save(like));
+        return response;
     }
-
-
-    // ========== DELETE ==========
 
     // remover uma curtida
     @Transactional
     public void unlikePost(Long postId) {
-        // pegar curtida existente pelo usuario logado no post curtido
-        Like like = globalHelperService.findLikeByUserIdAndPostId(
-                globalHelperService.getLoggedUser().getId(), postId);
+        User loggedUser = globalHelperService.getLoggedUser();
+
+        Like like = globalHelperService.findLikeByUserIdAndPostId(loggedUser.getId(), postId);
+        Post post = like.getPost();
 
         likeRepository.delete(like);
+
+        // reverte o peso do like no perfil de interesse
+        userInterestService.applyDelta(loggedUser, post, -UserInterestService.likeWeight());
     }
 
 
