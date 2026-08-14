@@ -5,6 +5,7 @@ package com.example.demo.comment.service;
 import com.example.demo.comment.dto.CommentRequest;
 import com.example.demo.comment.mapper.CommentMapper;
 import com.example.demo.comment.dto.CommentResponse;
+import com.example.demo.feed.interest.service.UserInterestService;
 import com.example.demo.notification.entity.NotificationType;
 import com.example.demo.notification.service.NotificationService;
 import com.example.demo.helpers.GlobalHelperService;
@@ -25,6 +26,7 @@ public class CommentService {
     public final GlobalHelperService  globalHelperService;
     private final CommentMapper commentMapper;
     private final NotificationService notificationService;
+    private final UserInterestService userInterestService;
 
     // TODO pro futuro, criar funcionalidae de responder comentarios em um post e curtir comentarios
     // TODO criar get que mostra todos os comentarios que o uusario ja fez permitindo gerenciar
@@ -43,45 +45,40 @@ public class CommentService {
     // criar comentario em um post
     @Transactional
     public CommentResponse createCommente(Long postId, CommentRequest request) {
-        // pegar user logado
         User loggedUser = globalHelperService.getLoggedUser();
-
-        // encontrar o post
         Post post = globalHelperService.findPostById(postId);
 
-        // cria o objeto de comentário
         Comment comment = new Comment();
-
-        // cria o relacionamento
         comment.setPost(post);
         comment.setUser(loggedUser);
-
         comment.setContent(request.content());
 
-        // conteudo da notificação
+        Comment saved = commentRepository.save(comment);
+
+        // atualiza o perfil de interesse com o peso do comentário
+        userInterestService.applyDelta(loggedUser, post, UserInterestService.commentWeight());
+
         String content = loggedUser.getName() + " comentou no seu post: " + comment.getContent();
-
-        // cria a notificação e ja envia via webSocket
         notificationService.createPostNotification(
-                loggedUser, post.getUser(), post, NotificationType.COMMENT,
-                content
-        );
+                loggedUser, post.getUser(), post, NotificationType.COMMENT, content);
 
-        return commentMapper.toCommentResponse(commentRepository.save(comment));
-
+        return commentMapper.toCommentResponse(saved);
     }
 
     // ========== DELETE ==========
 
     // deletar um comentario do user logado passando o id do comentario
+    @Transactional
     public void deleteCommente(Long commentId) {
+        User loggedUser = globalHelperService.getLoggedUser();
 
-        // verifica se o usuario é dono do comentario
-        Comment comment = globalHelperService.validateCommentOwnership(
-                commentId, globalHelperService.getLoggedUser());
+        Comment comment = globalHelperService.validateCommentOwnership(commentId, loggedUser);
+        Post post = comment.getPost();
 
         commentRepository.delete(comment);
 
+        // reverte o peso do comentário no perfil de interesse
+        userInterestService.applyDelta(loggedUser, post, -UserInterestService.commentWeight());
     }
 
 }
