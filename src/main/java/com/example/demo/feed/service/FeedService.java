@@ -34,9 +34,11 @@ public class FeedService {
     private static final double POPULARITY_WEIGHT = 0.2;
     private static final double RECENCY_WEIGHT = 0.1;
 
+    private static final double EXPLORATION_RATIO = 0.10; // 1 a cada 10 posts
+    private static final double LOW_INTEREST_THRESHOLD = 0.05; // abaixo disso, conta como "não conhecido"
+
     private final PostRepository postRepository;
     private final UserInterestRepository userInterestRepository;
-    private final LikeRepository likeRepository;
     private final PostMapper postMapper;
     private final GlobalHelperService globalHelperService;
 
@@ -66,10 +68,9 @@ public class FeedService {
     private List<ScoredPost> scorePersonalized(List<Post> candidates, User user) {
         Map<Long, Double> tagScores = loadUserTagScores(user, candidates);
         double maxInterest = tagScores.values().stream().mapToDouble(v -> v).max().orElse(1.0);
-
         double now = System.currentTimeMillis();
 
-        return candidates.stream()
+        List<ScoredPost> scored = candidates.stream()
                 .map(post -> {
                     double interestScore = normalizedInterestScore(post, tagScores, maxInterest);
                     double popularityScore = normalizedPopularity(post);
@@ -80,13 +81,49 @@ public class FeedService {
                                     + POPULARITY_WEIGHT * popularityScore
                                     + RECENCY_WEIGHT * recencyScore;
 
-                    return new ScoredPost(post, finalScore);
+                    return new ScoredPost(post, finalScore, interestScore);
                 })
-                .sorted(Comparator.comparingDouble(ScoredPost::score).reversed())
                 .toList();
+
+        return interleaveExploration(scored);
     }
 
-    // busca em lote o score de interesse do usuário só pras tags que aparecem no pool
+    // separa "conhecido" de "exploração" e intercala na proporção definida
+    private List<ScoredPost> interleaveExploration(List<ScoredPost> scored) {
+        List<ScoredPost> known = scored.stream()
+                .filter(sp -> sp.interestScore() > LOW_INTEREST_THRESHOLD)
+                .sorted(Comparator.comparingDouble(ScoredPost::finalScore).reversed())
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        Deque<ScoredPost> exploration = scored.stream()
+                .filter(sp -> sp.interestScore() <= LOW_INTEREST_THRESHOLD)
+                .sorted(Comparator.comparingDouble(ScoredPost::finalScore).reversed())
+                .collect(Collectors.toCollection(ArrayDeque::new));
+
+        if (exploration.isEmpty() || known.isEmpty()) {
+            // nada pra explorar, ou nada conhecido ainda (usuário novo) — devolve como está
+            List<ScoredPost> fallback = new ArrayList<>(known);
+            fallback.addAll(exploration);
+            return fallback;
+        }
+
+        int interval = (int) Math.round(1 / EXPLORATION_RATIO);
+        List<ScoredPost> result = new ArrayList<>();
+
+        for (int i = 0; i < known.size(); i++) {
+            result.add(known.get(i));
+
+            if ((i + 1) % interval == 0 && !exploration.isEmpty()) {
+                result.add(exploration.poll());
+            }
+        }
+
+        // se sobrou exploração sem "encaixe", entra no fim (better than descartar)
+        result.addAll(exploration);
+
+        return result;
+    }
+
     private Map<Long, Double> loadUserTagScores(User user, List<Post> candidates) {
         List<Long> tagIds = candidates.stream()
                 .flatMap(p -> p.getTags().stream())
@@ -120,19 +157,19 @@ public class FeedService {
 
                     double finalScore = 0.6 * popularityScore + 0.3 * recencyScore + randomness;
 
-                    return new ScoredPost(post, finalScore);
+                    return new ScoredPost(post, finalScore, 0.0); // sem conceito de interesse pra anônimo
                 })
-                .sorted(Comparator.comparingDouble(ScoredPost::score).reversed())
+                .sorted(Comparator.comparingDouble(ScoredPost::finalScore).reversed())
                 .toList();
     }
 
     // ---------- fatores compartilhados ----------
 
     private double normalizedPopularity(Post post) {
-        long likes = post.getLikesCount(); // ou likeRepository.countByPost(post) se não for contador denormalizado
+        long likes = post.getLikesCount();
         long comments = post.getCommentsCount();
         double raw = likes + comments * 1.5;
-        return Math.min(1.0, raw / 100.0); // 100 = teto arbitrário, ajustar com dados reais
+        return Math.min(1.0, raw / 100.0);
     }
 
     private double normalizedRecency(Post post, double now) {
@@ -153,7 +190,7 @@ public class FeedService {
             ScoredPost next = remaining.stream()
                     .filter(sp -> !violatesDiversity(sp.post(), consecutiveTagCount, maxConsecutive))
                     .findFirst()
-                    .orElse(remaining.get(0)); // se todos violarem, aceita o melhor mesmo assim
+                    .orElse(remaining.get(0));
 
             result.add(next.post());
             remaining.remove(next);
@@ -169,7 +206,6 @@ public class FeedService {
     }
 
     private void updateConsecutiveCount(Post post, Map<Long, Integer> counts) {
-        // zera tags que não estão nesse post, incrementa as que estão
         Set<Long> postTagIds = post.getTags().stream().map(Tag::getId).collect(Collectors.toSet());
         counts.replaceAll((tagId, count) -> postTagIds.contains(tagId) ? count + 1 : 0);
         for (Long tagId : postTagIds) {
@@ -193,5 +229,5 @@ public class FeedService {
                 .map(post -> postMapper.toPostDetaisResponse(post, userId));
     }
 
-    private record ScoredPost(Post post, double score) {}
+    private record ScoredPost(Post post, double finalScore, double interestScore) {}
 }

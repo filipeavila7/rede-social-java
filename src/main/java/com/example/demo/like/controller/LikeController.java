@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/posts")
+@RequestMapping("/likes")
 public class LikeController {
 
     public final LikeService service;
