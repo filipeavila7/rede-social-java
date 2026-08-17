@@ -2,6 +2,7 @@ package com.example.demo.feed.service;
 
 import com.example.demo.feed.interest.entity.UserInterest;
 import com.example.demo.feed.interest.repository.UserInterestRepository;
+import com.example.demo.feed.repository.PostImpressionRepository;
 import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.like.repository.LikeRepository;
 import com.example.demo.post.dto.PostDetaisResponse;
@@ -34,11 +35,16 @@ public class FeedService {
     private static final double POPULARITY_WEIGHT = 0.2;
     private static final double RECENCY_WEIGHT = 0.1;
 
-    private static final double EXPLORATION_RATIO = 0.10; // 1 a cada 10 posts
-    private static final double LOW_INTEREST_THRESHOLD = 0.05; // abaixo disso, conta como "não conhecido"
+    private static final double EXPLORATION_RATIO = 0.10;
+    private static final double LOW_INTEREST_THRESHOLD = 0.05;
+
+    private static final int IMPRESSION_WINDOW_HOURS = 6;
+    private static final double EXPOSURE_PENALTY = 0.25;
 
     private final PostRepository postRepository;
     private final UserInterestRepository userInterestRepository;
+    private final PostImpressionRepository postImpressionRepository;
+    private final PostImpressionService postImpressionService;
     private final PostMapper postMapper;
     private final GlobalHelperService globalHelperService;
 
@@ -53,7 +59,24 @@ public class FeedService {
 
         List<Post> ranked = applyDiversity(scored);
 
-        return paginate(ranked, page, size, loggedUser);
+        PagedResult pageResult = paginate(ranked, page, size);
+
+        if (loggedUser != null) {
+            // não bloqueia a resposta — roda em outra thread, outra transação
+            postImpressionService.registerImpressions(loggedUser, pageResult.content());
+        }
+
+        Long userId = loggedUser != null ? loggedUser.getId() : null;
+
+        Page<PostDetaisResponse> dtoPage = new PageImpl<>(
+                pageResult.content().stream()
+                        .map(post -> postMapper.toPostDetaisResponse(post, userId))
+                        .toList(),
+                pageResult.pageable(),
+                ranked.size()
+        );
+
+        return dtoPage;
     }
 
     private List<Post> fetchCandidatePool() {
@@ -70,6 +93,9 @@ public class FeedService {
         double maxInterest = tagScores.values().stream().mapToDouble(v -> v).max().orElse(1.0);
         double now = System.currentTimeMillis();
 
+        Set<Long> recentlyShown = postImpressionRepository.findRecentlyShownPostIds(
+                user.getId(), LocalDateTime.now().minusHours(IMPRESSION_WINDOW_HOURS));
+
         List<ScoredPost> scored = candidates.stream()
                 .map(post -> {
                     double interestScore = normalizedInterestScore(post, tagScores, maxInterest);
@@ -81,6 +107,12 @@ public class FeedService {
                                     + POPULARITY_WEIGHT * popularityScore
                                     + RECENCY_WEIGHT * recencyScore;
 
+                    if (recentlyShown.contains(post.getId())) {
+                        finalScore -= EXPOSURE_PENALTY;
+                    }
+
+                    finalScore += ThreadLocalRandom.current().nextDouble(0, 0.02);
+
                     return new ScoredPost(post, finalScore, interestScore);
                 })
                 .toList();
@@ -88,7 +120,6 @@ public class FeedService {
         return interleaveExploration(scored);
     }
 
-    // separa "conhecido" de "exploração" e intercala na proporção definida
     private List<ScoredPost> interleaveExploration(List<ScoredPost> scored) {
         List<ScoredPost> known = scored.stream()
                 .filter(sp -> sp.interestScore() > LOW_INTEREST_THRESHOLD)
@@ -101,7 +132,6 @@ public class FeedService {
                 .collect(Collectors.toCollection(ArrayDeque::new));
 
         if (exploration.isEmpty() || known.isEmpty()) {
-            // nada pra explorar, ou nada conhecido ainda (usuário novo) — devolve como está
             List<ScoredPost> fallback = new ArrayList<>(known);
             fallback.addAll(exploration);
             return fallback;
@@ -112,15 +142,12 @@ public class FeedService {
 
         for (int i = 0; i < known.size(); i++) {
             result.add(known.get(i));
-
             if ((i + 1) % interval == 0 && !exploration.isEmpty()) {
                 result.add(exploration.poll());
             }
         }
 
-        // se sobrou exploração sem "encaixe", entra no fim (better than descartar)
         result.addAll(exploration);
-
         return result;
     }
 
@@ -157,7 +184,7 @@ public class FeedService {
 
                     double finalScore = 0.6 * popularityScore + 0.3 * recencyScore + randomness;
 
-                    return new ScoredPost(post, finalScore, 0.0); // sem conceito de interesse pra anônimo
+                    return new ScoredPost(post, finalScore, 0.0);
                 })
                 .sorted(Comparator.comparingDouble(ScoredPost::finalScore).reversed())
                 .toList();
@@ -184,16 +211,26 @@ public class FeedService {
         Map<Long, Integer> consecutiveTagCount = new HashMap<>();
         int maxConsecutive = 2;
 
-        List<ScoredPost> remaining = new ArrayList<>(scored);
+        LinkedList<ScoredPost> remaining = new LinkedList<>(scored);
 
         while (!remaining.isEmpty()) {
-            ScoredPost next = remaining.stream()
-                    .filter(sp -> !violatesDiversity(sp.post(), consecutiveTagCount, maxConsecutive))
-                    .findFirst()
-                    .orElse(remaining.get(0));
+            Iterator<ScoredPost> it = remaining.iterator();
+            ScoredPost next = null;
+
+            while (it.hasNext()) {
+                ScoredPost candidate = it.next();
+                if (!violatesDiversity(candidate.post(), consecutiveTagCount, maxConsecutive)) {
+                    next = candidate;
+                    it.remove();
+                    break;
+                }
+            }
+
+            if (next == null) {
+                next = remaining.poll(); // ninguém passa no filtro — aceita o melhor mesmo assim
+            }
 
             result.add(next.post());
-            remaining.remove(next);
             updateConsecutiveCount(next.post(), consecutiveTagCount);
         }
 
@@ -215,19 +252,17 @@ public class FeedService {
 
     // ---------- paginação sobre o pool já ranqueado ----------
 
-    private Page<PostDetaisResponse> paginate(List<Post> ranked, int page, int size, User loggedUser) {
+    private PagedResult paginate(List<Post> ranked, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         int start = Math.toIntExact(pageable.getOffset());
         int end = Math.min(start + pageable.getPageSize(), ranked.size());
 
-        List<Post> pageContent = start >= ranked.size() ? List.of() : ranked.subList(start, end);
+        List<Post> content = start >= ranked.size() ? List.of() : ranked.subList(start, end);
 
-        Long userId = loggedUser != null ? loggedUser.getId() : null;
-
-        return new PageImpl<>(pageContent, pageable, ranked.size())
-                .map(post -> postMapper.toPostDetaisResponse(post, userId));
+        return new PagedResult(content, pageable);
     }
 
     private record ScoredPost(Post post, double finalScore, double interestScore) {}
+    private record PagedResult(List<Post> content, Pageable pageable) {}
 }
