@@ -1,8 +1,13 @@
 package com.example.demo.save.service;
 
 import com.example.demo.helpers.GlobalHelperService;
+import com.example.demo.save.dto.SaveResponse;
+import com.example.demo.save.mapper.SaveMapper;
 import com.example.demo.save.repository.SaveRepository;
+import com.example.demo.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -10,7 +15,14 @@ import org.springframework.stereotype.Service;
 public class SaveService {
     private final SaveRepository saveRepository;
     private final GlobalHelperService globalHelperService;
+    private final SaveMapper saveMapper;
 
 
-    public
+    // mostrar posts salvos do user logado
+    public Page<SaveResponse> getMySaves(Pageable pageable){
+        User loggedUser = globalHelperService.getLoggedUser();
+
+        return saveRepository.findByUserId(loggedUser.getId(), pageable)
+                .map(saveMapper::toSaveResponse);
+    }
 }
