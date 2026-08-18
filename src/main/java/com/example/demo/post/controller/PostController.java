@@ -39,6 +39,7 @@ public class PostController {
 
     // ========== GET ==========
 
+    // TODO - mover essa rota para o controller de feed
     @GetMapping
     public ResponseEntity<Page<PostDetaisResponse>> getFeed(
             @RequestParam(defaultValue = "0") int page,

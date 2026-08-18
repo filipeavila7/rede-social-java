@@ -17,6 +17,8 @@ import com.example.demo.follow.entity.Follow;
 import com.example.demo.user.entity.User;
 import com.example.demo.follow.repository.FollowRepository;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class FollowService {
@@ -48,6 +50,7 @@ public class FollowService {
 
         follow.setFollower(loggedUser);
         follow.setFollowed(followed);
+        follow.setCreatedAt(LocalDateTime.now());
 
         // conteydo da notificação
         String content = loggedUser.getName() + " começou a seguir você";

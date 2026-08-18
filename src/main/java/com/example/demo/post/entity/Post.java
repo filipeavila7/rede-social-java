@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.demo.comment.entity.Comment;
+import com.example.demo.feed.entity.PostImpression;
+import com.example.demo.feed.interaction.entity.UserInteraction;
 import com.example.demo.like.entity.Like;
 import com.example.demo.tag.entity.Tag;
 import com.example.demo.user.entity.User;
@@ -65,6 +67,14 @@ public class Post {
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private List<Tag> tags;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostImpression> impressions;
+
+
+    @OneToMany(mappedBy = "post")
+    private List<UserInteraction> interactions;
+
 
     // TODO dar uma olhada nisso depois
 

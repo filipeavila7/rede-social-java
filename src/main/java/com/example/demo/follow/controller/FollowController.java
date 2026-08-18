@@ -49,13 +49,13 @@ public class FollowController {
         return ResponseEntity.noContent().build();
     }
 
-    // contagem de seguidores e seguindo de outro user
+
     @GetMapping("/{userId}/followers/count")
     public ResponseEntity<Long> countFollowers(@PathVariable Long userId) {
         return ResponseEntity.ok(service.countFollowers(userId));
     }
 
-    // GET /users/{userId}/following/count
+
     @GetMapping("/{userId}/following/count")
     public ResponseEntity<Long> countFollowing(@PathVariable Long userId) {
         return ResponseEntity.ok(service.countFollowing(userId));

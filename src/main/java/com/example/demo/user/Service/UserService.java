@@ -1,9 +1,11 @@
 package com.example.demo.user.Service;
 
 
+import com.example.demo.exeptions.user.UserConflictException;
 import com.example.demo.user.dto.UpdateUserRequest;
 import com.example.demo.user.dto.UserRequest;
 import com.example.demo.user.dto.UserResponse;
+import com.example.demo.user.dto.UserRoleResponse;
 import com.example.demo.user.entity.Role;
 import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.user.mapper.UserMapper;
@@ -83,7 +85,23 @@ public class UserService {
     }
 
 
-    // TODO - metodo para tornar o usuário um artista
+    // transaformar user logado em artista
+    public UserRoleResponse toArtist(){
+        User loggedUser = globalHelperService.getLoggedUser();
+
+        if (loggedUser.getRole() == Role.ARTIST){
+            throw new UserConflictException("Você já é um artista");
+        }
+
+        if (loggedUser.getRole() == Role.ADMIN){
+            throw new UserConflictException("Administradores não podem ser artistas");
+        }
+
+        loggedUser.setRole(Role.ARTIST);
+
+        return userMapper.toUserRoleResponse(userRepository.save(loggedUser));
+
+    }
 
 
     // ========== DELETE ==========

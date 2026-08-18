@@ -35,6 +35,8 @@ public class ConversationService {
                 .map(c -> conversationMapper.toConversationResponse(c, loggedUser));
     }
 
+    // criar um metodo para retornar dados do outro usuario pelos ids das users na conversation
+
 
     // criar conversa caso ela ainda não exista
     public ConversationResponse openConversation(Long otherUserId) {
