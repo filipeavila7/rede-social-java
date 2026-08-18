@@ -47,7 +47,14 @@ public class SaveService {
 
     }
 
-    /
+    // remover salvo
+    public void deleteSave(Long postId){
+        Save save = saveRepository.findByUserIdAndPostId(
+                globalHelperService.getLoggedUser().getId(), postId
+        ).orElseThrow(() -> new RuntimeException("Save não encontrado"));
+
+        saveRepository.delete(save);
+    }
 
 
 
