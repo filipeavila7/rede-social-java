@@ -81,11 +81,11 @@ public class User {
 
 
     // um usuario pode ter varios seguidores
-    @OneToMany(mappedBy = "followed")
+    @OneToMany(mappedBy = "followed", cascade = CascadeType.ALL)
     private List<Follow> followers;
 
     // um usuario pode seguir varios usuarios
-    @OneToMany(mappedBy =  "follower")
+    @OneToMany(mappedBy =  "follower", cascade = CascadeType.ALL)
     private List<Follow> following;
 
 

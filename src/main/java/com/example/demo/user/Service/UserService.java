@@ -85,7 +85,7 @@ public class UserService {
     }
 
 
-    // transaformar user logado em artista
+    // transformar user logado em artista
     public UserRoleResponse toArtist(){
         User loggedUser = globalHelperService.getLoggedUser();
 
