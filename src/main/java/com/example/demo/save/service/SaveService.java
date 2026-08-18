@@ -1,7 +1,9 @@
 package com.example.demo.save.service;
 
 import com.example.demo.helpers.GlobalHelperService;
+import com.example.demo.post.entity.Post;
 import com.example.demo.save.dto.SaveResponse;
+import com.example.demo.save.entity.Save;
 import com.example.demo.save.mapper.SaveMapper;
 import com.example.demo.save.repository.SaveRepository;
 import com.example.demo.user.entity.User;
@@ -10,13 +12,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class SaveService {
     private final SaveRepository saveRepository;
     private final GlobalHelperService globalHelperService;
     private final SaveMapper saveMapper;
-
 
     // mostrar posts salvos do user logado
     public Page<SaveResponse> getMySaves(Pageable pageable){
@@ -25,4 +28,27 @@ public class SaveService {
         return saveRepository.findByUserId(loggedUser.getId(), pageable)
                 .map(saveMapper::toSaveResponse);
     }
+
+    // salvar um post
+    public void createSave(Long postId){
+        User loggedUser = globalHelperService.getLoggedUser();
+
+        Post post = globalHelperService.findPostById(postId);
+
+        // cria o salvamento
+        Save save = new Save();
+
+        // relaciona
+        save.setCreateAt(LocalDateTime.now());
+        save.setPost(post);
+        save.setUser(loggedUser);
+
+        saveRepository.save(save);
+
+    }
+
+    /
+
+
+
 }
