@@ -31,5 +31,10 @@ public class Save {
     private Post post;
 
     @Column
-    LocalDateTime createAt;
+    private LocalDateTime createAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createAt = LocalDateTime.now();
+    }
 }

@@ -12,7 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +39,6 @@ public class SaveService {
         Save save = new Save();
 
         // relaciona
-        save.setCreateAt(LocalDateTime.now());
         save.setPost(post);
         save.setUser(loggedUser);
 
