@@ -53,6 +53,7 @@ public class NotificationService {
 
 
     // criar notificações que tem post (COMMENT E LIKE) e ja envia via webSocket
+
     public void createPostNotification(
             User loggedUser, User receiver, Post post, NotificationType type, String content) {
 
@@ -77,6 +78,29 @@ public class NotificationService {
                 notificationMapper.toNotificationPostResponse(notification));
     }
 
+    public void createCommentNotification(
+            User loggedUser, User receiver, Post post, NotificationType type, String content) {
+
+        // só notifica se não for o próprio post
+        if (post.getUser().getId().equals(loggedUser.getId())) {
+            return;
+        }
+
+        // cria a notificação
+        Notification notification = globalHelperService.buildNotification(
+                loggedUser, receiver, type, content
+        );
+
+        // relaciona com post
+        notification.setPost(post);
+
+        // salva
+        notificationRepository.save(notification);
+
+        // enviar notificação via webSocket
+        webSocketService.sendPostNotificationToUser(receiver.getId(),
+                notificationMapper.toNotificationPostResponse(notification));
+    }
 
     // notificações de mensagens do chat, não salva no banco
     public void createChatNotification(

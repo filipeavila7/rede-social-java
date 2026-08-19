@@ -5,6 +5,7 @@ package com.example.demo.comment.service;
 import com.example.demo.comment.dto.CommentRequest;
 import com.example.demo.comment.mapper.CommentMapper;
 import com.example.demo.comment.dto.CommentResponse;
+import com.example.demo.exeptions.comment.CommentNotFoundException;
 import com.example.demo.feed.interest.service.UserInterestService;
 import com.example.demo.notification.entity.NotificationType;
 import com.example.demo.notification.service.NotificationService;
@@ -52,6 +53,7 @@ public class CommentService {
         comment.setPost(post);
         comment.setUser(loggedUser);
         comment.setContent(request.content());
+        comment.setParentComment(null);
 
         Comment saved = commentRepository.save(comment);
 
@@ -63,6 +65,39 @@ public class CommentService {
                 loggedUser, post.getUser(), post, NotificationType.COMMENT, content);
 
         return commentMapper.toCommentResponse(saved);
+    }
+
+
+    // responder um comentario
+    public CommentResponse replyComment(Long commentId, Long postId, CommentRequest request){
+        // acha usuario
+        User loggedUser = globalHelperService.getLoggedUser();
+
+        // acha post
+        Post post = globalHelperService.findPostById(postId);
+
+        // acha o comentario que sera respondido
+        Comment comment = commentRepository.findByIdAndPostId(commentId, postId)
+                .orElseThrow(CommentNotFoundException::new);
+
+        // cria a resposta
+        Comment replyComment = new Comment();
+
+        replyComment.setPost(post);
+        replyComment.setUser(loggedUser);
+        replyComment.setContent(request.content());
+        replyComment.setParentComment(comment); // coloca o comentario que foi respondido
+
+
+        Comment save = commentRepository.save(replyComment);
+
+        userInterestService.applyDelta(loggedUser, post, UserInterestService.commentWeight());
+
+        String content = loggedUser.getName() + " respondeu o seu comentario: " + request.content();
+
+        // gerar notificação para respostas de comentarios
+
+        return commentMapper.toCommentResponse(save);
     }
 
     // ========== DELETE ==========

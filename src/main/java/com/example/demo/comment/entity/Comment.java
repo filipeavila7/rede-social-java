@@ -51,7 +51,14 @@ public class Comment {
     private List<LikeComment> likeComments;
 
 
+    // responder comentarios:
 
+    @ManyToOne
+    @JoinColumn(name = "parent_comment_id")
+    private Comment parentComment;
+
+    @OneToMany(mappedBy = "parentComment")
+    private List<Comment> replies;
     
 
 
