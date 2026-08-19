@@ -1,5 +1,6 @@
 package com.example.demo.notification.service;
 
+import com.example.demo.comment.entity.Comment;
 import com.example.demo.message.dto.MessageReadResponse;
 import com.example.demo.notification.dto.NotificationGetResponse;
 import com.example.demo.helpers.GlobalHelperService;
@@ -78,11 +79,12 @@ public class NotificationService {
                 notificationMapper.toNotificationPostResponse(notification));
     }
 
+    // ciar notificação para resposta de comentarios
     public void createCommentNotification(
-            User loggedUser, User receiver, Post post, NotificationType type, String content) {
+            User loggedUser, User receiver, Post post, Comment comment, NotificationType type, String content) {
 
-        // só notifica se não for o próprio post
-        if (post.getUser().getId().equals(loggedUser.getId())) {
+        // só notifica se não for o próprio comentario
+        if (comment.getUser().getId().equals(loggedUser.getId())) {
             return;
         }
 
@@ -94,12 +96,15 @@ public class NotificationService {
         // relaciona com post
         notification.setPost(post);
 
+        // relaciona com comentario
+        notification.setComment(comment);
+
         // salva
         notificationRepository.save(notification);
 
         // enviar notificação via webSocket
-        webSocketService.sendPostNotificationToUser(receiver.getId(),
-                notificationMapper.toNotificationPostResponse(notification));
+        webSocketService.sendCommentNotificationToUser(receiver.getId(),
+                notificationMapper.toNotificationCommentResponse(notification));
     }
 
     // notificações de mensagens do chat, não salva no banco

@@ -1,9 +1,6 @@
 package com.example.demo.notification.mapper;
 
-import com.example.demo.notification.dto.NotificationGetResponse;
-import com.example.demo.notification.dto.NotificationChatResponse;
-import com.example.demo.notification.dto.NotificationFollowResponse;
-import com.example.demo.notification.dto.NotificationPostResponse;
+import com.example.demo.notification.dto.*;
 import com.example.demo.notification.entity.Notification;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +17,21 @@ public class NotificationMapper {
                 n.getPost() != null ?  n.getPost().getId() : null,
                 n.getContent(),
                 n.getCreatedAt()
+        );
+    }
+
+    public NotificationCommentResponse toNotificationCommentResponse(Notification n){
+        return new NotificationCommentResponse(
+                n.getType(),
+                n.getSender().getId(),
+                n.getSender().getName(),
+                n.getSender().getUserName(),
+                n.getSender().getProfile().getImageUrlProfile() != null ?
+                        n.getSender().getProfile().getImageUrlProfile() : null,
+                n.getPost() != null ?  n.getPost().getId() : null,
+                n.getContent(),
+                n.getCreatedAt(),
+                n.getComment()
         );
     }
 

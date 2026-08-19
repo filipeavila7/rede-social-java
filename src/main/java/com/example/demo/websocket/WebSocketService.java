@@ -3,6 +3,7 @@ package com.example.demo.websocket;
 import com.example.demo.message.dto.ConversationUpdateResponse;
 import com.example.demo.message.dto.MessageReadResponse;
 import com.example.demo.notification.dto.NotificationChatResponse;
+import com.example.demo.notification.dto.NotificationCommentResponse;
 import com.example.demo.notification.dto.NotificationFollowResponse;
 import com.example.demo.notification.dto.NotificationPostResponse;
 import com.example.demo.message.dto.MessageResponse;
@@ -39,6 +40,14 @@ public class WebSocketService {
 
     // notificações do tipo (LIKE, COMMENT)
     public void sendPostNotificationToUser(Long userId, NotificationPostResponse notification) {
+        messagingTemplate.convertAndSend(
+                "/topic/notifications/" + userId,
+                notification
+        );
+    }
+
+
+    public void sendCommentNotificationToUser(Long userId, NotificationCommentResponse notification) {
         messagingTemplate.convertAndSend(
                 "/topic/notifications/" + userId,
                 notification
