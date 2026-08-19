@@ -96,6 +96,8 @@ public class CommentService {
         String content = loggedUser.getName() + " respondeu o seu comentario: " + request.content();
 
         // gerar notificação para respostas de comentarios
+        notificationService.createCommentNotification(
+                loggedUser, comment.getUser(), post, comment, NotificationType.REPLY, content);
 
         return commentMapper.toCommentResponse(save);
     }

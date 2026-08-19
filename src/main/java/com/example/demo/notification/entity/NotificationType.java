@@ -5,5 +5,6 @@ public enum NotificationType {
     LIKE,
     FOLLOW,
     MESSAGE,
-    READ
+    READ,
+    REPLY
 }
