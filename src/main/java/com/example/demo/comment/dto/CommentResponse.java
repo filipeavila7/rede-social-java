@@ -10,6 +10,7 @@ public record CommentResponse(
         String content,
         LocalDateTime createdAt,
         UserResponse user,
-        PostSummaryResponse post
+        PostSummaryResponse post,
+        boolean likedByMe
 
 ) {}
