@@ -12,7 +12,9 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "like_comment")
+@Table(name = "like_comment",
+// evitar duplicação de curtidas
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "comment_id"}))
 @Getter
 @Setter
 @AllArgsConstructor
@@ -23,7 +25,7 @@ public class LikeComment {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "comment-id")
+    @JoinColumn(name = "comment_id")
     private Comment comment;
 
     @ManyToOne

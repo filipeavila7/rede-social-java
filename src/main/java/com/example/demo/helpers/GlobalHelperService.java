@@ -5,6 +5,7 @@ import com.example.demo.comment.repository.CommentRepository;
 import com.example.demo.conversation.entity.Conversation;
 import com.example.demo.conversation.repository.ConversationRepository;
 import com.example.demo.exeptions.comment.CommentConflictException;
+import com.example.demo.exeptions.comment.CommentNotFoundException;
 import com.example.demo.exeptions.like.LikeConflictException;
 import com.example.demo.exeptions.like.LikeNotFoundException;
 import com.example.demo.exeptions.profile.ProfileNotFoundException;
@@ -137,8 +138,15 @@ public class GlobalHelperService {
                 .orElseThrow(()-> new CommentConflictException("Esse comentário não pertence a você"));
     }
 
+    // conta o numero de comentarios em um post
     public Long countCommentBypostId(Long postId){
         return commentRepository.countByPostId(postId);
+    }
+
+
+    public Comment findByCommentId(Long commentId){
+        return commentRepository.findById(commentId)
+                .orElseThrow(CommentNotFoundException::new);
     }
 
     // verifica se existe registro de like no post
