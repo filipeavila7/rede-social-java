@@ -1,5 +1,6 @@
 package com.example.demo.comment.entity;
 
+import com.example.demo.likeComents.entity.LikeComment;
 import com.example.demo.post.entity.Post;
 import com.example.demo.user.entity.User;
 import jakarta.persistence.*;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -43,6 +45,10 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     User user;
+
+
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
+    private List<LikeComment> likeComments;
 
 
 
