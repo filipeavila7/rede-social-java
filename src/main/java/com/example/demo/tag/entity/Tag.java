@@ -32,5 +32,8 @@ public class Tag {
     @JsonIgnore
     private List<Post> posts;
 
-
+    public Tag(List<Post> posts, String name) {
+        this.posts = posts;
+        this.name = name;
+    }
 }

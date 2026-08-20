@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.demo.like.entity.Like;
+
 import com.example.demo.like.service.LikeService;
 
 import org.springframework.http.HttpStatus;
@@ -22,13 +22,6 @@ public class LikeController {
     public final LikeService service;
 
     // ========== GET ==========
-
-    // TODO - POSSÍVEL ROTA REDUNDANTE
-    @GetMapping("/{postId}/liked")
-    public ResponseEntity<Boolean> hasLiked(@PathVariable Long postId) {
-        boolean liked = service.hasUserLikedPost(postId);
-        return ResponseEntity.ok(liked);
-    }
 
 
     @GetMapping("/my")

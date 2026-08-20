@@ -6,8 +6,6 @@ import com.example.demo.like.dto.LikeResponse;
 import com.example.demo.like.mapper.LikeMapper;
 import com.example.demo.notification.entity.NotificationType;
 import com.example.demo.notification.service.NotificationService;
-import com.example.demo.post.dto.PostDetaisResponse;
-import com.example.demo.post.mapper.PostMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,18 +25,9 @@ public class LikeService {
     private final GlobalHelperService globalHelperService;
     private final LikeMapper likeMapper;
     private final UserInterestService userInterestService;
-    private final PostMapper postMapper;
+
 
     // ========== GET ==========
-
-    // true ou false, se existe curtida ou não
-    // TODO - POSSÍVEL METODO REDUNDANTE
-    public boolean hasUserLikedPost(Long postId) {
-        // verifica se existe like
-        return globalHelperService.existsLikeInPost(
-                globalHelperService.getLoggedUser().getId(), postId
-        );
-    }
 
 
     // retorna todos os posts que o usuario curtiu

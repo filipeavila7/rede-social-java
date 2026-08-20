@@ -29,7 +29,6 @@ public class CommentService {
     private final NotificationService notificationService;
     private final UserInterestService userInterestService;
 
-    // TODO criar get que mostra todos os comentarios que o usuario ja fez permitindo gerenciar
 
     // ========== GET ==========
 
