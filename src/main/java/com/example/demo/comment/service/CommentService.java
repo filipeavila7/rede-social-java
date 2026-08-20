@@ -30,7 +30,7 @@ public class CommentService {
     private final UserInterestService userInterestService;
 
     // TODO pro futuro, criar funcionalidae de responder comentarios em um post e curtir comentarios
-    // TODO criar get que mostra todos os comentarios que o uusario ja fez permitindo gerenciar
+    // TODO criar get que mostra todos os comentarios que o usuario ja fez permitindo gerenciar
 
     // ========== GET ==========
 
@@ -39,6 +39,21 @@ public class CommentService {
         return commentRepository.findByPostIdOrderByCreatedAtDesc(postId, pageable)
                 .map(commentMapper::toCommentResponse);
 
+    }
+
+    // ver resposta dos comentarios
+    public Page<CommentResponse> getCommentReplys(Long commentId, Pageable pageable){
+        // verifica se o comentario existe
+        globalHelperService.findByCommentId(commentId);
+        // retorna as resosta desse comentario
+        return commentRepository.findByParentCommentId(commentId, pageable)
+                .map(commentMapper::toCommentResponse);
+    }
+
+
+    // boleano se existe resposta no comentario ou não (usar no dto de comentario)
+    public boolean exixstReplys(Long commentId){
+        return commentRepository.existsByParentCommentId(commentId);
     }
 
     // ========== POST ==========

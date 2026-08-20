@@ -11,6 +11,7 @@ public record CommentResponse(
         LocalDateTime createdAt,
         UserResponse user,
         PostSummaryResponse post,
-        boolean likedByMe
+        boolean likedByMe,
+        Boolean hasReplies
 
 ) {}
