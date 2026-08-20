@@ -2,6 +2,9 @@ package com.example.demo.like.controller;
 
 import com.example.demo.like.dto.LikeResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.like.entity.Like;
@@ -25,6 +28,15 @@ public class LikeController {
     public ResponseEntity<Boolean> hasLiked(@PathVariable Long postId) {
         boolean liked = service.hasUserLikedPost(postId);
         return ResponseEntity.ok(liked);
+    }
+
+
+    @GetMapping("/my")
+    public ResponseEntity<Page<LikeResponse>> myLikedPosts(
+            @PageableDefault(size = 12)
+            Pageable pageable
+    ){
+        return ResponseEntity.ok().body(service.getMyLikedPost(pageable));
     }
 
     // ========== POST ==========

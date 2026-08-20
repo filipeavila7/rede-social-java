@@ -42,13 +42,12 @@ public class LikeService {
 
 
     // retorna todos os posts que o usuario curtiu
-    public Page<PostDetaisResponse> findMyLikedPost(Pageable pageable){
+    public Page<LikeResponse> getMyLikedPost(Pageable pageable){
         User loggedUser = globalHelperService.getLoggedUser();
 
         return likeRepository.findAllByUserId(
-                loggedUser.getId(), pageable
-        ).map(Like::getPost)
-                .map(post -> postMapper.toPostDetaisResponse(post, loggedUser.getId()));
+                loggedUser.getId(), pageable)
+                .map(likeMapper::toLikeResponse);
     }
 
     // ========== POST ==========
