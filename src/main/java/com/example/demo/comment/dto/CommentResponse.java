@@ -14,6 +14,7 @@ public record CommentResponse(
         boolean likedByMe,
         Boolean hasReplies,
         long totalReplys,
-        long totalLikes
+        long totalLikes,
+        String replyToUsername
 
 ) {}

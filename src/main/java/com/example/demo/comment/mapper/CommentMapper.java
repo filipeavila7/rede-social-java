@@ -27,7 +27,8 @@ public class CommentMapper {
                 likeCommentService.likeCommentByMe(c.getId()),
                 commentService.exixstReplys(c.getId()),
                 commentService.countReplys(c.getId()),
-                likeCommentService.countCommentLike(c.getId())
+                likeCommentService.countCommentLike(c.getId()),
+                c.getParentComment() != null ? c.getParentComment().getUser().getUserName() : null
 
 
         );
