@@ -29,7 +29,6 @@ public class CommentService {
     private final NotificationService notificationService;
     private final UserInterestService userInterestService;
 
-    // TODO pro futuro, criar funcionalidae de responder comentarios em um post e curtir comentarios
     // TODO criar get que mostra todos os comentarios que o usuario ja fez permitindo gerenciar
 
     // ========== GET ==========
@@ -51,11 +50,18 @@ public class CommentService {
     }
 
 
+    // retornar todos os comentarios que o user logado fez
+    public Page<CommentResponse> getAllMyComments(Pageable pageable){
+        return commentRepository.findAllByUserId(
+                globalHelperService.getLoggedUser().getId(), pageable
+        ).map(commentMapper::toCommentResponse);
+    }
+
+
     // boleano se existe resposta no comentario ou não (usar no dto de comentario)
     public boolean exixstReplys(Long commentId){
         return commentRepository.existsByParentCommentId(commentId);
     }
-
 
     // contar quantas respostas um comentario tem
     public long countReplys(Long commentId){

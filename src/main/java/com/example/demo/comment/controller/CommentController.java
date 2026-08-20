@@ -47,6 +47,15 @@ public class CommentController {
         return ResponseEntity.ok().body(service.getCommentReplys(commentId, pageable));
     }
 
+
+    @GetMapping("/my")
+    public ResponseEntity<Page<CommentResponse>> getAllMyComments(
+            @PageableDefault(size = 12, sort = "createdAt", direction = Sort.Direction.ASC)
+            Pageable pageable
+    ){
+        return ResponseEntity.ok().body(service.getAllMyComments(pageable));
+    }
+
     // ========== POST ==========
     @PostMapping("/{postId}/new")
     public ResponseEntity<CommentResponse> createCommente(

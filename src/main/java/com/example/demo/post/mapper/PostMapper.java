@@ -57,7 +57,8 @@ public class PostMapper {
     public PostSummaryResponse toPostSumaryResponse(Post p){
         return new PostSummaryResponse(
                 p.getId(),
-                p.getTitle()
+                p.getTitle(),
+                p.getImageUrl()
         );
     }
 
