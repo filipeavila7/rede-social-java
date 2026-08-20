@@ -32,6 +32,13 @@ public class LikeCommentService {
 
     }
 
+
+    // contar quantas curtidas tem
+    public long countCommentLike(Long commentId){
+        return likeCommentRepository.countByCommentId(commentId);
+    }
+
+    // remover curtida
     public void deleteLikeComment(Long commentId){
         // pega o usuario
         User loggedUser = globalHelperService.getLoggedUser();

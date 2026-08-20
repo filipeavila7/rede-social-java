@@ -12,6 +12,8 @@ public record CommentResponse(
         UserResponse user,
         PostSummaryResponse post,
         boolean likedByMe,
-        Boolean hasReplies
+        Boolean hasReplies,
+        long totalReplys,
+        long totalLikes
 
 ) {}

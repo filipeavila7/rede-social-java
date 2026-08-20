@@ -25,7 +25,9 @@ public class CommentMapper {
                 userMapper.toUserResponse(c.getUser()),
                 postMapper.toPostSumaryResponse(c.getPost()),
                 likeCommentService.likeCommentByMe(c.getId()),
-                commentService.exixstReplys(c.getId())
+                commentService.exixstReplys(c.getId()),
+                commentService.countReplys(c.getId()),
+                likeCommentService.countCommentLike(c.getId())
 
 
         );

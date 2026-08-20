@@ -56,6 +56,12 @@ public class CommentService {
         return commentRepository.existsByParentCommentId(commentId);
     }
 
+
+    // contar quantas respostas um comentario tem
+    public long countReplys(Long commentId){
+        return commentRepository.countByParentCommentId(commentId);
+    }
+
     // ========== POST ==========
 
     // criar comentario em um post
