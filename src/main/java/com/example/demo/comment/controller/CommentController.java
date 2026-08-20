@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,7 +23,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("comments")
-public class CommenteController {
+public class CommentController {
 
     private final CommentService service;
 
@@ -37,12 +38,33 @@ public class CommenteController {
 
     }
 
+    @GetMapping("/reply/{commentId}")
+    public ResponseEntity<Page<CommentResponse>> getReplys(
+            @PathVariable Long commentId,
+            @PageableDefault(size = 7, sort = "createdAt", direction = Sort.Direction.ASC)
+            Pageable pageable
+    ){
+        return ResponseEntity.ok().body(service.getCommentReplys(commentId, pageable));
+    }
+
     // ========== POST ==========
     @PostMapping("/{postId}/new")
     public ResponseEntity<CommentResponse> createCommente(
             @PathVariable Long postId, @Valid @RequestBody CommentRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.createCommente(postId, request));
     }
+
+
+    @PostMapping("/reply/{postId}/{commentId}")
+    public ResponseEntity<CommentResponse> replyComment(
+            @PathVariable Long commentId,
+            @PathVariable Long postId,
+            @Valid @RequestBody CommentRequest request
+
+    ){
+        return ResponseEntity.ok().body(service.replyComment(commentId, postId, request));
+    }
+
 
 
     // ========== DELETE ==========
