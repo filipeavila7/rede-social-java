@@ -20,6 +20,7 @@ public class PostMapper {
     private final GlobalHelperService globalHelperService;
     private final FileUrlUtils fileUrlUtils;
 
+    // TODO - como no novo front não vai mais mostrar like by me e nem contagem, esse metodo sera refatorado
     public PostDetaisResponse toPostDetaisResponse(Post post, Long loggedUserId) {
 
         long likesCount = globalHelperService.countLikeByPostId(post.getId());
@@ -40,6 +41,7 @@ public class PostMapper {
         );
     }
 
+    // TODO - possivelmente vamos usar só esse
     public PostResponse toPostResponse(Post post){
         return new PostResponse(
                 post.getId(),

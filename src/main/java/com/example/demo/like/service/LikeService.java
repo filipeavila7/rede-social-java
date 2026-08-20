@@ -6,8 +6,12 @@ import com.example.demo.like.dto.LikeResponse;
 import com.example.demo.like.mapper.LikeMapper;
 import com.example.demo.notification.entity.NotificationType;
 import com.example.demo.notification.service.NotificationService;
+import com.example.demo.post.dto.PostDetaisResponse;
+import com.example.demo.post.mapper.PostMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.like.entity.Like;
@@ -23,6 +27,7 @@ public class LikeService {
     private final GlobalHelperService globalHelperService;
     private final LikeMapper likeMapper;
     private final UserInterestService userInterestService;
+    private final PostMapper postMapper;
 
     // ========== GET ==========
 
@@ -33,6 +38,17 @@ public class LikeService {
         return globalHelperService.existsLikeInPost(
                 globalHelperService.getLoggedUser().getId(), postId
         );
+    }
+
+
+    // retorna todos os posts que o usuario curtiu
+    public Page<PostDetaisResponse> findMyLikedPost(Pageable pageable){
+        User loggedUser = globalHelperService.getLoggedUser();
+
+        return likeRepository.findAllByUserId(
+                loggedUser.getId(), pageable
+        ).map(Like::getPost)
+                .map(post -> postMapper.toPostDetaisResponse(post, loggedUser.getId()));
     }
 
     // ========== POST ==========

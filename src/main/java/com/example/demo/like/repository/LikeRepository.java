@@ -1,7 +1,10 @@
 package com.example.demo.like.repository;
 
+import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.demo.like.entity.Like;
@@ -9,6 +12,8 @@ import com.example.demo.like.entity.Like;
 public interface LikeRepository extends JpaRepository<Like, Long> {
     boolean existsByUserIdAndPostId(Long userId, Long postId); // verifica se ja existe curtida do usuario naquele post, retorna um boleano
     Optional<Like> findByUserIdAndPostId(Long userId, Long postId); // busca a curtida em si, pode existir ou não um like
+
+    Page<Like> findAllByUserId(Long userId, Pageable pageable);
 
     long countByPostId(Long postId); // contar quantos likes um post tem
 }
