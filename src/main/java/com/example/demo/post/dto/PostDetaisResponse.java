@@ -5,6 +5,7 @@ import com.example.demo.tag.entity.Tag;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 public record PostDetaisResponse(
         Long id,
@@ -13,7 +14,7 @@ public record PostDetaisResponse(
         UserResponse user,
         LocalDateTime createdAt,
         String description,
-        List<Tag> tags,
+        Set<Tag> tags,
         long likesCount,
         long commentsCount,
         boolean likedByMe

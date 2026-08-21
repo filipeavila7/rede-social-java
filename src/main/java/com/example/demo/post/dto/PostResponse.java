@@ -5,6 +5,7 @@ import com.example.demo.tag.entity.Tag;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 
 // TODO - optar por usar esse dto
@@ -16,6 +17,6 @@ public record PostResponse(
         UserResponse user,
         LocalDateTime createdAt,
         String description,
-        List<Tag> tags
+        Set<Tag> tags
 ) {
 }

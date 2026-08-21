@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,7 +39,7 @@ public class UserInterestService {
     // usado diretamente por LikeService / CommentService, com delta positivo ou negativo
     @Transactional
     public void applyDelta(User user, Post post, double delta) {
-        List<Tag> tags = post.getTags();
+        Set<Tag> tags = post.getTags();
         if (tags.isEmpty()) {
             return;
         }

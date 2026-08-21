@@ -2,11 +2,13 @@ package com.example.demo.comment.service;
 
 
 
+import com.example.demo.comment.dto.CommentDetails;
 import com.example.demo.comment.dto.CommentRequest;
 import com.example.demo.comment.mapper.CommentMapper;
 import com.example.demo.comment.dto.CommentResponse;
 import com.example.demo.exeptions.comment.CommentNotFoundException;
 import com.example.demo.feed.interest.service.UserInterestService;
+import com.example.demo.likeComents.service.LikeCommentService;
 import com.example.demo.notification.entity.NotificationType;
 import com.example.demo.notification.service.NotificationService;
 import com.example.demo.helpers.GlobalHelperService;
@@ -28,6 +30,7 @@ public class CommentService {
     private final CommentMapper commentMapper;
     private final NotificationService notificationService;
     private final UserInterestService userInterestService;
+    private final LikeCommentService likeCommentService;
 
 
     // ========== GET ==========
@@ -35,7 +38,7 @@ public class CommentService {
     // listar todos os comentarios de um post passando o id dele
     public Page<CommentResponse> getAllPostCommentes(Long postId, Pageable pageable) {
         return commentRepository.findByPostIdOrderByCreatedAtDesc(postId, pageable)
-                .map(commentMapper::toCommentResponse);
+                .map(c -> commentMapper.toCommentResponse(c, toCommentDetails(c)));
 
     }
 
@@ -45,7 +48,7 @@ public class CommentService {
         globalHelperService.findByCommentId(commentId);
         // retorna as resosta desse comentario
         return commentRepository.findByParentCommentId(commentId, pageable)
-                .map(commentMapper::toCommentResponse);
+                .map(c -> commentMapper.toCommentResponse(c, toCommentDetails(c)));
     }
 
 
@@ -53,7 +56,7 @@ public class CommentService {
     public Page<CommentResponse> getAllMyComments(Pageable pageable){
         return commentRepository.findAllByUserId(
                 globalHelperService.getLoggedUser().getId(), pageable
-        ).map(commentMapper::toCommentResponse);
+        ).map(c -> commentMapper.toCommentResponse(c, toCommentDetails(c)));
     }
 
 
@@ -90,7 +93,7 @@ public class CommentService {
         notificationService.createPostNotification(
                 loggedUser, post.getUser(), post, NotificationType.COMMENT, content);
 
-        return commentMapper.toCommentResponse(saved);
+        return commentMapper.toCommentResponse(saved, toCommentDetails(saved));
     }
 
 
@@ -125,7 +128,7 @@ public class CommentService {
         notificationService.createCommentNotification(
                 loggedUser, comment.getUser(), post, comment, NotificationType.REPLY, content);
 
-        return commentMapper.toCommentResponse(save);
+        return commentMapper.toCommentResponse(save, toCommentDetails(save));
     }
 
     // ========== DELETE ==========
@@ -142,6 +145,16 @@ public class CommentService {
 
         // reverte o peso do comentário no perfil de interesse
         userInterestService.applyDelta(loggedUser, post, -UserInterestService.commentWeight());
+    }
+
+
+    private CommentDetails toCommentDetails(Comment c){
+        return new CommentDetails(
+                likeCommentService.likeCommentByMe(c.getId()),
+                exixstReplys(c.getId()),
+                countReplys(c.getId()),
+                likeCommentService.countCommentLike(c.getId())
+        );
     }
 
 }

@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Size;
 
 public record MessageRequest(
         @NotBlank
-        @Size(max = 1000)
+        @Size(max = 1000, message = "No máximo 1000 caracteres")
         String textMessage
 ) {
 }

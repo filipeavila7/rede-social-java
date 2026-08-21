@@ -4,6 +4,7 @@ import com.example.demo.feed.service.FeedService;
 import com.example.demo.post.dto.PostRequest;
 import com.example.demo.post.dto.PostDetaisResponse;
 import com.example.demo.post.dto.PostResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -98,7 +99,8 @@ public class PostController {
     // ========== POST ==========
 
     @PostMapping
-    public ResponseEntity<PostResponse> createPost(@RequestBody PostRequest post) {
+    public ResponseEntity<PostResponse> createPost(
+           @Valid @RequestBody PostRequest post) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.createPost(post));
     }
 
