@@ -12,9 +12,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class TagService {
-    // TODO: Normalizar as tags informadas pelo usuário e verificar se já existem no banco.
-    // Se a tag já existir, reutilizá-la; caso contrário, criar uma nova tag.
-
     private final TagRepository tagRepository;
 
     // metodo para normalizar tag (remove # e deixar minusculo)
@@ -35,7 +32,5 @@ public class TagService {
                         .orElseGet(() -> tagRepository.save(new Tag(null, tagName))))
                 .collect(Collectors.toSet());
     }
-
-
 
 }

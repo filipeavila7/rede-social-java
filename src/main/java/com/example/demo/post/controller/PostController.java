@@ -95,13 +95,6 @@ public class PostController {
     }
 
 
-    // retorna todos os likes e comentarios de um post pelo seu id
-    // TODO - POSSÍVEL ROTA REDUNDANTE
-    @GetMapping("/{postId}/stats")
-    public ResponseEntity<Map<String, Long>> getPostStats(@PathVariable Long postId) {
-        return ResponseEntity.ok(service.getPostStats(postId));
-    }
-
     // ========== POST ==========
 
     @PostMapping

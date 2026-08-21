@@ -6,5 +6,5 @@ import com.example.demo.tag.entity.Tag;
 import java.util.Optional;
 
 public interface TagRepository extends JpaRepository<Tag, Long> {
-    public Optional<Tag> findByName(String name);
+     Optional<Tag> findByName(String name);
 }

@@ -14,6 +14,7 @@ import com.example.demo.post.dto.PostResponse;
 import com.example.demo.post.mapper.PostMapper;
 import com.example.demo.post.repository.PostRepository;
 import com.example.demo.tag.repository.TagRepository;
+import com.example.demo.tag.service.TagService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -31,9 +32,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final PostMapper postMapper;
-    private final LikeRepository likeRepository;
-    private final CommentRepository commentRepository;
-    private final TagRepository tagRepository;
+    private final TagService tagService;
     private final GlobalHelperService globalHelperService;
 
 
@@ -99,19 +98,6 @@ public class PostService {
         return postRepository.countByUserId(userId);
     }
 
-    // stats isoladas
-    // TODO - POSSÍVEL METODO REDUNDANTE - a quantidade de likes e comentarios ja estão sendo retornados no dto
-    // de postDetais
-    public Map<String, Long> getPostStats(Long postId) {
-        long likes = likeRepository.countByPostId(postId);
-        long comments = commentRepository.countByPostId(postId);
-
-        Map<String, Long> stats = new HashMap<>();
-        stats.put("likes", likes);
-        stats.put("comments", comments);
-        return stats;
-    }
-
 
     public Page<PostDetaisResponse> searchPosts(String termo, Pageable pageable) {
 
@@ -171,27 +157,14 @@ public class PostService {
 
     // criar post
     @Transactional
-    public PostResponse createPost(PostRequest request) {
+    public PostResponse createPost(PostRequest request ) {
         // pega o user logado
         User user = globalHelperService.getLoggedUser();
 
-        // verifica se os ids das tags passadas existem
-        List<Tag> tags = tagRepository.findAllById(request.tagIds());
 
-        if (tags.size() != request.tagIds().size()) {
-            throw new TagConflictException("Tag não encontrada");
-        }
-
-        // verifica se tem no máximo 3 tags por post
-        if (request.tagIds().size() > 3) {
-            throw new TagConflictException("É permitido no máximo 3 tags");
-        }
-
-        // verificar se não estão repetidas
-        Set<Long> uniqueTags = new HashSet<>(request.tagIds());
-
-        if (uniqueTags.size() != request.tagIds().size()) {
-            throw new TagConflictException("Tags repetidas");
+        // verifica se tem no máximo 5 tags por post
+        if (request.tags().size() > 5) {
+            throw new TagConflictException("É permitido no máximo 5 tags");
         }
 
         // cria o post
@@ -201,7 +174,7 @@ public class PostService {
         post.setImageUrl(request.imageUrl());
         post.setCreatedAt(LocalDateTime.now());
         post.setUser(user);
-        post.setTags(tags);
+        post.setTags(tagService.createTags(request.tags()));
 
         return postMapper.toPostResponse(postRepository.save(post));
     }
