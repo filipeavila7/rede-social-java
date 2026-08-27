@@ -4,13 +4,13 @@ import com.example.demo.feed.interest.entity.UserInterest;
 import com.example.demo.feed.interest.repository.UserInterestRepository;
 import com.example.demo.feed.repository.PostImpressionRepository;
 import com.example.demo.helpers.GlobalHelperService;
-import com.example.demo.like.repository.LikeRepository;
 import com.example.demo.post.dto.PostDetaisResponse;
 import com.example.demo.post.entity.Post;
 import com.example.demo.post.mapper.PostMapper;
 import com.example.demo.post.repository.PostRepository;
 import com.example.demo.tag.entity.Tag;
 import com.example.demo.user.entity.User;
+import com.github.benmanes.caffeine.cache.Cache;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -41,6 +41,10 @@ public class FeedService {
     private static final int IMPRESSION_WINDOW_HOURS = 6;
     private static final double EXPOSURE_PENALTY = 0.25;
 
+    private final Cache<Long, List<Long>> feedRankingCache;
+
+    private final Cache<String, List<Long>> anonymousFeedRankingCache;
+
     private final PostRepository postRepository;
     private final UserInterestRepository userInterestRepository;
     private final PostImpressionRepository postImpressionRepository;
@@ -51,32 +55,52 @@ public class FeedService {
     public Page<PostDetaisResponse> getFeed(int page, int size) {
         User loggedUser = globalHelperService.getLoggedUserOrNull();
 
+        List<Long> orderedIds = loggedUser != null
+                ? feedRankingCache.get(loggedUser.getId(), id -> buildRankedIds(loggedUser))
+                : anonymousFeedRankingCache.get("global", key -> buildRankedIds(null));
+
+        return paginateByIds(orderedIds, page, size, loggedUser);
+    }
+
+    private List<Long> buildRankedIds(User user) {
         List<Post> candidates = fetchCandidatePool();
 
-        List<ScoredPost> scored = loggedUser != null
-                ? scorePersonalized(candidates, loggedUser)
+        List<ScoredPost> scored = user != null
+                ? scorePersonalized(candidates, user)
                 : scoreGlobal(candidates);
 
         List<Post> ranked = applyDiversity(scored);
 
-        PagedResult pageResult = paginate(ranked, page, size);
+        return ranked.stream().map(Post::getId).toList();
+    }
+
+    private Page<PostDetaisResponse> paginateByIds(List<Long> orderedIds, int page, int size, User loggedUser) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        int start = Math.toIntExact(pageable.getOffset());
+        int end = Math.min(start + pageable.getPageSize(), orderedIds.size());
+
+        List<Long> pageIds = start >= orderedIds.size() ? List.of() : orderedIds.subList(start, end);
+
+        Map<Long, Post> postsById = postRepository.findAllById(pageIds).stream()
+                .collect(Collectors.toMap(Post::getId, p -> p));
+
+        List<Post> orderedPage = pageIds.stream()
+                .map(postsById::get)
+                .filter(Objects::nonNull)
+                .toList();
 
         if (loggedUser != null) {
-            // não bloqueia a resposta — roda em outra thread, outra transação
-            postImpressionService.registerImpressions(loggedUser, pageResult.content());
+            postImpressionService.registerImpressions(loggedUser, orderedPage);
         }
 
         Long userId = loggedUser != null ? loggedUser.getId() : null;
 
-        Page<PostDetaisResponse> dtoPage = new PageImpl<>(
-                pageResult.content().stream()
-                        .map(post -> postMapper.toPostDetaisResponse(post, userId))
-                        .toList(),
-                pageResult.pageable(),
-                ranked.size()
-        );
+        List<PostDetaisResponse> content = orderedPage.stream()
+                .map(post -> postMapper.toPostDetaisResponse(post, userId))
+                .toList();
 
-        return dtoPage;
+        return new PageImpl<>(content, pageable, orderedIds.size());
     }
 
     private List<Post> fetchCandidatePool() {
@@ -227,7 +251,7 @@ public class FeedService {
             }
 
             if (next == null) {
-                next = remaining.poll(); // ninguém passa no filtro — aceita o melhor mesmo assim
+                next = remaining.poll();
             }
 
             result.add(next.post());
@@ -250,19 +274,5 @@ public class FeedService {
         }
     }
 
-    // ---------- paginação sobre o pool já ranqueado ----------
-
-    private PagedResult paginate(List<Post> ranked, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-
-        int start = Math.toIntExact(pageable.getOffset());
-        int end = Math.min(start + pageable.getPageSize(), ranked.size());
-
-        List<Post> content = start >= ranked.size() ? List.of() : ranked.subList(start, end);
-
-        return new PagedResult(content, pageable);
-    }
-
     private record ScoredPost(Post post, double finalScore, double interestScore) {}
-    private record PagedResult(List<Post> content, Pageable pageable) {}
 }
