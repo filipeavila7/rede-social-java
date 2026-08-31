@@ -4,6 +4,7 @@ import com.example.demo.follow.dto.FollowingProfileResponse;
 import com.example.demo.follow.dto.FollowResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -89,9 +90,11 @@ public class FollowController {
 
 
 
+    // seguindo do user logado
     @GetMapping("/me/following")
     public ResponseEntity<Page<FollowingProfileResponse>> getMyFollowing(
-            @PageableDefault(size = 12)
+            @PageableDefault(size = 12, sort = "followed.profile.messageStatusCreatedAt",
+                    direction = Sort.Direction.DESC)
             Pageable pageable
     ) {
         return ResponseEntity.ok(service.getMyFollowing(pageable));
