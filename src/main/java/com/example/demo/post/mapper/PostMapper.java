@@ -60,7 +60,7 @@ public class PostMapper {
         return new PostSummaryResponse(
                 p.getId(),
                 p.getTitle(),
-                p.getImageUrl()
+               fileUrlUtils.toPublicUrl(p.getImageUrl())
         );
     }
 
