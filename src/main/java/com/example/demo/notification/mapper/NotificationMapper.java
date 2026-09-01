@@ -2,10 +2,15 @@ package com.example.demo.notification.mapper;
 
 import com.example.demo.notification.dto.*;
 import com.example.demo.notification.entity.Notification;
+import com.example.demo.util.FileUrlUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class NotificationMapper {
+    private final FileUrlUtils fileUrlUtils;
+
     public NotificationPostResponse toNotificationPostResponse(Notification n){
         return new NotificationPostResponse(
                 n.getType(),
@@ -13,7 +18,7 @@ public class NotificationMapper {
                 n.getSender().getName(),
                 n.getSender().getUserName(),
                 n.getSender().getProfile().getImageUrlProfile() != null ?
-                        n.getSender().getProfile().getImageUrlProfile() : null,
+                        fileUrlUtils.toPublicUrl(n.getSender().getProfile().getImageUrlProfile())  : null,
                 n.getPost() != null ?  n.getPost().getId() : null,
                 n.getContent(),
                 n.getCreatedAt()
@@ -27,7 +32,7 @@ public class NotificationMapper {
                 n.getSender().getName(),
                 n.getSender().getUserName(),
                 n.getSender().getProfile().getImageUrlProfile() != null ?
-                        n.getSender().getProfile().getImageUrlProfile() : null,
+                        fileUrlUtils.toPublicUrl(n.getSender().getProfile().getImageUrlProfile())  : null,
                 n.getPost() != null ?  n.getPost().getId() : null,
                 n.getContent(),
                 n.getCreatedAt(),
@@ -43,7 +48,7 @@ public class NotificationMapper {
                 n.getSender().getName(),
                 n.getSender().getUserName(),
                 n.getSender().getProfile().getImageUrlProfile() != null ?
-                        n.getSender().getProfile().getImageUrlProfile() : null,
+                    fileUrlUtils.toPublicUrl(n.getSender().getProfile().getImageUrlProfile())  : null,
                 conversationId,
                 messageId,
                 n.getContent(),
@@ -58,7 +63,7 @@ public class NotificationMapper {
                 n.getSender().getName(),
                 n.getSender().getUserName(),
                 n.getSender().getProfile().getImageUrlProfile() != null ?
-                        n.getSender().getProfile().getImageUrlProfile() : null,
+                      fileUrlUtils.toPublicUrl(n.getSender().getProfile().getImageUrlProfile())  : null,
                 n.getContent(),
                 n.getCreatedAt()
         );
@@ -75,7 +80,7 @@ public class NotificationMapper {
                 n.getSender().getName(),
                 n.getSender().getUserName(),
                 n.getSender().getProfile().getImageUrlProfile() != null ?
-                        n.getSender().getProfile().getImageUrlProfile() : null,
+                     fileUrlUtils.toPublicUrl( n.getSender().getProfile().getImageUrlProfile())  : null,
                 n.getPost() != null ? n.getPost().getId() : null
 
         );
