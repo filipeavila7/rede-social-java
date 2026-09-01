@@ -2,6 +2,7 @@ package com.example.demo.notification.mapper;
 
 import com.example.demo.notification.dto.*;
 import com.example.demo.notification.entity.Notification;
+import com.example.demo.post.mapper.PostMapper;
 import com.example.demo.util.FileUrlUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class NotificationMapper {
     private final FileUrlUtils fileUrlUtils;
+    private final PostMapper postMapper;
 
     public NotificationPostResponse toNotificationPostResponse(Notification n){
         return new NotificationPostResponse(
@@ -81,7 +83,7 @@ public class NotificationMapper {
                 n.getSender().getUserName(),
                 n.getSender().getProfile().getImageUrlProfile() != null ?
                      fileUrlUtils.toPublicUrl( n.getSender().getProfile().getImageUrlProfile())  : null,
-                n.getPost() != null ? n.getPost().getId() : null
+                n.getPost() != null ? postMapper.toPostSumaryResponse(n.getPost()) : null
 
         );
     }

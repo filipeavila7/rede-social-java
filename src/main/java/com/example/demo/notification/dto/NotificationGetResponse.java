@@ -1,6 +1,7 @@
 package com.example.demo.notification.dto;
 
 import com.example.demo.notification.entity.NotificationType;
+import com.example.demo.post.dto.PostSummaryResponse;
 
 import java.time.LocalDateTime;
 
@@ -14,6 +15,6 @@ public record NotificationGetResponse(
         String senderName,
         String senderUserName,
         String senderPhoto,
-        Long postId
+        PostSummaryResponse post
 ) {
 }
