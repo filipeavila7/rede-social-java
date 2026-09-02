@@ -8,5 +8,8 @@ public record ProfileResponse(
         String bio,
         String imageUrlProfile,
         String messageStatus,
-        String userName
+        String userName,
+        long followCount,
+        long followerCount,
+        long postCount
 ) {}

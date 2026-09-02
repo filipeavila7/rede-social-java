@@ -2,12 +2,10 @@ package com.example.demo.post.mapper;
 
 import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.post.dto.PostSummaryResponse;
-import com.example.demo.user.dto.UserResponse;
+
 import com.example.demo.post.dto.PostDetaisResponse;
 import com.example.demo.post.dto.PostResponse;
 import com.example.demo.post.entity.Post;
-import com.example.demo.comment.repository.CommentRepository;
-import com.example.demo.like.repository.LikeRepository;
 import com.example.demo.user.mapper.UserMapper;
 import com.example.demo.util.FileUrlUtils;
 import lombok.RequiredArgsConstructor;

@@ -9,6 +9,7 @@ import com.example.demo.exeptions.comment.CommentNotFoundException;
 import com.example.demo.exeptions.like.LikeConflictException;
 import com.example.demo.exeptions.like.LikeNotFoundException;
 import com.example.demo.exeptions.profile.ProfileNotFoundException;
+import com.example.demo.follow.repository.FollowRepository;
 import com.example.demo.like.entity.Like;
 import com.example.demo.like.repository.LikeRepository;
 import com.example.demo.notification.entity.Notification;
@@ -42,6 +43,7 @@ public class GlobalHelperService {
     private final LikeRepository likeRepository;
     private final ProfileRepository profileRepository;
     private final ConversationRepository conversationRepository;
+    private final FollowRepository followRepository;
 
 
     // TODO - provavelmente usar esse metodo na service de follow
@@ -132,6 +134,11 @@ public class GlobalHelperService {
                 .orElseThrow(PostNotFoundException::new);
     }
 
+    // contagem de post
+    public long getPostsCountByUserId(Long userId) {
+        return postRepository.countByUserId(userId);
+    }
+
     // verifica se o usuario é dono do comentário
     public Comment validateCommentOwnership(Long commentId, User user){
         return commentRepository.findByIdAndUserId(commentId, user.getId())
@@ -191,5 +198,15 @@ public class GlobalHelperService {
         notification.setIsRead(false);
 
         return notification;
+    }
+
+
+    public long countFollowers(Long userId) {
+        return followRepository.countByFollowedId(userId);
+    }
+
+    // contagem de seguindo
+    public long countFollowing(Long userId) {
+        return followRepository.countByFollowerId(userId);
     }
 }
