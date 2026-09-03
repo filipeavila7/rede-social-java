@@ -88,6 +88,9 @@ public class PostService {
     public Page<PostDetaisResponse> getPostsByUserName(String userName, Pageable pageable) {
         User loggedUser = globalHelperService.getLoggedUser();
 
+        // verifica se o perfil é privado e se ambos se seguem
+        globalHelperService.validateCanViewProfile(globalHelperService.findByUserName(userName).getId());
+
         return postRepository
                 .findByUserUserNameOrderByCreatedAtDesc(userName, pageable)
                 .map(post -> postMapper.toPostDetaisResponse(post, loggedUser.getId()));
