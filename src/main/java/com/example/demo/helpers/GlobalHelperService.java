@@ -200,7 +200,7 @@ public class GlobalHelperService {
         return notification;
     }
 
-
+    // contagem de seguidores
     public long countFollowers(Long userId) {
         return followRepository.countByFollowedId(userId);
     }
@@ -208,5 +208,15 @@ public class GlobalHelperService {
     // contagem de seguindo
     public long countFollowing(Long userId) {
         return followRepository.countByFollowerId(userId);
+    }
+
+
+    // verifica se os 2 usuarios se seguem
+    public boolean isFollowFriends(Long userA, Long userB){
+        boolean followsOwner = followRepository.existsByFollowerIdAndFollowedId(userA, userB);
+
+        boolean ownerFollowsUser = followRepository.existsByFollowerIdAndFollowedId(userB, userA);
+
+        return followsOwner && ownerFollowsUser;
     }
 }

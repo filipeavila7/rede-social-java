@@ -39,6 +39,8 @@ public class UserService {
 
     // ========== POST ==========
 
+    // TODO - verifica se o email e userName ja exitste
+
     // criar usuario
     @Transactional
     public UserResponse createUser(UserRequest request){
@@ -61,6 +63,7 @@ public class UserService {
 
     }
 
+    // TODO - verifica se o email e userName ja exitste
 
     // ========== PUT ==========
 
