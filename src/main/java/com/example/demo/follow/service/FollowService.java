@@ -99,12 +99,17 @@ public class FollowService {
 
     // pegar seguindo de outro usuario
     public Page<FollowingProfileResponse> getFollowing(Long userId, Pageable pageable) {
+        // verifica se a conta é privada e se o user logado é amigo do user
+        globalHelperService.validateCanViewProfile(userId);
+
         return followRepository.findByFollowerId(userId, pageable)
                 .map(followMapper::toFollowingProfileResponse);
     }
 
     // pegar seguidores de outro de usuario
     public Page<FollowingProfileResponse> getFollowers(Long userId, Pageable pageable) {
+        globalHelperService.validateCanViewProfile(userId);
+
         return followRepository.findByFollowedId(userId, pageable)
                 .map(followMapper::toFollowerProfileResponse);
 

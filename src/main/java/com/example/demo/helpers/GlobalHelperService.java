@@ -4,6 +4,7 @@ import com.example.demo.comment.entity.Comment;
 import com.example.demo.comment.repository.CommentRepository;
 import com.example.demo.conversation.entity.Conversation;
 import com.example.demo.conversation.repository.ConversationRepository;
+import com.example.demo.exeptions.api.AccessDeniedException;
 import com.example.demo.exeptions.comment.CommentConflictException;
 import com.example.demo.exeptions.comment.CommentNotFoundException;
 import com.example.demo.exeptions.like.LikeConflictException;
@@ -212,11 +213,40 @@ public class GlobalHelperService {
 
 
     // verifica se os 2 usuarios se seguem
-    public boolean isFollowFriends(Long userA, Long userB){
-        boolean followsOwner = followRepository.existsByFollowerIdAndFollowedId(userA, userB);
+    public void validateCanViewProfile(Long profileUserId) {
 
-        boolean ownerFollowsUser = followRepository.existsByFollowerIdAndFollowedId(userB, userA);
+        // pegar o logado
+        Long loggedUserId = getLoggedUser().getId();
 
-        return followsOwner && ownerFollowsUser;
+        // É o próprio perfil
+        if (loggedUserId.equals(profileUserId)) {
+            return;
+        }
+
+        User profileUser = userRepository.findById(profileUserId)
+                .orElseThrow(UserNotFoundException::new);
+
+        // Perfil público
+        if (!profileUser.getProfile().isPrivateProfile()) {
+            return;
+        }
+
+        // Perfil privado → precisa seguir mutuamente
+        boolean followsOwner =
+                followRepository.existsByFollowerIdAndFollowedId(
+                        loggedUserId,
+                        profileUserId
+                );
+
+        boolean ownerFollows =
+                followRepository.existsByFollowerIdAndFollowedId(
+                        profileUserId,
+                        loggedUserId
+                );
+
+        // caso não se sigam, não deixa acessar
+        if (!followsOwner || !ownerFollows) {
+            throw new AccessDeniedException();
+        }
     }
 }
