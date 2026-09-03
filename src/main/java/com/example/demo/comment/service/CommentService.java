@@ -89,7 +89,7 @@ public class CommentService {
         // atualiza o perfil de interesse com o peso do comentário
         userInterestService.applyDelta(loggedUser, post, UserInterestService.commentWeight());
 
-        String content = loggedUser.getName() + " comentou no seu post: " + comment.getContent();
+        String content =  " comentou no seu post: " + comment.getContent();
         notificationService.createPostNotification(
                 loggedUser, post.getUser(), post, NotificationType.COMMENT, content);
 
@@ -122,7 +122,7 @@ public class CommentService {
 
         userInterestService.applyDelta(loggedUser, post, UserInterestService.commentWeight());
 
-        String content = loggedUser.getName() + " respondeu o seu comentario: " + request.content();
+        String content =  " respondeu o seu comentario: " + request.content();
 
         // gerar notificação para respostas de comentarios
         notificationService.createCommentNotification(

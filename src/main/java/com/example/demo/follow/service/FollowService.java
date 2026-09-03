@@ -53,7 +53,7 @@ public class FollowService {
         follow.setCreatedAt(LocalDateTime.now());
 
         // conteydo da notificação
-        String content = loggedUser.getName() + " começou a seguir você";
+        String content =  " começou a seguir você";
 
         // cria a notificação
         notificationService.createFollowNotification(

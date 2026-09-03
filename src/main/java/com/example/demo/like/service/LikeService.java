@@ -58,7 +58,7 @@ public class LikeService {
         // atualiza o perfil de interesse com o peso do like
         userInterestService.applyDelta(loggedUser, post, UserInterestService.likeWeight());
 
-        String content = loggedUser.getName() + " curtiu o seu post";
+        String content =  " curtiu o seu post";
         notificationService.createPostNotification(
                 loggedUser, post.getUser(), post, NotificationType.LIKE, content);
 
