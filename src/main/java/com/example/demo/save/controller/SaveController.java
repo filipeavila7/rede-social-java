@@ -21,7 +21,7 @@ public class SaveController {
     @GetMapping()
     public ResponseEntity<Page<SaveResponse>> getMySaves(
             @PageableDefault(size = 12,
-                    sort = "createdAt",
+                    sort = "createAt",
                     direction = Sort.Direction.DESC)
             Pageable pageable
     ){
