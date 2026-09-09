@@ -33,6 +33,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -248,5 +252,49 @@ public class GlobalHelperService {
         if (!followsOwner || !ownerFollows) {
             throw new AccessDeniedException();
         }
+    }
+
+
+
+
+    // filtrar posts excluindo os privados
+    public List<Post> filterVisible(List<Post> candidates, User viewer) {
+        if (candidates.isEmpty()) return candidates;
+
+        List<Long> authorIds = candidates.stream()
+                .map(p -> p.getUser().getId())
+                .distinct()
+                .toList();
+
+        Set<Long> privateAuthorIds = userRepository.findPrivateUserIds(authorIds);
+
+        if (privateAuthorIds.isEmpty()) {
+            return candidates;
+        }
+
+        if (viewer == null) {
+            return candidates.stream()
+                    .filter(p -> !privateAuthorIds.contains(p.getUser().getId()))
+                    .toList();
+        }
+
+        Set<Long> othersPrivateIds = privateAuthorIds.stream()
+                .filter(id -> !id.equals(viewer.getId()))
+                .collect(Collectors.toSet());
+
+        Set<Long> viewerFollows = followRepository.findFollowedIdsAmong(viewer.getId(), othersPrivateIds);
+        Set<Long> followViewer = followRepository.findFollowerIdsAmong(viewer.getId(), othersPrivateIds);
+
+        Set<Long> mutuallyVisible = new HashSet<>(viewerFollows);
+        mutuallyVisible.retainAll(followViewer);
+
+        return candidates.stream()
+                .filter(p -> {
+                    Long authorId = p.getUser().getId();
+                    if (!privateAuthorIds.contains(authorId)) return true;
+                    if (authorId.equals(viewer.getId())) return true;
+                    return mutuallyVisible.contains(authorId);
+                })
+                .toList();
     }
 }

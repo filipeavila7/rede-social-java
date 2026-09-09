@@ -3,7 +3,6 @@ package com.example.demo.feed.service;
 import com.example.demo.feed.interest.entity.UserInterest;
 import com.example.demo.feed.interest.repository.UserInterestRepository;
 import com.example.demo.feed.repository.PostImpressionRepository;
-import com.example.demo.follow.repository.FollowRepository;
 import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.post.dto.PostDetaisResponse;
 import com.example.demo.post.entity.Post;
@@ -11,7 +10,6 @@ import com.example.demo.post.mapper.PostMapper;
 import com.example.demo.post.repository.PostRepository;
 import com.example.demo.tag.entity.Tag;
 import com.example.demo.user.entity.User;
-import com.example.demo.user.repository.UserRepository;
 import com.github.benmanes.caffeine.cache.Cache;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -53,8 +51,6 @@ public class FeedService {
     private final PostImpressionService postImpressionService;
     private final PostMapper postMapper;
     private final GlobalHelperService globalHelperService;
-    private final UserRepository userRepository;
-    private final FollowRepository followRepository;
 
     public Page<PostDetaisResponse> getFeed(int page, int size) {
         User loggedUser = globalHelperService.getLoggedUserOrNull();
@@ -68,7 +64,7 @@ public class FeedService {
 
     private List<Long> buildRankedIds(User user) {
         List<Post> candidates = fetchCandidatePool();
-        List<Post> visibleCandidates = filterVisiblePosts(candidates, user);
+        List<Post> visibleCandidates = globalHelperService.filterVisible(candidates, user);
 
         List<ScoredPost> scored = user != null
                 ? scorePersonalized(visibleCandidates, user)
@@ -79,45 +75,7 @@ public class FeedService {
         return ranked.stream().map(Post::getId).toList();
     }
 
-    private List<Post> filterVisiblePosts(List<Post> candidates, User viewer) {
-        List<Long> authorIds = candidates.stream()
-                .map(p -> p.getUser().getId())
-                .distinct()
-                .toList();
 
-        Set<Long> privateAuthorIds = userRepository.findPrivateUserIds(authorIds);
-
-        if (privateAuthorIds.isEmpty()) {
-            return candidates; // ninguém privado no pool, nada a filtrar
-        }
-
-        if (viewer == null) {
-            // visitante nunca vê posts de conta privada
-            return candidates.stream()
-                    .filter(p -> !privateAuthorIds.contains(p.getUser().getId()))
-                    .toList();
-        }
-
-        // não precisa checar follow contra si mesmo
-        Set<Long> othersPrivateIds = privateAuthorIds.stream()
-                .filter(id -> !id.equals(viewer.getId()))
-                .collect(Collectors.toSet());
-
-        Set<Long> viewerFollows = followRepository.findFollowedIdsAmong(viewer.getId(), othersPrivateIds);
-        Set<Long> followViewer = followRepository.findFollowerIdsAmong(viewer.getId(), othersPrivateIds);
-
-        Set<Long> mutuallyVisible = new HashSet<>(viewerFollows);
-        mutuallyVisible.retainAll(followViewer);
-
-        return candidates.stream()
-                .filter(p -> {
-                    Long authorId = p.getUser().getId();
-                    if (!privateAuthorIds.contains(authorId)) return true; // conta pública
-                    if (authorId.equals(viewer.getId())) return true;      // é o próprio dono
-                    return mutuallyVisible.contains(authorId);              // segue mutuamente
-                })
-                .toList();
-    }
 
     private Page<PostDetaisResponse> paginateByIds(List<Long> orderedIds, int page, int size, User loggedUser) {
         Pageable pageable = PageRequest.of(page, size);

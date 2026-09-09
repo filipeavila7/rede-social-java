@@ -4,6 +4,7 @@ import com.example.demo.feed.service.FeedService;
 import com.example.demo.post.dto.PostRequest;
 import com.example.demo.post.dto.PostDetaisResponse;
 import com.example.demo.post.dto.PostResponse;
+import com.example.demo.post.dto.PostWithRelatedResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -66,7 +67,7 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<PostDetaisResponse> getPostById(@PathVariable Long postId){
+    public ResponseEntity<PostWithRelatedResponse> getPostById(@PathVariable Long postId) {
         return ResponseEntity.ok(service.getPostById(postId));
     }
 

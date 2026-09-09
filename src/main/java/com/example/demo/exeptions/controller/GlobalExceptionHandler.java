@@ -15,11 +15,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<?> handleRuntime(RuntimeException ex) {
 
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(Map.of(
-                        "erro", ex.getMessage()
-                ));
+        return ResponseEntity.badRequest().body(
+                Map.of(
+                        "error",
+                        ex.getMessage() != null
+                                ? ex.getMessage()
+                                : "Erro interno"
+                )
+        );
     }
 
 

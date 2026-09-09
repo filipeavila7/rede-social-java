@@ -1,11 +1,13 @@
 package com.example.demo.post.repository;
 
+import com.example.demo.tag.entity.Tag;
 import com.example.demo.user.entity.User;
 import com.example.demo.post.entity.Post;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +20,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // findAll()
     // findById()
     // deleteById()
+
+
 
 
     @Query("""
@@ -52,4 +56,22 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Optional<Post> findByUserAndId(User user, Long postId);
 
     long countByUserId(Long userId); // retorna a quantidade de posts de um usuario
+
+
+    @Query("""
+    SELECT p
+    FROM Post p
+    JOIN p.tags t
+    LEFT JOIN p.likes l
+    WHERE t IN :tags
+      AND p.id != :excludePostId
+    GROUP BY p
+    ORDER BY COUNT(DISTINCT t) DESC,
+             COUNT(DISTINCT l) DESC
+""")
+    List<Post> findRelatedByTags(
+            @Param("tags") Set<Tag> tags,
+            @Param("excludePostId") Long excludePostId,
+            Pageable pageable
+    );
 }

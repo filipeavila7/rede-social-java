@@ -3,17 +3,16 @@ package com.example.demo.post.service;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import com.example.demo.comment.repository.CommentRepository;
+
 import com.example.demo.exeptions.tag.TagConflictException;
 import com.example.demo.helpers.GlobalHelperService;
-import com.example.demo.like.repository.LikeRepository;
 import com.example.demo.post.dto.PostRequest;
 import com.example.demo.post.dto.PostDetaisResponse;
+import com.example.demo.post.dto.PostWithRelatedResponse;
 import com.example.demo.tag.entity.Tag;
 import com.example.demo.post.dto.PostResponse;
 import com.example.demo.post.mapper.PostMapper;
 import com.example.demo.post.repository.PostRepository;
-import com.example.demo.tag.repository.TagRepository;
 import com.example.demo.tag.service.TagService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +28,9 @@ import com.example.demo.user.entity.User;
 @Service
 @RequiredArgsConstructor
 public class PostService {
+
+    private static final int RELATED_CANDIDATE_LIMIT = 20;
+    private static final int RELATED_RESULT_LIMIT = 10;
 
     private final PostRepository postRepository;
     private final PostMapper postMapper;
@@ -71,16 +73,37 @@ public class PostService {
     }
 
 
-    // buscar post pelo id
-    public PostDetaisResponse getPostById(Long postId) {
-        // pegar usuario logado
-        User loggedUser = globalHelperService.getLoggedUser();
-
-        // verifica se o post existe
+    // buscar post pelo id, ja com os posts relacionados
+    public PostWithRelatedResponse getPostById(Long postId) {
+        User viewer = globalHelperService.getLoggedUserOrNull();
         Post post = globalHelperService.findPostById(postId);
 
-        // retorna o post response
-        return postMapper.toPostDetaisResponse(post, loggedUser.getId());
+        List<Post> related = fetchRelatedPosts(post, viewer);
+
+        Long viewerId = viewer != null ? viewer.getId() : null;
+
+        PostDetaisResponse postResponse = postMapper.toPostDetaisResponse(post, viewerId);
+        List<PostDetaisResponse> relatedResponses = related.stream()
+                .map(p -> postMapper.toPostDetaisResponse(p, viewerId))
+                .toList();
+
+        return new PostWithRelatedResponse(postResponse, relatedResponses);
+    }
+
+    private List<Post> fetchRelatedPosts(Post post, User viewer) {
+        Set<Tag> tags = post.getTags();
+        if (tags.isEmpty()) {
+            return List.of();
+        }
+
+        List<Post> candidates = postRepository.findRelatedByTags(
+                tags, post.getId(), PageRequest.of(0, RELATED_CANDIDATE_LIMIT));
+
+        List<Post> visible = globalHelperService.filterVisible(candidates, viewer);
+
+        return visible.size() > RELATED_RESULT_LIMIT
+                ? visible.subList(0, RELATED_RESULT_LIMIT)
+                : visible;
     }
 
 
