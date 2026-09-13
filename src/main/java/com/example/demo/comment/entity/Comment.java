@@ -59,7 +59,11 @@ public class Comment {
 
     @OneToMany(mappedBy = "parentComment")
     private List<Comment> replies;
-    
+
+
+    @ManyToOne
+    @JoinColumn(name = "reply_to_comment_id")
+    private Comment replyToComment;
 
 
     

@@ -29,10 +29,11 @@ public class CommentMapper {
                 details.hasReplies(),
                 details.replyCount(),
                 details.likeCount(),
-                c.getParentComment() != null
-                        ? c.getParentComment().getUser().getUserName()
+                c.getReplyToComment() != null
+                        ? c.getReplyToComment().getUser().getUserName()
                         : null
         );
     }
+
 }
 

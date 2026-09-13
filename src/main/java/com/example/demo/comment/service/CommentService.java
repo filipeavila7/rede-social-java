@@ -109,6 +109,7 @@ public class CommentService {
         Comment comment = commentRepository.findByIdAndPostId(commentId, postId)
                 .orElseThrow(CommentNotFoundException::new);
 
+
         // se não for nulo, ou seja se ja for uma resposta de uma resposta, pega o parent_id da reposta
         // se for nulo sigifca que é uma respsta do comentario pai e pega o id dele
         Comment parentComment = comment.getParentComment() != null
@@ -122,7 +123,8 @@ public class CommentService {
         replyComment.setPost(post);
         replyComment.setUser(loggedUser);
         replyComment.setContent(request.content());
-        replyComment.setParentComment(parentComment); // coloca o comentario que foi respondido
+        replyComment.setParentComment(parentComment); // coloca o id do comentario pai
+        replyComment.setReplyToComment(comment);  // id do comentario respondido
 
 
         Comment save = commentRepository.save(replyComment);
