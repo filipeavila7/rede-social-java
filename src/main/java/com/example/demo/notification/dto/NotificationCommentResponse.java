@@ -1,5 +1,6 @@
 package com.example.demo.notification.dto;
 
+import com.example.demo.comment.dto.CommentResponse;
 import com.example.demo.comment.entity.Comment;
 import com.example.demo.notification.entity.NotificationType;
 
@@ -21,9 +22,8 @@ public record NotificationCommentResponse(
 
         String content,
 
-        LocalDateTime createdAt,
+        LocalDateTime createdAt
 
-        Comment comment
 
 ) {
 }

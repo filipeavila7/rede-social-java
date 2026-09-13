@@ -12,7 +12,7 @@ public record PostRequest(
         String title,
 
         // opcional
-        @Size(max = 250, message = "No máximo 250 caracteres")
+        @Size(max = 150, message = "No máximo 150 caracteres")
         String description,
 
         @NotBlank

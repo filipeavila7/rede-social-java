@@ -1,5 +1,6 @@
 package com.example.demo.notification.mapper;
 
+import com.example.demo.comment.mapper.CommentMapper;
 import com.example.demo.notification.dto.*;
 import com.example.demo.notification.entity.Notification;
 import com.example.demo.post.mapper.PostMapper;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 public class NotificationMapper {
     private final FileUrlUtils fileUrlUtils;
     private final PostMapper postMapper;
+
 
     public NotificationPostResponse toNotificationPostResponse(Notification n){
         return new NotificationPostResponse(
@@ -37,8 +39,8 @@ public class NotificationMapper {
                         fileUrlUtils.toPublicUrl(n.getSender().getProfile().getImageUrlProfile())  : null,
                 n.getPost() != null ?  n.getPost().getId() : null,
                 n.getContent(),
-                n.getCreatedAt(),
-                n.getComment()
+                n.getCreatedAt()
+
         );
     }
 
