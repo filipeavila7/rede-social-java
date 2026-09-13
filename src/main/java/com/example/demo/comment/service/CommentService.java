@@ -37,17 +37,23 @@ public class CommentService {
 
     // listar todos os comentarios de um post passando o id dele
     public Page<CommentResponse> getAllPostCommentes(Long postId, Pageable pageable) {
-        return commentRepository.findByPostIdAndParentCommentIsNullOrderByCreatedAtDesc(postId, pageable)
-                .map(c -> commentMapper.toCommentResponse(c, toCommentDetails(c)));
 
+        Long userId = globalHelperService.getLoggedUser().getId();
+
+        return commentRepository
+                .findPostCommentsPrioritized(postId, userId, pageable)
+                .map(c -> commentMapper.toCommentResponse(c, toCommentDetails(c)));
     }
 
     // ver resposta dos comentarios
-    public Page<CommentResponse> getCommentReplys(Long commentId, Pageable pageable){
-        // verifica se o comentario existe
+    public Page<CommentResponse> getCommentReplys(Long commentId, Pageable pageable) {
+
         globalHelperService.findByCommentId(commentId);
-        // retorna as resosta desse comentario
-        return commentRepository.findByParentCommentId(commentId, pageable)
+
+        Long userId = globalHelperService.getLoggedUser().getId();
+
+        return commentRepository
+                .findCommentRepliesPrioritized(commentId, userId, pageable)
                 .map(c -> commentMapper.toCommentResponse(c, toCommentDetails(c)));
     }
 
