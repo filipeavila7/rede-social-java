@@ -46,14 +46,11 @@ public class CommentService {
     }
 
     // ver resposta dos comentarios
-    public Page<CommentResponse> getCommentReplys(Long commentId, Pageable pageable) {
-
+    public Page<CommentResponse> getCommentReplys(Long commentId, Pageable pageable){
+        // verifica se o comentario existe
         globalHelperService.findByCommentId(commentId);
-
-        Long userId = globalHelperService.getLoggedUser().getId();
-
-        return commentRepository
-                .findCommentRepliesPrioritized(commentId, userId, pageable)
+        // retorna as resosta desse comentario
+        return commentRepository.findByParentCommentId(commentId, pageable)
                 .map(c -> commentMapper.toCommentResponse(c, toCommentDetails(c)));
     }
 

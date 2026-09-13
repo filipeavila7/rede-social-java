@@ -5,6 +5,8 @@ import com.example.demo.exeptions.comment.CommentNotFoundException;
 import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.likeComents.entity.LikeComment;
 import com.example.demo.likeComents.repository.LikeCommentRepository;
+import com.example.demo.notification.entity.NotificationType;
+import com.example.demo.notification.service.NotificationService;
 import com.example.demo.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 public class LikeCommentService {
     private final LikeCommentRepository likeCommentRepository;
     private final GlobalHelperService globalHelperService;
+    private final NotificationService notificationService;
 
     // curtir comentario
     public void likeComment(Long commentId){
@@ -22,6 +25,11 @@ public class LikeCommentService {
 
         // encontra o comentario
         Comment comment = globalHelperService.findByCommentId(commentId);
+
+
+
+        notificationService.createCommentNotification(loggedUser, comment.getUser(),
+                comment.getPost(), comment, NotificationType.LIKE, " curtiu o seu comentário" );
 
         // cria o like no comentario
         LikeComment likeComment = new LikeComment();
