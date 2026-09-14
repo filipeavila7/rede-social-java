@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,8 +17,6 @@ import com.example.demo.post.entity.Post;
 import com.example.demo.post.service.PostService;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -69,6 +66,12 @@ public class PostController {
     @GetMapping("/{postId}")
     public ResponseEntity<PostWithRelatedResponse> getPostById(@PathVariable Long postId) {
         return ResponseEntity.ok(service.getPostById(postId));
+    }
+
+
+    @GetMapping("/my/{postId}")
+    public ResponseEntity<PostDetaisResponse> getMyPostById(@PathVariable Long postId) {
+        return ResponseEntity.ok(service.getMyPostById(postId));
     }
 
     @GetMapping("/user/me")

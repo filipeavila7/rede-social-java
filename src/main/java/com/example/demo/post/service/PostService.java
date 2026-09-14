@@ -73,6 +73,13 @@ public class PostService {
     }
 
 
+    // retornar somemte os post sem relacionados
+    public PostDetaisResponse getMyPostById(Long postId){
+        return postMapper.toPostDetaisResponse(globalHelperService.findPostById(postId),
+                globalHelperService.getLoggedUser().getId());
+
+    }
+
     // buscar post pelo id, ja com os posts relacionados
     public PostWithRelatedResponse getPostById(Long postId) {
         User viewer = globalHelperService.getLoggedUserOrNull();
