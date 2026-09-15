@@ -10,6 +10,7 @@ import com.example.demo.feed.entity.PostImpression;
 import com.example.demo.feed.interaction.entity.UserInteraction;
 import com.example.demo.like.entity.Like;
 import com.example.demo.notification.entity.Notification;
+import com.example.demo.save.entity.Save;
 import com.example.demo.tag.entity.Tag;
 import com.example.demo.user.entity.User;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -64,6 +65,11 @@ public class Post {
     // um post tem várias notificações
     @OneToMany(mappedBy = "post",  cascade = CascadeType.ALL)
     private List<Notification> notifications;
+
+    // um post tem uma lista de salvos
+    @OneToMany(mappedBy = "post",  cascade = CascadeType.ALL)
+    private List<Save> saves;
+
 
 
     // tabela intermediária que relaciona post com tag (post_tags) -> post_id | tag_id
