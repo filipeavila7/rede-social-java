@@ -148,12 +148,14 @@ public class NotificationService {
             User reader,
             Long receiverId,
             Long conversationId,
+            Long messageId,
             LocalDateTime readAt,
             NotificationType type
     ) {
         MessageReadResponse response = new MessageReadResponse(
                 type,
                 conversationId,
+                messageId,
                 reader.getId(),
                 readAt
         );

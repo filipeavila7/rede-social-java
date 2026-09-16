@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 public class FeedService {
 
     private static final int CANDIDATE_POOL_SIZE = 500;
-    private static final int WINDOW_DAYS = 30;
+    private static final int WINDOW_DAYS = 365;
 
     private static final double INTEREST_WEIGHT = 0.7;
     private static final double POPULARITY_WEIGHT = 0.2;

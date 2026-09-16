@@ -167,12 +167,15 @@ public class MessageService {
 
         messageRepository.saveAll(messages);
 
-        notificationService.sendMessageReadNotification(
-                loggedUser,
-                otherUserId,
-                conversationId,
-                now,
-                NotificationType.READ
+        messages.forEach(message ->
+                notificationService.sendMessageReadNotification(
+                        loggedUser,
+                        otherUserId,
+                        conversationId,
+                        message.getId(),
+                        now,
+                        NotificationType.READ
+                )
         );
     }
 

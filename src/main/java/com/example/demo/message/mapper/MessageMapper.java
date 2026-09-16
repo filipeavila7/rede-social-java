@@ -20,7 +20,7 @@ public class MessageMapper {
                 fileUrlUtils.toPublicUrl(m.getSender().getProfile().getImageUrlProfile()),
                 m.getContent(),
                 m.getCreatedAt().toString(),
-                m.getReadAt().toString()
+                m.getReadAt() != null ? m.getReadAt().toString() : null
         );
     }
 }

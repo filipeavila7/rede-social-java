@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 public record MessageReadResponse(
         NotificationType type,
         Long conversationId,
+        Long messageId,
         Long readerId,
         LocalDateTime readAt
 ) {}
