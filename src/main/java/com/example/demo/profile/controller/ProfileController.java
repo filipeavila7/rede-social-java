@@ -9,17 +9,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 import com.example.demo.profile.dto.ProfileResponse;
 
 import com.example.demo.profile.service.ProfileService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PutMapping;
 
 @RequiredArgsConstructor
 @RestController
@@ -33,8 +28,8 @@ public class ProfileController {
     }
 
 
-    @GetMapping("/user")
-    public ResponseEntity<ProfileResponse> getProfileByUserName(@RequestParam String userName) {
+    @GetMapping("/user/{userName}")
+    public ResponseEntity<ProfileResponse> getProfileByUserName(@PathVariable String userName) {
         return ResponseEntity.ok(service.getProfileByUserName(userName));
     }
 
