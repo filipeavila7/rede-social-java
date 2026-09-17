@@ -17,6 +17,7 @@ public record PostDetaisResponse(
         Set<Tag> tags,
         long likesCount,
         long commentsCount,
-        boolean likedByMe
+        boolean likedByMe,
+        boolean saveByMe
 ) {
 }

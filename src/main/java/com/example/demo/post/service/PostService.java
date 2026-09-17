@@ -59,7 +59,7 @@ public class PostService {
                 : orderedPosts.subList(start, end);
 
         return new PageImpl<>(pagedPosts, pageable, orderedPosts.size())
-                .map(post -> postMapper.toPostDetaisResponse(post, loggedUser.getId()));
+                .map(postMapper::toPostDetaisResponse);
     }
 
 
@@ -69,15 +69,13 @@ public class PostService {
 
         return postRepository
                 .findByUserIdOrderByCreatedAtDesc(user.getId(), pageable)
-                .map(post -> postMapper.toPostDetaisResponse(post, user.getId()));
+                .map(postMapper::toPostDetaisResponse);
     }
 
 
     // retornar somemte os post sem relacionados
     public PostDetaisResponse getMyPostById(Long postId){
-        return postMapper.toPostDetaisResponse(globalHelperService.findPostById(postId),
-                globalHelperService.getLoggedUser().getId());
-
+        return postMapper.toPostDetaisResponse(globalHelperService.findPostById(postId));
     }
 
     // buscar post pelo id, ja com os posts relacionados
@@ -87,11 +85,9 @@ public class PostService {
 
         List<Post> related = fetchRelatedPosts(post, viewer);
 
-        Long viewerId = viewer != null ? viewer.getId() : null;
-
-        PostDetaisResponse postResponse = postMapper.toPostDetaisResponse(post, viewerId);
+        PostDetaisResponse postResponse = postMapper.toPostDetaisResponse(post);
         List<PostDetaisResponse> relatedResponses = related.stream()
-                .map(p -> postMapper.toPostDetaisResponse(p, viewerId))
+                .map(postMapper::toPostDetaisResponse)
                 .toList();
 
         return new PostWithRelatedResponse(postResponse, relatedResponses);
@@ -123,7 +119,7 @@ public class PostService {
 
         return postRepository
                 .findByUserUserNameOrderByCreatedAtDesc(userName, pageable)
-                .map(post -> postMapper.toPostDetaisResponse(post, loggedUser.getId()));
+                .map(postMapper::toPostDetaisResponse);
     }
 
     // quantidade de posts
@@ -148,7 +144,7 @@ public class PostService {
                         busca,
                         pageable
                 )
-                .map(post -> postMapper.toPostDetaisResponse(post, loggedUser.getId()));
+                .map(postMapper::toPostDetaisResponse);
     }
 
 

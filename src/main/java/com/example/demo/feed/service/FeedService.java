@@ -97,10 +97,10 @@ public class FeedService {
             postImpressionService.registerImpressions(loggedUser, orderedPage);
         }
 
-        Long userId = loggedUser != null ? loggedUser.getId() : null;
+
 
         List<PostDetaisResponse> content = orderedPage.stream()
-                .map(post -> postMapper.toPostDetaisResponse(post, userId))
+                .map(postMapper::toPostDetaisResponse)
                 .toList();
 
         return new PageImpl<>(content, pageable, orderedIds.size());

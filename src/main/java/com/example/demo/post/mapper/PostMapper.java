@@ -19,11 +19,12 @@ public class PostMapper {
     private final FileUrlUtils fileUrlUtils;
 
     // TODO - como no novo front não vai mais mostrar like by me e nem contagem, esse metodo sera refatorado
-    public PostDetaisResponse toPostDetaisResponse(Post post, Long loggedUserId) {
+    public PostDetaisResponse toPostDetaisResponse(Post post) {
 
         long likesCount = globalHelperService.countLikeByPostId(post.getId());
         long commentsCount = globalHelperService.countCommentBypostId(post.getId());
-        boolean likedByMe = globalHelperService.existsLikeInPost(loggedUserId, post.getId());
+        boolean likedByMe = globalHelperService.existsLikeInPost(post.getId());
+        boolean saveByMe = globalHelperService.saveByMe(post.getId());
 
         return new PostDetaisResponse(
                 post.getId(),
@@ -35,7 +36,8 @@ public class PostMapper {
                 post.getTags(),
                 likesCount,
                 commentsCount,
-                likedByMe
+                likedByMe,
+                saveByMe
         );
     }
 

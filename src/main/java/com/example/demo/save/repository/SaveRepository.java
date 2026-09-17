@@ -12,4 +12,6 @@ public interface SaveRepository extends JpaRepository<Save, Long> {
     Page<Save> findByUserId(Long userId, Pageable pageable);
 
     Optional<Save> findByUserIdAndPostId(Long userId, Long postId);
+
+    boolean existsByUserIdAndPostId(Long userId, Long postId);
 }

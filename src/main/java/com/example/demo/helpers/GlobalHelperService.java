@@ -17,6 +17,7 @@ import com.example.demo.notification.entity.Notification;
 import com.example.demo.notification.entity.NotificationType;
 import com.example.demo.profile.entity.Profile;
 import com.example.demo.profile.repository.ProfileRepository;
+import com.example.demo.save.repository.SaveRepository;
 import com.example.demo.user.entity.User;
 import com.example.demo.exeptions.post.PostConflictException;
 import com.example.demo.exeptions.post.PostNotFoundException;
@@ -49,6 +50,7 @@ public class GlobalHelperService {
     private final ProfileRepository profileRepository;
     private final ConversationRepository conversationRepository;
     private final FollowRepository followRepository;
+    private final SaveRepository saveRepository;
 
 
     // TODO - provavelmente usar esse metodo na service de follow
@@ -169,8 +171,9 @@ public class GlobalHelperService {
     }
 
     // retorna um boleano caso exista curtida ou não
-    public boolean existsLikeInPost(Long userId, Long postId){
-        return likeRepository.existsByUserIdAndPostId(userId, postId);
+    public boolean existsLikeInPost(Long postId){
+        User loggedUser = this.getLoggedUser();
+        return likeRepository.existsByUserIdAndPostId(loggedUser.getId(), postId);
     }
 
     // retorna like existente
@@ -298,9 +301,16 @@ public class GlobalHelperService {
                 .toList();
     }
 
-
+    // boleano para verificar se o user segue o outro
     public boolean amIFollowing(Long followedId) {
         return followRepository.existsByFollowerIdAndFollowedId(
                 this.getLoggedUser().getId(), followedId);
+    }
+
+
+    // boleano para verificar se o post ja foi salvo
+    public boolean saveByMe(Long postId){
+        User loggedUser = this.getLoggedUser();
+        return saveRepository.existsByUserIdAndPostId(loggedUser.getId(), postId);
     }
 }
