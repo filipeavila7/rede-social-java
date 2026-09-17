@@ -83,9 +83,9 @@ public class PostController {
     }
 
     // ver posts de outros usuarios
-    @GetMapping("/user")
+    @GetMapping("/user/{userName}")
     public ResponseEntity<Page<PostDetaisResponse>> getPostsByUserName(
-            @RequestParam String userName,
+            @PathVariable String userName,
             @PageableDefault(size = 12)
             Pageable pageable
     ) {

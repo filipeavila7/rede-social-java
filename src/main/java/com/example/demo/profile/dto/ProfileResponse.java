@@ -11,5 +11,6 @@ public record ProfileResponse(
         String userName,
         long followCount,
         long followerCount,
-        long postCount
+        long postCount,
+        boolean amIfollowing
 ) {}

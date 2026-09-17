@@ -6,6 +6,7 @@ public record ConversationResponse(
     Long conversationId,
     Long otherUserId,
     String otherUserName,
+    String otherUserUsername,
     String otherUserPhoto,
     String lastMessage,
     LocalDateTime lastMessageAt

@@ -24,6 +24,7 @@ public class ConversationMapper {
                 conversation.getId(),
                 otherUser.getId(),
                 otherUser.getName(),
+                otherUser.getUserName(),
                 fileUrlUtils.toPublicUrl(otherUser.getProfile().getImageUrlProfile()),
                 conversation.getLastMessage(),
                 conversation.getLastMessageAt()

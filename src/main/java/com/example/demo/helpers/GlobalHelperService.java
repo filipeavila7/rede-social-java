@@ -297,4 +297,10 @@ public class GlobalHelperService {
                 })
                 .toList();
     }
+
+
+    public boolean amIFollowing(Long followedId) {
+        return followRepository.existsByFollowerIdAndFollowedId(
+                this.getLoggedUser().getId(), followedId);
+    }
 }
