@@ -17,6 +17,12 @@ public interface UserRepository extends JpaRepository<User, Long> { // passar cl
     // findById()
     // deleteById()
 
+
+    List<String> findTop10ByUserNameContainingIgnoreCaseOrNameContainingIgnoreCase(
+            String userName,
+            String name
+    );
+
     @Query("SELECT u.id FROM User u WHERE u.id IN :userIds AND u.profile.privateProfile = true")
     Set<Long> findPrivateUserIds(@Param("userIds") Collection<Long> userIds);
 

@@ -74,4 +74,30 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             @Param("excludePostId") Long excludePostId,
             Pageable pageable
     );
+
+
+    // buscar posts pelo titulo ou tag
+    @Query("""
+    SELECT DISTINCT p
+    FROM Post p
+    LEFT JOIN p.tags t
+    WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :q, '%'))
+       OR LOWER(t.name) LIKE LOWER(CONCAT('%', :q, '%'))
+""")
+    Page<Post> searchPosts(
+            @Param("q") String q,
+            Pageable pageable
+    );
+
+    // sugestão de posts
+    @Query("""
+    SELECT DISTINCT p
+    FROM Post p
+    WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :q, '%'))
+    ORDER BY p.createdAt DESC
+""")
+    List<Post> searchPostSuggestions(
+            @Param("q") String q,
+            Pageable pageable
+    );
 }

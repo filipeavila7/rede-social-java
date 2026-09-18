@@ -313,4 +313,25 @@ public class GlobalHelperService {
         User loggedUser = this.getLoggedUser();
         return saveRepository.existsByUserIdAndPostId(loggedUser.getId(), postId);
     }
+
+
+
+    // versão segura para visitante anônimo — não lança exceção
+    public boolean existsLikeInPostOrDefault(Long postId){
+        User loggedUser = this.getLoggedUserOrNull();
+        if (loggedUser == null) {
+            return false;
+        }
+        return likeRepository.existsByUserIdAndPostId(loggedUser.getId(), postId);
+    }
+
+
+    // versão segura para visitante anônimo — não lança exceção
+    public boolean saveByMeOrDefault(Long postId){
+        User loggedUser = this.getLoggedUserOrNull();
+        if (loggedUser == null) {
+            return false;
+        }
+        return saveRepository.existsByUserIdAndPostId(loggedUser.getId(), postId);
+    }
 }

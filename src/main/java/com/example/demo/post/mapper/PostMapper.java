@@ -23,8 +23,8 @@ public class PostMapper {
 
         long likesCount = globalHelperService.countLikeByPostId(post.getId());
         long commentsCount = globalHelperService.countCommentBypostId(post.getId());
-        boolean likedByMe = globalHelperService.existsLikeInPost(post.getId());
-        boolean saveByMe = globalHelperService.saveByMe(post.getId());
+        boolean likedByMe = globalHelperService.existsLikeInPostOrDefault(post.getId());
+        boolean saveByMe = globalHelperService.saveByMeOrDefault(post.getId());
 
         return new PostDetaisResponse(
                 post.getId(),
