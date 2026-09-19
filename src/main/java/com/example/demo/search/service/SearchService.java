@@ -51,7 +51,7 @@ public class SearchService {
         );
     }
 
-
+    // sugestões de tags, usuarios e posts
     public SearchSuggestionsResponse suggestions(String q) {
 
         String query = q.trim();
@@ -66,14 +66,13 @@ public class SearchService {
                         .map(searchMapper::toProfileSuggestion)
                         .toList();
 
-        List<PostSuggestionResponse> posts =
+        List<String> posts =
                 postRepository
                         .searchPostSuggestions(
                                 query,
                                 PageRequest.of(0, 5)
                         )
                         .stream()
-                        .map(searchMapper::toPostSuggestion)
                         .toList();
 
         List<TagSuggestionResponse> tags =

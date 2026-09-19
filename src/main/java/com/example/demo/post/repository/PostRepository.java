@@ -89,14 +89,14 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             Pageable pageable
     );
 
-    // sugestão de posts
+    // sugestão de post
     @Query("""
-    SELECT DISTINCT p
+    SELECT DISTINCT p.title
     FROM Post p
     WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :q, '%'))
-    ORDER BY p.createdAt DESC
+    ORDER BY p.title ASC
 """)
-    List<Post> searchPostSuggestions(
+    List<String> searchPostSuggestions(
             @Param("q") String q,
             Pageable pageable
     );

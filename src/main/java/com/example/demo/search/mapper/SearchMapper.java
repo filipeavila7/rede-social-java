@@ -6,17 +6,23 @@ import com.example.demo.search.dto.ProfileSuggestionResponse;
 import com.example.demo.search.dto.TagSuggestionResponse;
 import com.example.demo.profile.entity.Profile;
 import com.example.demo.tag.entity.Tag;
+import com.example.demo.util.FileUrlUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class SearchMapper {
+
+    private final FileUrlUtils fileUrlUtils;
+
 
     public ProfileSuggestionResponse toProfileSuggestion(Profile profile) {
         return new ProfileSuggestionResponse(
                 profile.getId(),
                 profile.getUser().getName(),
                 profile.getUser().getUserName(),
-                profile.getImageUrlProfile()
+               fileUrlUtils.toPublicUrl(profile.getImageUrlProfile())
         );
     }
 
@@ -24,7 +30,7 @@ public class SearchMapper {
         return new PostSuggestionResponse(
                 post.getId(),
                 post.getTitle(),
-                post.getImageUrl()
+                fileUrlUtils.toPublicUrl(post.getImageUrl())
         );
     }
 
