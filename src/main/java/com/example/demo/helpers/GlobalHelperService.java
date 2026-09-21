@@ -96,6 +96,11 @@ public class GlobalHelperService {
                 .orElseThrow(UserNotFoundException::new);
     }
 
+    // verificar se o userName ja existe
+    public boolean validadeUserName(String userName){
+        return userRepository.existsByUserNameAndIdNot(userName, this.getLoggedUser().getId());
+    }
+
     public User getLoggedUserOrNull() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 

@@ -17,16 +17,12 @@ public interface UserRepository extends JpaRepository<User, Long> { // passar cl
     // findById()
     // deleteById()
 
-
-    List<String> findTop10ByUserNameContainingIgnoreCaseOrNameContainingIgnoreCase(
-            String userName,
-            String name
-    );
+    boolean existsByUserNameAndIdNot(String userName, Long id);
 
     @Query("SELECT u.id FROM User u WHERE u.id IN :userIds AND u.profile.privateProfile = true")
     Set<Long> findPrivateUserIds(@Param("userIds") Collection<Long> userIds);
 
     Optional<User>  findByEmail(String email); // procurar pelo email
     Optional<User> findByuserName(String userName);
-    List<User> findByuserNameContainingIgnoreCase(String userName);
+
 }

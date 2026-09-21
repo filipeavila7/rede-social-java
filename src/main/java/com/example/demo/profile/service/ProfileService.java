@@ -9,6 +9,7 @@ import com.example.demo.profile.mapper.ProfileMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.profile.dto.ProfileResponse;
@@ -16,6 +17,7 @@ import com.example.demo.profile.entity.Profile;
 import com.example.demo.user.entity.User;
 import com.example.demo.profile.repository.ProfileRepository;
 import com.example.demo.util.FileUrlUtils;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -71,6 +73,7 @@ public class ProfileService {
         return profileMapper.toProfileResponse(profile);
     }
 
+    // TODO - adcionar verificação de userName existente quando for atualizar o userName pois ele é unico
     // Atualiza perfil do usuario logado.
     // Se o status veio vazio, apaga se veio preenchido, grava hora de criacao.
     public ProfileResponse updateMyProfile(ProfileUpdateRequest request) {
@@ -80,11 +83,33 @@ public class ProfileService {
         // encontra a profile
         Profile profile = globalHelperService.getProfileByUserId(loggedUser.getId());
 
+        User userProfile = profile.getUser();
 
         // atualiza a bio
        if (request.bio() != null){
            profile.setBio(request.bio());
        }
+
+       // atualiza o name
+       if (request.name() != null){
+           userProfile.setName(request.name());
+       }
+
+
+       // atualiza o userName e verifica se ele ja esta em uso
+        if (request.userName() != null){
+            if (globalHelperService.validadeUserName(
+                    request.userName()
+            )) {
+                throw new ResponseStatusException(
+                        HttpStatus.CONFLICT,
+                        "Nome de usuário já está em uso"
+                );
+            }
+
+            userProfile.setUserName(request.userName());
+
+        }
 
         // só atualiza a foto quando vier uma URL persistível; preview blob do navegador não deve ir para o banco
         String imageUrlProfile = request.imageUrlProfile();
