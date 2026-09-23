@@ -1,6 +1,7 @@
 package com.example.demo.notification.entity;
 
 import com.example.demo.comment.entity.Comment;
+import com.example.demo.followRequest.entity.FollowRequest;
 import com.example.demo.post.entity.Post;
 import com.example.demo.user.entity.User;
 import jakarta.persistence.*;
@@ -40,6 +41,9 @@ public class Notification {
     @JoinColumn(name = "sender_id")
     private User sender;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "follow_request_id")
+    private FollowRequest followRequest;
 
     @ManyToOne
     @JoinColumn(name = "receiver_id")

@@ -1,9 +1,11 @@
 package com.example.demo.notification.mapper;
 
 import com.example.demo.comment.mapper.CommentMapper;
+import com.example.demo.followRequest.entity.FollowRequest;
 import com.example.demo.notification.dto.*;
 import com.example.demo.notification.entity.Notification;
 import com.example.demo.post.mapper.PostMapper;
+import com.example.demo.user.entity.User;
 import com.example.demo.util.FileUrlUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -13,6 +15,27 @@ import org.springframework.stereotype.Component;
 public class NotificationMapper {
     private final FileUrlUtils fileUrlUtils;
     private final PostMapper postMapper;
+
+
+    public NotificationFollowRequestResponse
+    toNotificationFollowRequestResponse(Notification notification) {
+
+        FollowRequest request = notification.getFollowRequest();
+
+        User requester = request.getRequester();
+
+        return new NotificationFollowRequestResponse(
+                request.getId(),
+                notification.getType(),
+                requester.getId(),
+                request.getStatus(),
+                requester.getName(),
+                requester.getUserName(),
+                fileUrlUtils.toPublicUrl(requester.getProfile().getImageUrlProfile()),
+                notification.getContent(),
+                notification.getCreatedAt()
+        );
+    }
 
 
     public NotificationPostResponse toNotificationPostResponse(Notification n){
@@ -86,7 +109,9 @@ public class NotificationMapper {
                 n.getSender().getUserName(),
                 n.getSender().getProfile().getImageUrlProfile() != null ?
                      fileUrlUtils.toPublicUrl( n.getSender().getProfile().getImageUrlProfile())  : null,
-                n.getPost() != null ? postMapper.toPostSumaryResponse(n.getPost()) : null
+                n.getPost() != null ? postMapper.toPostSumaryResponse(n.getPost()) : null,
+                n.getFollowRequest() != null ? n.getFollowRequest().getId() : null,
+                n.getFollowRequest() != null ? n.getFollowRequest().getStatus() : null
 
         );
     }

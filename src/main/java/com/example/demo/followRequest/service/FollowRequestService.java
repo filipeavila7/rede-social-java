@@ -4,7 +4,7 @@ import com.example.demo.followRequest.entity.FollowRequest;
 import com.example.demo.followRequest.entity.FollowRequestStatus;
 import com.example.demo.followRequest.repository.FollowRequestRepository;
 import com.example.demo.helpers.GlobalHelperService;
-import com.example.demo.notification.entity.NotificationType;
+
 import com.example.demo.notification.service.NotificationService;
 import com.example.demo.user.entity.User;
 import jakarta.transaction.Transactional;
@@ -64,11 +64,7 @@ public class FollowRequestService {
 
             // cria a notificação de novo
             notificationService.createFollowRequestNotification(
-                    request.getId(),
-                    requester,
-                    target,
-                    NotificationType.FOLLOW_REQUEST,
-                    requester.getName() + " quer seguir você"
+                    request
             );
 
             return;
@@ -83,16 +79,11 @@ public class FollowRequestService {
         request.setCreatedAt(LocalDateTime.now());
 
         // salva
-        followRequestRepository.save(request);
+        FollowRequest saved = followRequestRepository.save(request);
 
         // cria a notificação
         notificationService.createFollowRequestNotification(
-                request.getId(),
-                requester,
-                target,
-                NotificationType.FOLLOW_REQUEST,
-                requester.getName() + " quer seguir você"
-        );
+                saved);
     }
 
 

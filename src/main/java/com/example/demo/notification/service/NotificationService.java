@@ -1,6 +1,7 @@
 package com.example.demo.notification.service;
 
 import com.example.demo.comment.entity.Comment;
+import com.example.demo.followRequest.entity.FollowRequest;
 import com.example.demo.message.dto.MessageReadResponse;
 import com.example.demo.notification.dto.NotificationGetResponse;
 import com.example.demo.helpers.GlobalHelperService;
@@ -122,7 +123,32 @@ public class NotificationService {
                 notificationMapper.toNotificationChatResponse(notification, conversationId, messageId));
     }
 
+
     // criar notificação de solicitação para seguir
+    public void createFollowRequestNotification(FollowRequest request) {
+
+        User requester = request.getRequester();
+        User target = request.getTarget();
+
+        Notification notification = globalHelperService.buildNotification(
+                requester,
+                target,
+                NotificationType.FOLLOW_REQUEST,
+                requester.getName() + " quer seguir você"
+        );
+
+        notification.setFollowRequest(request);
+
+        Notification savedNotification =
+                notificationRepository.save(notification);
+
+        webSocketService.sendFollowRequestNotificationToUser(
+                target.getId(),
+                notificationMapper.toNotificationFollowRequestResponse(
+                        savedNotification
+                )
+        );
+    }
 
     // criar notificação de novo seguidor
     public void createFollowNotification(

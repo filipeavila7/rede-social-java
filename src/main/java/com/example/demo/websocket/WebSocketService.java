@@ -2,10 +2,7 @@ package com.example.demo.websocket;
 
 import com.example.demo.message.dto.ConversationUpdateResponse;
 import com.example.demo.message.dto.MessageReadResponse;
-import com.example.demo.notification.dto.NotificationChatResponse;
-import com.example.demo.notification.dto.NotificationCommentResponse;
-import com.example.demo.notification.dto.NotificationFollowResponse;
-import com.example.demo.notification.dto.NotificationPostResponse;
+import com.example.demo.notification.dto.*;
 import com.example.demo.message.dto.MessageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -68,6 +65,16 @@ public class WebSocketService {
         );
     }
 
+    // notificação de solicitação para seguir
+    public void sendFollowRequestNotificationToUser(
+            Long userId,
+            NotificationFollowRequestResponse notification
+    ) {
+        messagingTemplate.convertAndSend(
+                "/topic/notifications/" + userId,
+                notification
+        );
+    }
 
     // atualizar fora da conversation
     public void sendConversationUpdate(Long userId, ConversationUpdateResponse response) {
