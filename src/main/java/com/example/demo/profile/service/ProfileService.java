@@ -73,7 +73,7 @@ public class ProfileService {
         return profileMapper.toProfileResponse(profile);
     }
 
-    // TODO - adcionar verificação de userName existente quando for atualizar o userName pois ele é unico
+
     // Atualiza perfil do usuario logado.
     // Se o status veio vazio, apaga se veio preenchido, grava hora de criacao.
     public ProfileResponse updateMyProfile(ProfileUpdateRequest request) {

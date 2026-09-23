@@ -11,7 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-// TODO - possivelmente fazer mudanças na logica de tags nos posts
+
 
 @Entity
 @Table(name = "tags")

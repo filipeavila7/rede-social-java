@@ -224,6 +224,7 @@ public class GlobalHelperService {
     }
 
 
+    // TODO - metodo antigo, verifica se os 2 se seguem mas o ideal é apenas se o user logado esta seguindo o outro
     // verifica se os 2 usuarios se seguem
     public void validateCanViewProfile(Long profileUserId) {
 
@@ -258,6 +259,38 @@ public class GlobalHelperService {
 
         // caso não se sigam, não deixa acessar
         if (!followsOwner || !ownerFollows) {
+            throw new AccessDeniedException();
+        }
+    }
+
+
+
+    // verifica se o usuário logado pode visualizar o perfil, ver posts, story
+    public void validateCanViewPrivateProfile(Long profileUserId) {
+
+        Long loggedUserId = getLoggedUser().getId();
+
+        // É o próprio perfil
+        if (loggedUserId.equals(profileUserId)) {
+            return;
+        }
+
+        User profileUser = userRepository.findById(profileUserId)
+                .orElseThrow(UserNotFoundException::new);
+
+        // Perfil público
+        if (!profileUser.getProfile().isPrivateProfile()) {
+            return;
+        }
+
+        // Perfil privado → precisa seguir o dono
+        boolean followsOwner =
+                followRepository.existsByFollowerIdAndFollowedId(
+                        loggedUserId,
+                        profileUserId
+                );
+
+        if (!followsOwner) {
             throw new AccessDeniedException();
         }
     }
