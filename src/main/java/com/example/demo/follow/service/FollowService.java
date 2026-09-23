@@ -52,6 +52,10 @@ public class FollowService {
         follow.setFollowed(followed);
         follow.setCreatedAt(LocalDateTime.now());
 
+        if (followed.getProfile().isPrivateProfile()) {
+            return followRequestService.createRequest(loggedUser, followed);
+        }
+
         // conteydo da notificação
         String content =  " começou a seguir você";
 

@@ -43,4 +43,8 @@ public class FollowRequest {
     public void prePersist() {
         createdAt = LocalDateTime.now();
     }
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private FollowRequestStatus status;
 }

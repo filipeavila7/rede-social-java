@@ -122,6 +122,7 @@ public class NotificationService {
                 notificationMapper.toNotificationChatResponse(notification, conversationId, messageId));
     }
 
+    // criar notificação de solicitação para seguir
 
     // criar notificação de novo seguidor
     public void createFollowNotification(

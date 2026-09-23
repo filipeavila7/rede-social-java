@@ -6,5 +6,6 @@ public enum NotificationType {
     FOLLOW,
     MESSAGE,
     READ,
-    REPLY
+    REPLY,
+    FOLLOW_REQUEST
 }
