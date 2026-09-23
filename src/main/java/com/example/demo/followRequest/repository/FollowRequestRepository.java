@@ -11,4 +11,6 @@ public interface FollowRequestRepository extends JpaRepository<FollowRequest, Lo
             Long requesterId,
             Long targetId
     );
+
+    void deleteByRequesterIdAndTargetId(Long requesterId, Long targetId);
 }

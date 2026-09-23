@@ -16,10 +16,11 @@ public class FollowMapper {
     private final UserMapper userMapper;
     private final GlobalHelperService globalHelperService;
     private final FileUrlUtils fileUrlUtils;
-    public FollowResponse toFollowResponse(Follow f){
+    public FollowResponse toFollowResponse(Follow f, boolean requestPadding){
         return new FollowResponse(
                 userMapper.toUserResponse(f.getFollowed()),
-                f.getCreatedAt()
+                f.getCreatedAt(),
+                requestPadding
         );
     }
 

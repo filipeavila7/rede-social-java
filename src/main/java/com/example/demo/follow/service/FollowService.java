@@ -6,9 +6,12 @@ import com.example.demo.exeptions.follow.FollowConflictException;
 import com.example.demo.exeptions.user.UserNotFoundException;
 import com.example.demo.follow.dto.FollowResponse;
 import com.example.demo.follow.mapper.FollowMapper;
+import com.example.demo.followRequest.repository.FollowRequestRepository;
+import com.example.demo.followRequest.service.FollowRequestService;
 import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.notification.entity.NotificationType;
 import com.example.demo.notification.service.NotificationService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,9 +26,11 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class FollowService {
     private final FollowRepository followRepository;
+    private final FollowRequestRepository followRequestRepository;
     private final NotificationService notificationService;
     private final GlobalHelperService globalHelperService;
     private final FollowMapper followMapper;
+    private final FollowRequestService followRequestService;
 
     // seguir usuario pelo id dele
     public FollowResponse followUser(Long followedId) {
@@ -53,7 +58,8 @@ public class FollowService {
         follow.setCreatedAt(LocalDateTime.now());
 
         if (followed.getProfile().isPrivateProfile()) {
-            return followRequestService.createRequest(loggedUser, followed);
+            followRequestService.createRequest(loggedUser, followed);
+            return followMapper.toFollowResponse(follow, true);
         }
 
         // conteydo da notificação
@@ -64,31 +70,56 @@ public class FollowService {
                 loggedUser, followed, NotificationType.FOLLOW, content
         );
 
-        return followMapper.toFollowResponse(followRepository.save(follow));
+        return followMapper.toFollowResponse(followRepository.save(follow), false);
 
     }
 
     // deixar de seguir
+    @Transactional
     public void unfollowUser(Long followedId) {
         User loggedUser = globalHelperService.getLoggedUser();
 
         // acha o usuario seguido
-        Follow follow = followRepository.findByFollowerIdAndFollowedId(loggedUser.getId(), followedId)
+        Follow follow = followRepository
+                .findByFollowerIdAndFollowedId(
+                        loggedUser.getId(),
+                        followedId
+                )
                 .orElseThrow(UserNotFoundException::new);
 
         followRepository.delete(follow);
 
+        // remove o pedido de seguir aceito
+        followRequestRepository
+                .findByRequesterIdAndTargetId(
+                        loggedUser.getId(),
+                        followedId
+                )
+                .ifPresent(followRequestRepository::delete);
     }
 
     // remover um seguidor
+    @Transactional
     public void removeFollower(Long followerId) {
         User loggedUser = globalHelperService.getLoggedUser();
 
         // busca o seguidor
-        Follow follow = followRepository.findByFollowerIdAndFollowedId(followerId, loggedUser.getId())
+        Follow follow = followRepository
+                .findByFollowerIdAndFollowedId(
+                        followerId,
+                        loggedUser.getId()
+                )
                 .orElseThrow(UserNotFoundException::new);
 
         followRepository.delete(follow);
+
+        // remove o pedido de seguir aceito
+        followRequestRepository
+                .findByRequesterIdAndTargetId(
+                        followerId,
+                        loggedUser.getId()
+                )
+                .ifPresent(followRequestRepository::delete);
     }
 
     // contagem de seguidores

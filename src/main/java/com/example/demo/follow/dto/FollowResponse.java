@@ -6,7 +6,8 @@ import java.time.LocalDateTime;
 
 public record FollowResponse(
         UserResponse followed,
-        LocalDateTime createAt
+        LocalDateTime createAt,
+        boolean requestPadding
 ) {
 }
 
