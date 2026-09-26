@@ -133,8 +133,7 @@ public class NotificationService {
         Notification notification = globalHelperService.buildNotification(
                 requester,
                 target,
-                NotificationType.FOLLOW_REQUEST,
-                requester.getName() + " quer seguir você"
+                NotificationType.FOLLOW_REQUEST, " quer seguir você"
         );
 
         notification.setFollowRequest(request);

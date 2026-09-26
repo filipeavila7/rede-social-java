@@ -31,50 +31,21 @@ public class FollowRequestService {
     // criar pedido
     public void createRequest(User requester, User target) {
 
-        // verifica se ja existe pedido
-        Optional<FollowRequest> existingRequest =
+        Optional<FollowRequest> pendingRequest =
                 followRequestRepository
-                        .findByRequesterIdAndTargetId(
+                        .findByRequesterIdAndTargetIdAndStatus(
                                 requester.getId(),
-                                target.getId()
+                                target.getId(),
+                                FollowRequestStatus.PENDING
                         );
 
-        // caso exista
-        if (existingRequest.isPresent()) {
-
-            FollowRequest request = existingRequest.get();
-
-            // caso o pedido ainda esteja pendente:
-            if (request.getStatus() == FollowRequestStatus.PENDING) {
-                throw new ResponseStatusException(
-                        HttpStatus.CONFLICT,
-                        "Você já enviou uma solicitação para esse usuário"
-                );
-            }
-
-            // caso ja tenha sido aceito
-            if (request.getStatus() == FollowRequestStatus.ACCEPTED) {
-                throw new ResponseStatusException(
-                        HttpStatus.CONFLICT,
-                        "Você já segue esse usuário"
-                );
-            }
-
-            // se foi rejeitado pode enviar novamente, mudando apenas a data e tipo para pending
-            request.setStatus(FollowRequestStatus.PENDING);
-            request.setCreatedAt(LocalDateTime.now());
-
-            followRequestRepository.save(request);
-
-            // cria a notificação de novo
-            notificationService.createFollowRequestNotification(
-                    request
+        if (pendingRequest.isPresent()) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Você já enviou uma solicitação para esse usuário"
             );
-
-            return;
         }
 
-        // caso nunca tenha existido pedido, cria um novo
         FollowRequest request = new FollowRequest();
 
         request.setRequester(requester);
@@ -82,15 +53,13 @@ public class FollowRequestService {
         request.setStatus(FollowRequestStatus.PENDING);
         request.setCreatedAt(LocalDateTime.now());
 
-        // salva
         FollowRequest saved = followRequestRepository.save(request);
 
-        // cria a notificação
-        notificationService.createFollowRequestNotification(
-                saved);
+        notificationService.createFollowRequestNotification(saved);
     }
 
 
+    // TODO - criar notificação de follow tb
     // aceitar pedido para seguir
     @Transactional
     public void acceptRequest(Long requestId) {

@@ -15,6 +15,8 @@ public record ProfileUpdateRequest(
         String userName,
 
         @Size(max = 30, message = "No máximo 30 caracteres na mensagem")
-        String messageStatus
+        String messageStatus,
+
+        Boolean isPrivateProfile
 ) {
 }

@@ -355,15 +355,16 @@ public class GlobalHelperService {
         User loggedUser = this.getLoggedUser();
 
         Optional<FollowRequest> existingRequest =
-                followRequestRepository.findByRequesterIdAndTargetId(
-                        loggedUser.getId(),
-                        userId
-                );
+                followRequestRepository
+                        .findByRequesterIdAndTargetIdAndStatus(
+                                loggedUser.getId(),
+                                userId,
+                                FollowRequestStatus.PENDING
+                        );
 
         return existingRequest
                 .map(FollowRequest::getStatus)
                 .orElse(null);
-
     }
 
 

@@ -25,7 +25,8 @@ public class ProfileMapper {
                 globalHelperService.countFollowers(p.getUser().getId()),
                 globalHelperService.getPostsCountByUserId(p.getUser().getId()),
                 globalHelperService.amIFollowing(p.getUser().getId()),
-                globalHelperService.getFollowRequestStatus(p.getUser().getId())
+                globalHelperService.getFollowRequestStatus(p.getUser().getId()),
+                p.isPrivateProfile()
         );
     }
 }

@@ -95,6 +95,10 @@ public class ProfileService {
            userProfile.setName(request.name());
        }
 
+        // atualiza a visibilidade do perfil
+        if (request.isPrivateProfile() != null){
+            profile.setPrivateProfile(request.isPrivateProfile());
+        }
 
        // atualiza o userName e verifica se ele ja esta em uso
         if (request.userName() != null){
