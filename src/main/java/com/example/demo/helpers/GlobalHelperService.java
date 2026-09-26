@@ -11,6 +11,9 @@ import com.example.demo.exeptions.like.LikeConflictException;
 import com.example.demo.exeptions.like.LikeNotFoundException;
 import com.example.demo.exeptions.profile.ProfileNotFoundException;
 import com.example.demo.follow.repository.FollowRepository;
+import com.example.demo.followRequest.entity.FollowRequest;
+import com.example.demo.followRequest.entity.FollowRequestStatus;
+import com.example.demo.followRequest.repository.FollowRequestRepository;
 import com.example.demo.like.entity.Like;
 import com.example.demo.like.repository.LikeRepository;
 import com.example.demo.notification.entity.Notification;
@@ -36,6 +39,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -51,7 +55,7 @@ public class GlobalHelperService {
     private final ConversationRepository conversationRepository;
     private final FollowRepository followRepository;
     private final SaveRepository saveRepository;
-
+    private final FollowRequestRepository followRequestRepository;
 
     // TODO - provavelmente usar esse metodo na service de follow
     // Retorna o status apenas se estiver dentro de 24h.
@@ -343,6 +347,23 @@ public class GlobalHelperService {
     public boolean amIFollowing(Long followedId) {
         return followRepository.existsByFollowerIdAndFollowedId(
                 this.getLoggedUser().getId(), followedId);
+    }
+
+
+    // retorna o tipo do request de pedido para seguir
+    public FollowRequestStatus getFollowRequestStatus(Long userId) {
+        User loggedUser = this.getLoggedUser();
+
+        Optional<FollowRequest> existingRequest =
+                followRequestRepository.findByRequesterIdAndTargetId(
+                        loggedUser.getId(),
+                        userId
+                );
+
+        return existingRequest
+                .map(FollowRequest::getStatus)
+                .orElse(null);
+
     }
 
 

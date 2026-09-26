@@ -2,6 +2,8 @@
 package com.example.demo.profile.dto;
 
 
+import com.example.demo.followRequest.entity.FollowRequestStatus;
+
 public record ProfileResponse(
         Long userId,
         String name,
@@ -12,5 +14,6 @@ public record ProfileResponse(
         long followCount,
         long followerCount,
         long postCount,
-        boolean amIfollowing
+        boolean amIfollowing,
+        FollowRequestStatus followRequestStatus
 ) {}
