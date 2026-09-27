@@ -1,5 +1,6 @@
 package com.example.demo.story.entity;
 
+import com.example.demo.likeStory.entity.LikeStory;
 import com.example.demo.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "story")
@@ -28,7 +30,12 @@ public class Story {
     private LocalDateTime expiresAt;
 
     // um ysuario pode postar vários storys
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+
+    // um story tem varios likes
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "story")
+    private List<LikeStory> likeStories;
 }
