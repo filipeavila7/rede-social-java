@@ -20,6 +20,7 @@ public class StoryService {
     private final StoryMapper storyMapper;
 
 
+    // TODO - criar entidade e endpoint para stories, salvando o usuario que viu e o id do story
     // mostrar todos os stories de um usuario pelo userName
     public Page<StoryResponse> getUserStories(String userName, Pageable pageable){
         // encontra o usuario
@@ -30,6 +31,7 @@ public class StoryService {
             globalHelperService.validateCanViewPrivateProfile(user.getId());
         }
 
+        // retorna todos os stories validos
         return storyRepository.findByUserUserNameAndExpiresAtAfterOrderByCreatedAtAsc(
                 userName, LocalDateTime.now(), pageable)
                 .map(storyMapper::toStoryResponse);
