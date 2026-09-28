@@ -1,5 +1,6 @@
 package com.example.demo.story.service;
 
+
 import com.example.demo.exeptions.api.AccessDeniedException;
 import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.story.dto.StoryRequest;
@@ -44,7 +45,7 @@ public class StoryService {
 
         // retorna todos os stories validos
         return storyRepository.findByUserUserNameAndExpiresAtAfterOrderByCreatedAtAsc(
-                userName, LocalDateTime.now(), pageable)
+                        userName, LocalDateTime.now(), pageable)
                 .map(storyMapper::toStoryResponse);
     }
 
@@ -82,6 +83,20 @@ public class StoryService {
         // Se o perfil for privado, verifica se o usuário pode visualizar
         if (user.getProfile().isPrivateProfile()) {
             globalHelperService.validateCanViewPrivateProfile(user.getId());
+        }
+
+        // Se o Story for somente para Melhores Amigos
+        if (story.getVisibility() == StoryVisibility.CLOSE_FRIENDS) {
+
+            boolean isCloseFriend =
+                    closeFriendRepository.existsByUserIdAndFriendId(
+                            user.getId(),
+                            loggedUser.getId()
+                    );
+
+            if (!isCloseFriend) {
+                throw new AccessDeniedException();
+            }
         }
 
 
