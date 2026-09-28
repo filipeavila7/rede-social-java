@@ -50,4 +50,34 @@ public class UploadController {
         String url = storageService.save(file);
         return ResponseEntity.ok(Map.of("url", url));
     }
+
+
+    @PostMapping("/upload/story")
+    public ResponseEntity<Map<String, String>> uploadStory(
+            @RequestParam("file") MultipartFile file
+    ) throws IOException {
+
+        if (file == null || file.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Arquivo vazio"));
+        }
+
+        if (file.getSize() > 10 * 1024 * 1024) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Arquivo maior que 10MB"));
+        }
+
+        String type = file.getContentType();
+
+        if (type == null ||
+                !(type.equals("image/jpeg") || type.equals("image/png"))) {
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Somente PNG ou JPG"));
+        }
+
+        String filename = storageService.savePrivateStory(file);
+
+        return ResponseEntity.ok(Map.of("filename", filename));
+    }
 }
