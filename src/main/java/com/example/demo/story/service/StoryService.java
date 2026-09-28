@@ -4,6 +4,7 @@ import com.example.demo.exeptions.api.AccessDeniedException;
 import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.story.dto.StoryRequest;
 import com.example.demo.story.dto.StoryResponse;
+import com.example.demo.story.dto.StoryTextRequest;
 import com.example.demo.story.entity.Story;
 import com.example.demo.story.entity.StoryVisibility;
 import com.example.demo.story.mapper.StoryMapper;
@@ -52,6 +53,14 @@ public class StoryService {
     public StoryResponse createStory(StoryRequest request){
         Story story = storyMapper.createStory(request);
         return storyMapper.toStoryResponse(storyRepository.save(story));
+
+    }
+
+
+    // criar story de texto
+    public StoryResponse createTextStory(StoryTextRequest request){
+        Story story = storyMapper.createTextStory(request);
+        return  storyMapper.toStoryResponse(storyRepository.save(story));
 
     }
 

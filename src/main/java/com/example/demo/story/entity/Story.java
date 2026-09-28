@@ -35,7 +35,13 @@ public class Story {
 
     @Column
     @Enumerated(EnumType.STRING)
-    StoryVisibility visibility;
+    private StoryVisibility visibility;
+
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private StoryType storyType;
+
 
     // um ysuario pode postar vários storys
     @ManyToOne(fetch = FetchType.LAZY)
