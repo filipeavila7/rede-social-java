@@ -29,6 +29,14 @@ public class Story {
     @Column
     private LocalDateTime expiresAt;
 
+    @Column
+    private String description;
+
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    StoryVisibility visibility;
+
     // um ysuario pode postar vários storys
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
