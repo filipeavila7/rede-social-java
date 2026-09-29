@@ -38,10 +38,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -86,6 +83,28 @@ public class GlobalHelperService {
                         "Conversa não encontrada"
                 ));
     }
+
+    // busca varios usuarios pelo id
+    public List<User> findAllUsersByIdIn(Collection<Long> ids){
+        return userRepository.findAllByIdIn(ids);
+    }
+
+    // verifica se o usuario tem alguma relação de follow ou followwing com outros usuarios
+    public Set<Long> getRelatedUserIds(Long loggedUserId, Collection<Long> userIds) {
+
+        Set<Long> followingIds =
+                followRepository.findFollowedIdsAmong(loggedUserId, userIds);
+
+        Set<Long> followerIds =
+                followRepository.findFollowerIdsAmong(loggedUserId, userIds);
+
+        Set<Long> relatedIds = new HashSet<>(followingIds);
+        relatedIds.addAll(followerIds);
+
+        return relatedIds;
+    }
+
+
 
     // criar profile rapidamente
     public void createProfile(User user){
