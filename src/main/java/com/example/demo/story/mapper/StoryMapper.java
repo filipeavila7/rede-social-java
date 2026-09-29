@@ -21,12 +21,13 @@ public class StoryMapper {
     private final UserMapper userMapper;
     private final GlobalHelperService globalHelperService;
 
-    public StoryResponse toStoryResponse(Story s){
+    // TODO - ficar de olho aqui
+    public StoryResponse toStoryResponse(Story s) {
         return new StoryResponse(
                 s.getId(),
-                fileUrlUtils.toPublicUrl(s.getImageUrl()),
+                "/stories/" + s.getId() + "/image",
                 s.getCreatedAt(),
-               userMapper.toUserResponse(s.getUser())
+                userMapper.toUserResponse(s.getUser())
         );
     }
 
