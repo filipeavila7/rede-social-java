@@ -33,8 +33,6 @@ public class StoryService {
 
     // <img src={`/stories/${story.id}/image`} /> como o front mostrara imagens de story
     // TODO - criar entidade de stories de registro e adcionar qualquer novo story la
-    // TODO - criar lista de melhores amigos e enum de tipo de visibilidade de story
-    // TODO - se caso a visibilidade seja close, porcura se existe um relacionamento entre o logado e o dono
     // TODO - criar entidade e endpoint para vizualação de stories, salvando o usuario que viu e o id do story
     // mostrar todos os stories de um usuario pelo userName
     public Page<StoryResponse> getUserStories(String userName, Pageable pageable) {

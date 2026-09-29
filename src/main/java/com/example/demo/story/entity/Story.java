@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -48,8 +49,11 @@ public class Story {
     @JoinColumn(name = "user_id")
     private User user;
 
-
     // um story tem varios likes
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "story")
-    private List<LikeStory> likeStories;
+    private List<LikeStory> likeStories = new ArrayList<>();
+
+    // um story tem varias vizualizações
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "story")
+    private List<StoryVisibility> storyVisibilities = new ArrayList<>();
 }
