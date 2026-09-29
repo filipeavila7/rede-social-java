@@ -60,4 +60,23 @@ public class LikeStoryService {
 
         likeStoryRepository.save(likeStory);
     }
+
+
+    // remover curtida
+    public void unlikeStory(Long storyId) {
+
+        User loggedUser = globalHelperService.getLoggedUser();
+
+        LikeStory likeStory = likeStoryRepository
+                .findByStoryIdAndUserId(
+                        storyId,
+                        loggedUser.getId()
+                )
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Curtida não encontrada"
+                ));
+
+        likeStoryRepository.delete(likeStory);
+    }
 }
