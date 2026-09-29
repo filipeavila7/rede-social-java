@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 public interface CloseFriendsRepository extends JpaRepository<CloseFriends, Long> {
@@ -23,6 +24,18 @@ public interface CloseFriendsRepository extends JpaRepository<CloseFriends, Long
         AND cf.friend.id IN :friendIds
         """)
     Set<Long> findFriendIdsByUserIdAndFriendIdIn(
+            @Param("userId") Long userId,
+            @Param("friendIds") Collection<Long> friendIds
+    );
+
+
+    @Query("""
+        SELECT cf
+        FROM CloseFriends cf
+        WHERE cf.user.id = :userId
+        AND cf.friend.id IN :friendIds
+        """)
+    List<CloseFriends> findAllByUserIdAndFriendIdIn(
             @Param("userId") Long userId,
             @Param("friendIds") Collection<Long> friendIds
     );

@@ -33,7 +33,6 @@ public class CloseFriendsService {
     }
 
 
-
     // adcionar usuarios aos melhores amigos
     public List<CloseFriendsResponse> addUsersInCloseFriends(
             CloseFriendsRequest request
@@ -72,6 +71,26 @@ public class CloseFriendsService {
                 .toList();
 
         closeFriendsRepository.saveAll(closeFriends);
+
+        return closeFriends.stream()
+                .map(closeFriendsMapper::toCloseFriendsResponse)
+                .toList();
+    }
+
+
+    // remover dos melhores amigos
+    public List<CloseFriendsResponse> removeUsersFromCloseFriends(
+            CloseFriendsRequest request
+    ) {
+        User loggedUser = globalHelperService.getLoggedUser();
+
+        List<CloseFriends> closeFriends =
+                closeFriendsRepository.findAllByUserIdAndFriendIdIn(
+                        loggedUser.getId(),
+                        request.userIds()
+                );
+
+        closeFriendsRepository.deleteAll(closeFriends);
 
         return closeFriends.stream()
                 .map(closeFriendsMapper::toCloseFriendsResponse)
