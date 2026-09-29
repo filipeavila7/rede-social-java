@@ -30,7 +30,7 @@ public class CloseFriends {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user; // usuario que pois no cf
+    private User user; // usuario que pos no cf
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "friend_id", nullable = false)

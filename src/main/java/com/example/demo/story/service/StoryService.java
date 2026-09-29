@@ -15,10 +15,12 @@ import com.example.demo.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -34,19 +36,55 @@ public class StoryService {
     // TODO - se caso a visibilidade seja close, porcura se existe um relacionamento entre o logado e o dono
     // TODO - criar entidade e endpoint para vizualação de stories, salvando o usuario que viu e o id do story
     // mostrar todos os stories de um usuario pelo userName
-    public Page<StoryResponse> getUserStories(String userName, Pageable pageable){
-        // encontra o usuario
+    public Page<StoryResponse> getUserStories(String userName, Pageable pageable) {
+
+        // encontra o dono dos stories
         User user = globalHelperService.findByUserName(userName);
 
-        // verifica se o usuario logado segue o dono do story
-        if (user.getProfile().isPrivateProfile()){
+        // usuário logado
+        User loggedUser = globalHelperService.getLoggedUser();
+
+        // verifica acesso ao perfil privado
+        if (user.getProfile().isPrivateProfile()) {
             globalHelperService.validateCanViewPrivateProfile(user.getId());
         }
 
-        // retorna todos os stories validos
-        return storyRepository.findByUserUserNameAndExpiresAtAfterOrderByCreatedAtAsc(
-                        userName, LocalDateTime.now(), pageable)
-                .map(storyMapper::toStoryResponse);
+        // busca todos os stories ativos
+        List<Story> stories = storyRepository
+                .findByUserUserNameAndExpiresAtAfterOrderByCreatedAtAsc(
+                        userName,
+                        LocalDateTime.now()
+                );
+
+        // verifica uma única vez se o usuário logado é close friend
+        boolean isCloseFriend = globalHelperService.isCloseFriends(
+                user.getId(),
+                loggedUser.getId()
+        );
+
+        // filtra os stories que o usuário pode visualizar
+        List<StoryResponse> visibleStories = stories.stream()
+                .filter(story ->
+                        story.getVisibility() != StoryVisibility.CLOSE_FRIENDS
+                                || isCloseFriend
+                )
+                .map(storyMapper::toStoryResponse)
+                .toList();
+
+        // aplica a paginação depois do filtro
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), visibleStories.size());
+
+        List<StoryResponse> pageContent =
+                start >= visibleStories.size()
+                        ? List.of()
+                        : visibleStories.subList(start, end);
+
+        return new PageImpl<>(
+                pageContent,
+                pageable,
+                visibleStories.size()
+        );
     }
 
 
@@ -88,11 +126,10 @@ public class StoryService {
         // Se o Story for somente para Melhores Amigos
         if (story.getVisibility() == StoryVisibility.CLOSE_FRIENDS) {
 
-            boolean isCloseFriend =
-                    closeFriendRepository.existsByUserIdAndFriendId(
+            boolean isCloseFriend = globalHelperService.isCloseFriends(
                             user.getId(),
                             loggedUser.getId()
-                    );
+            );
 
             if (!isCloseFriend) {
                 throw new AccessDeniedException();

@@ -1,5 +1,6 @@
 package com.example.demo.helpers;
 
+import com.example.demo.closeFriends.repository.CloseFriendsRepository;
 import com.example.demo.comment.entity.Comment;
 import com.example.demo.comment.repository.CommentRepository;
 import com.example.demo.conversation.entity.Conversation;
@@ -56,8 +57,9 @@ public class GlobalHelperService {
     private final FollowRepository followRepository;
     private final SaveRepository saveRepository;
     private final FollowRequestRepository followRequestRepository;
+    private final CloseFriendsRepository closeFriendsRepository;
 
-    // TODO - provavelmente usar esse metodo na service de follow
+
     // Retorna o status apenas se estiver dentro de 24h.
     public String getActiveStatus(Profile profile) {
         String status = profile.getMessageStatus();
@@ -365,6 +367,12 @@ public class GlobalHelperService {
         return existingRequest
                 .map(FollowRequest::getStatus)
                 .orElse(null);
+    }
+
+
+    // verifica se o usuario está nos melhores amigos
+    public boolean isCloseFriends(Long userId, Long friendId){
+        return closeFriendsRepository.existsByUserIdAndFriendId(userId, friendId);
     }
 
 

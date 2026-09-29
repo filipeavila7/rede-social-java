@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface StoryRepository extends JpaRepository<Story, Long> {
 
@@ -15,5 +16,10 @@ public interface StoryRepository extends JpaRepository<Story, Long> {
             String userName,
             LocalDateTime now,
             Pageable pageable
+    );
+
+    List<Story> findByUserUserNameAndExpiresAtAfterOrderByCreatedAtAsc(
+            String userName,
+            LocalDateTime now
     );
 }
