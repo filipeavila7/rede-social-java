@@ -13,4 +13,6 @@ public interface StoryVisibilitiesRepository extends JpaRepository<StoryVisibili
             Long storyId,
             Pageable pageable
     );
+
+    long countByStoryId(Long storyId);
 }

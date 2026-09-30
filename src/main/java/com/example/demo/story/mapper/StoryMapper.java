@@ -27,7 +27,11 @@ public class StoryMapper {
                 s.getId(),
                 "/stories/" + s.getId() + "/image",
                 s.getCreatedAt(),
-                userMapper.toUserResponse(s.getUser())
+                userMapper.toUserResponse(s.getUser()),
+                s.getStoryType(),
+                s.getVisibility(),
+                globalHelperService.countVisibilitiesByStoryId(s.getId()),
+                globalHelperService.isStoryLikedByMe(s.getId())
         );
     }
 

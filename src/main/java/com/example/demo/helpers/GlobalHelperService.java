@@ -17,6 +17,7 @@ import com.example.demo.followRequest.entity.FollowRequestStatus;
 import com.example.demo.followRequest.repository.FollowRequestRepository;
 import com.example.demo.like.entity.Like;
 import com.example.demo.like.repository.LikeRepository;
+import com.example.demo.likeStory.repository.LikeStoryRepository;
 import com.example.demo.notification.entity.Notification;
 import com.example.demo.notification.entity.NotificationType;
 import com.example.demo.profile.entity.Profile;
@@ -25,6 +26,7 @@ import com.example.demo.save.repository.SaveRepository;
 import com.example.demo.story.entity.Story;
 import com.example.demo.story.entity.StoryVisibility;
 import com.example.demo.story.repository.StoryRepository;
+import com.example.demo.storyVisibility.repository.StoryVisibilitiesRepository;
 import com.example.demo.user.entity.User;
 import com.example.demo.exeptions.post.PostConflictException;
 import com.example.demo.exeptions.post.PostNotFoundException;
@@ -59,6 +61,8 @@ public class GlobalHelperService {
     private final FollowRequestRepository followRequestRepository;
     private final CloseFriendsRepository closeFriendsRepository;
     private final StoryRepository storyRepository;
+    private final StoryVisibilitiesRepository storyVisibilitiesRepository;
+    private final LikeStoryRepository likeStoryRepository;
 
 
     // Retorna o status apenas se estiver dentro de 24h.
@@ -462,4 +466,17 @@ public class GlobalHelperService {
 
         return story;
     }
+
+    // retorna quantidade de vizualizações um story tem
+    public long countVisibilitiesByStoryId(Long storyId){
+        return storyVisibilitiesRepository.countByStoryId(storyId);
+    }
+
+    // boleano para saber se o user logado curtiu o story
+    public boolean isStoryLikedByMe(Long storyId){
+        return likeStoryRepository.existsByStoryIdAndUserId(
+                storyId, this.getLoggedUser().getId()
+        );
+    }
+
 }

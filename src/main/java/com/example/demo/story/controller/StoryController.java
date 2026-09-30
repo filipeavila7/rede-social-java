@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/stories")
 @RequiredArgsConstructor
 public class StoryController {
-
     private final StoryService storyService;
+
 
 
     @GetMapping("/{storyId}/image")

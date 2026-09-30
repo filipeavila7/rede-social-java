@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface LikeStoryRepository extends JpaRepository<LikeStory, Long> {
     Optional<LikeStory> findByStoryIdAndUserId(Long storyId, Long userId);
+
+    boolean existsByStoryIdAndUserId(Long storyId, Long userId);
 }

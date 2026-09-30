@@ -1,9 +1,9 @@
 package com.example.demo.storyVisibility.service;
 
+
 import com.example.demo.exeptions.api.AccessDeniedException;
 import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.story.entity.Story;
-import com.example.demo.story.entity.StoryVisibility;
 import com.example.demo.story.repository.StoryRepository;
 import com.example.demo.storyVisibility.dto.StoryVisibilitiesResponse;
 import com.example.demo.storyVisibility.entity.StoryVisibilities;
@@ -18,22 +18,37 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 
-
 import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class StoryVisibilitiesService {
     private final StoryVisibilitiesRepository storyVisibilityRepository;
-    private final StoryRepository storyRepository;
     private final GlobalHelperService globalHelperService;
     private final StoryVisibilitiesMapper storyVisibilitiesMapper;
+    private final StoryRepository storyRepository;
 
 
-    // retornar todas as vizualizações de um story
-    public Page<StoryVisibilitiesResponse> getStoryVisibilities(Long storyId, Pageable pageable){
-        // valida story
-        globalHelperService.getStoryAndValidateAccess(storyId);
+    // retornar todas as vizualizações de um story, so o user dono pode ver
+    public Page<StoryVisibilitiesResponse> getStoryVisibilities(
+            Long storyId,
+            Pageable pageable
+    ) {
+        // acha o story
+        Story story = storyRepository.findByIdAndExpiresAtAfter(
+                storyId,
+                LocalDateTime.now()
+        ).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Story não encontrado"
+        ));
+
+        User loggedUser = globalHelperService.getLoggedUser();
+
+        // se o dono for diferente do logado
+        if (!story.getUser().getId().equals(loggedUser.getId())) {
+            throw new AccessDeniedException();
+        }
 
         return storyVisibilityRepository.findByStoryId(storyId, pageable)
                 .map(storyVisibilitiesMapper::toStoryVisibilitiesResponse);
