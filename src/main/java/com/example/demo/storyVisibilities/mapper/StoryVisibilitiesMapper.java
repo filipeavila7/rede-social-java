@@ -1,7 +1,7 @@
-package com.example.demo.storyVisibility.mapper;
+package com.example.demo.storyVisibilities.mapper;
 
-import com.example.demo.storyVisibility.dto.StoryVisibilitiesResponse;
-import com.example.demo.storyVisibility.entity.StoryVisibilities;
+import com.example.demo.storyVisibilities.dto.StoryVisibilitiesResponse;
+import com.example.demo.storyVisibilities.entity.StoryVisibilities;
 import com.example.demo.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

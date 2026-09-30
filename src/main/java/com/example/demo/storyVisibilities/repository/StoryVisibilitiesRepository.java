@@ -1,7 +1,7 @@
-package com.example.demo.storyVisibility.repository;
+package com.example.demo.storyVisibilities.repository;
 
 
-import com.example.demo.storyVisibility.entity.StoryVisibilities;
+import com.example.demo.storyVisibilities.entity.StoryVisibilities;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

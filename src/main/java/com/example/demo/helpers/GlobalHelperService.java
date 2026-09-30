@@ -26,7 +26,7 @@ import com.example.demo.save.repository.SaveRepository;
 import com.example.demo.story.entity.Story;
 import com.example.demo.story.entity.StoryVisibility;
 import com.example.demo.story.repository.StoryRepository;
-import com.example.demo.storyVisibility.repository.StoryVisibilitiesRepository;
+import com.example.demo.storyVisibilities.repository.StoryVisibilitiesRepository;
 import com.example.demo.user.entity.User;
 import com.example.demo.exeptions.post.PostConflictException;
 import com.example.demo.exeptions.post.PostNotFoundException;

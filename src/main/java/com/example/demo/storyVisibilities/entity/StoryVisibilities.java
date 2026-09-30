@@ -1,4 +1,4 @@
-package com.example.demo.storyVisibility.entity;
+package com.example.demo.storyVisibilities.entity;
 
 import com.example.demo.story.entity.Story;
 import com.example.demo.user.entity.User;

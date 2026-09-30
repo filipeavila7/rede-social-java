@@ -1,4 +1,4 @@
-package com.example.demo.storyVisibility.dto;
+package com.example.demo.storyVisibilities.dto;
 
 
 import com.example.demo.user.dto.UserResponse;

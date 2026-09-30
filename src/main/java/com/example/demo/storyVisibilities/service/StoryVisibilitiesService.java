@@ -1,14 +1,14 @@
-package com.example.demo.storyVisibility.service;
+package com.example.demo.storyVisibilities.service;
 
 
 import com.example.demo.exeptions.api.AccessDeniedException;
 import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.story.entity.Story;
 import com.example.demo.story.repository.StoryRepository;
-import com.example.demo.storyVisibility.dto.StoryVisibilitiesResponse;
-import com.example.demo.storyVisibility.entity.StoryVisibilities;
-import com.example.demo.storyVisibility.mapper.StoryVisibilitiesMapper;
-import com.example.demo.storyVisibility.repository.StoryVisibilitiesRepository;
+import com.example.demo.storyVisibilities.dto.StoryVisibilitiesResponse;
+import com.example.demo.storyVisibilities.entity.StoryVisibilities;
+import com.example.demo.storyVisibilities.mapper.StoryVisibilitiesMapper;
+import com.example.demo.storyVisibilities.repository.StoryVisibilitiesRepository;
 import com.example.demo.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
