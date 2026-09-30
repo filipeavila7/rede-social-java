@@ -8,7 +8,6 @@ import com.example.demo.story.entity.Story;
 import com.example.demo.story.entity.StoryType;
 import com.example.demo.user.entity.User;
 import com.example.demo.user.mapper.UserMapper;
-import com.example.demo.util.FileUrlUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +16,6 @@ import java.time.LocalDateTime;
 @Component
 @RequiredArgsConstructor
 public class StoryMapper {
-    private final FileUrlUtils fileUrlUtils;
     private final UserMapper userMapper;
     private final GlobalHelperService globalHelperService;
 
