@@ -22,6 +22,9 @@ import com.example.demo.notification.entity.NotificationType;
 import com.example.demo.profile.entity.Profile;
 import com.example.demo.profile.repository.ProfileRepository;
 import com.example.demo.save.repository.SaveRepository;
+import com.example.demo.story.entity.Story;
+import com.example.demo.story.entity.StoryVisibility;
+import com.example.demo.story.repository.StoryRepository;
 import com.example.demo.user.entity.User;
 import com.example.demo.exeptions.post.PostConflictException;
 import com.example.demo.exeptions.post.PostNotFoundException;
@@ -55,6 +58,7 @@ public class GlobalHelperService {
     private final SaveRepository saveRepository;
     private final FollowRequestRepository followRequestRepository;
     private final CloseFriendsRepository closeFriendsRepository;
+    private final StoryRepository storyRepository;
 
 
     // Retorna o status apenas se estiver dentro de 24h.
@@ -420,5 +424,42 @@ public class GlobalHelperService {
             return false;
         }
         return saveRepository.existsByUserIdAndPostId(loggedUser.getId(), postId);
+    }
+
+    // valida story, melhores amigos e se o usuario segue
+    public Story getStoryAndValidateAccess(Long storyId) {
+
+        User loggedUser = this.getLoggedUser();
+
+        // verifica se o story existe e ainda não expirou
+        Story story = storyRepository.findByIdAndExpiresAtAfter(
+                storyId,
+                LocalDateTime.now()
+        ).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Story não encontrado"
+        ));
+
+        // verifica acesso ao perfil privado
+        if (story.getUser().getProfile().isPrivateProfile()) {
+            this.validateCanViewPrivateProfile(
+                    story.getUser().getId()
+            );
+        }
+
+        // verifica acesso aos Close Friends
+        if (story.getVisibility() == StoryVisibility.CLOSE_FRIENDS) {
+
+            boolean isCloseFriend = this.isCloseFriends(
+                    story.getUser().getId(),
+                    loggedUser.getId()
+            );
+
+            if (!isCloseFriend) {
+                throw new AccessDeniedException();
+            }
+        }
+
+        return story;
     }
 }

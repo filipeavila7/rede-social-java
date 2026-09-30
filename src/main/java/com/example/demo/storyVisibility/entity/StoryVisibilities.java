@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
                 columnNames = {"user_id", "story_id"}
         )
 })
-public class StoryVisibility {
+public class StoryVisibilities {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
