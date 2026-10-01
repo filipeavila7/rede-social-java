@@ -1,6 +1,7 @@
 package com.example.demo.story.entity;
 
 import com.example.demo.likeStory.entity.LikeStory;
+import com.example.demo.storyVisibilities.entity.StoryVisibilities;
 import com.example.demo.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -55,5 +56,5 @@ public class Story {
 
     // um story tem varias vizualizações
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "story")
-    private List<StoryVisibility> storyVisibilities = new ArrayList<>();
+    private List<StoryVisibilities> storyVisibilities = new ArrayList<>();
 }

@@ -32,4 +32,16 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
     Set<Long> findFollowerIdsAmong(@Param("userId") Long userId, @Param("ids") Collection<Long> ids);
 
 
+
+    @Query("""
+    SELECT f
+    FROM Follow f
+    WHERE f.follower.id = :userId
+       OR f.followed.id = :userId
+""")
+    Page<Follow> findMyConnections(
+            @Param("userId") Long userId,
+            Pageable pageable
+    );
+
 }

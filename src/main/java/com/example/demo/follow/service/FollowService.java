@@ -166,6 +166,14 @@ public class FollowService {
 
     }
 
+    // retorna todos os usuarios em que o logado tem alguma conexão seja de follow ou following
+    public Page<FollowingProfileResponse> getMyConnections(Pageable pageable) {
+        Long userId = globalHelperService.getLoggedUser().getId();
+
+        return followRepository.findMyConnections(userId, pageable)
+                .map(followMapper::toFollowingProfileResponse);
+    }
+
     // boleano se segue o usuario ou não
     public boolean amIFollowing(Long followedId) {
         return followRepository.existsByFollowerIdAndFollowedId(

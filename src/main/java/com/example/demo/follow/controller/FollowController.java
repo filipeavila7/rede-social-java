@@ -56,6 +56,15 @@ public class FollowController {
         return ResponseEntity.ok(service.countFollowers(userId));
     }
 
+    @GetMapping("/my/connections")
+    public ResponseEntity<Page<FollowingProfileResponse>> getMyConnections(
+            @PageableDefault(size = 20) Pageable pageable) {
+
+        return ResponseEntity.ok(
+                service.getMyConnections(pageable)
+        );
+    }
+
 
     @GetMapping("/{userId}/following/count")
     public ResponseEntity<Long> countFollowing(@PathVariable Long userId) {
