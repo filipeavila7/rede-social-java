@@ -2,6 +2,7 @@ package com.example.demo.follow.controller;
 
 import com.example.demo.follow.dto.FollowingProfileResponse;
 import com.example.demo.follow.dto.FollowResponse;
+import com.example.demo.user.dto.UserResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -57,7 +58,7 @@ public class FollowController {
     }
 
     @GetMapping("/my/connections")
-    public ResponseEntity<Page<FollowingProfileResponse>> getMyConnections(
+    public ResponseEntity<Page<UserResponse>> getMyConnections(
             @PageableDefault(size = 20) Pageable pageable) {
 
         return ResponseEntity.ok(

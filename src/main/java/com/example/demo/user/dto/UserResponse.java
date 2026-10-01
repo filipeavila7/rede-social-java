@@ -5,7 +5,8 @@ public record UserResponse(
         String name,
 
         String profileImageUrl,
-        String userName
+        String userName,
+        boolean isClosedFriends
 
 ) {
 }

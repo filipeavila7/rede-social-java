@@ -32,7 +32,8 @@ public class FollowMapper {
                 user.getName(),
                 fileUrlUtils.toPublicUrl(user.getProfile().getImageUrlProfile()),
                 globalHelperService.getActiveStatus(user.getProfile()),
-                user.getUserName()
+                user.getUserName(),
+                globalHelperService.isUserInCloseFriends(user.getId())
         );
     }
 
@@ -44,7 +45,8 @@ public class FollowMapper {
                 user.getName(),
                 fileUrlUtils.toPublicUrl(user.getProfile().getImageUrlProfile()),
                 globalHelperService.getActiveStatus(user.getProfile()),
-                user.getUserName()
+                user.getUserName(),
+                globalHelperService.isUserInCloseFriends(user.getId())
         );
     }
 }

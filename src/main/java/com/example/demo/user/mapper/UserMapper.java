@@ -1,5 +1,6 @@
 package com.example.demo.user.mapper;
 
+import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.user.dto.UserResponse;
 import com.example.demo.user.dto.UserRoleResponse;
 import com.example.demo.user.entity.User;
@@ -11,13 +12,15 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserMapper {
     private final FileUrlUtils fileUrlUtils;
+    private final GlobalHelperService globalHelperService;
 
     public UserResponse toUserResponse(User u){
         return new UserResponse(
                 u.getId(),
                 u.getName(),
                 fileUrlUtils.toPublicUrl(u.getProfile().getImageUrlProfile()),
-                u.getUserName()
+                u.getUserName(),
+                globalHelperService.isUserInCloseFriends(u.getId())
         );
     }
 

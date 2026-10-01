@@ -11,6 +11,8 @@ import com.example.demo.followRequest.service.FollowRequestService;
 import com.example.demo.helpers.GlobalHelperService;
 import com.example.demo.notification.entity.NotificationType;
 import com.example.demo.notification.service.NotificationService;
+import com.example.demo.user.dto.UserResponse;
+import com.example.demo.user.mapper.UserMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -31,6 +33,7 @@ public class FollowService {
     private final GlobalHelperService globalHelperService;
     private final FollowMapper followMapper;
     private final FollowRequestService followRequestService;
+    private final UserMapper userMapper;
 
     // seguir usuario pelo id dele
     public FollowResponse followUser(Long followedId) {
@@ -167,11 +170,11 @@ public class FollowService {
     }
 
     // retorna todos os usuarios em que o logado tem alguma conexão seja de follow ou following
-    public Page<FollowingProfileResponse> getMyConnections(Pageable pageable) {
+    public Page<UserResponse> getMyConnections(Pageable pageable) {
         Long userId = globalHelperService.getLoggedUser().getId();
 
         return followRepository.findMyConnections(userId, pageable)
-                .map(followMapper::toFollowingProfileResponse);
+                .map(userMapper::toUserResponse);
     }
 
     // boleano se segue o usuario ou não

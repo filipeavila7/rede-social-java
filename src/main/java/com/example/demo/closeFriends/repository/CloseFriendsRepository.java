@@ -29,6 +29,7 @@ public interface CloseFriendsRepository extends JpaRepository<CloseFriends, Long
     );
 
 
+
     @Query("""
         SELECT cf
         FROM CloseFriends cf

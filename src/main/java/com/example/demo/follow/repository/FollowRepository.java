@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import com.example.demo.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -33,13 +34,31 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
 
 
 
-    @Query("""
-    SELECT f
-    FROM Follow f
-    WHERE f.follower.id = :userId
-       OR f.followed.id = :userId
-""")
-    Page<Follow> findMyConnections(
+    @Query(value = """
+    SELECT DISTINCT u.*
+    FROM users u
+    INNER JOIN follows f
+        ON (
+            (f.follower_id = :userId AND f.followed_id = u.id)
+            OR
+            (f.followed_id = :userId AND f.follower_id = u.id)
+        )
+    WHERE u.id <> :userId
+    """,
+            countQuery = """
+    SELECT COUNT(DISTINCT u.id)
+    FROM users u
+    INNER JOIN follows f
+        ON (
+            (f.follower_id = :userId AND f.followed_id = u.id)
+            OR
+            (f.followed_id = :userId AND f.follower_id = u.id)
+        )
+    WHERE u.id <> :userId
+    """,
+            nativeQuery = true
+    )
+    Page<User> findMyConnections(
             @Param("userId") Long userId,
             Pageable pageable
     );

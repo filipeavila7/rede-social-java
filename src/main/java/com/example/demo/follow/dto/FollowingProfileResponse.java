@@ -6,6 +6,7 @@ public record FollowingProfileResponse(
         String nome,
         String imageUrlProfile,
         String messageStatus,
-        String userName
+        String userName,
+        boolean isClosedFriend
 ) {
 }

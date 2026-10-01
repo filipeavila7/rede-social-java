@@ -479,4 +479,9 @@ public class GlobalHelperService {
         );
     }
 
+    public boolean isUserInCloseFriends(Long friendId){
+        User loggedUser = this.getLoggedUser();
+        return closeFriendsRepository.existsByUserIdAndFriendId(loggedUser.getId(), friendId);
+    }
+
 }
