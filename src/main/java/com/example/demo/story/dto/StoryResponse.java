@@ -15,6 +15,7 @@ public record StoryResponse(
         StoryType storyType,
         StoryVisibility storyVisibility,
         long totalVisibilities,
-        boolean isLikedByMe
+        boolean isLikedByMe,
+        boolean viewed
 ) {
 }

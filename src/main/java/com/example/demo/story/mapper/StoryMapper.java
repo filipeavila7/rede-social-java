@@ -19,7 +19,7 @@ public class StoryMapper {
     private final UserMapper userMapper;
     private final GlobalHelperService globalHelperService;
 
-    // TODO - ficar de olho aqui
+
     public StoryResponse toStoryResponse(Story s) {
         return new StoryResponse(
                 s.getId(),
@@ -29,7 +29,8 @@ public class StoryMapper {
                 s.getStoryType(),
                 s.getVisibility(),
                 globalHelperService.countVisibilitiesByStoryId(s.getId()),
-                globalHelperService.isStoryLikedByMe(s.getId())
+                globalHelperService.isStoryLikedByMe(s.getId()),
+                globalHelperService.isStoryViwed(s.getId())
         );
     }
 

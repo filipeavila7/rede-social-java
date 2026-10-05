@@ -562,4 +562,16 @@ public class GlobalHelperService {
         return false;
     }
 
+
+    // verificar se existe vizualização no story
+    public boolean isStoryViwed(Long storyId) {
+        User loggedUser = this.getLoggedUserOrNull();
+
+        if (loggedUser == null) {
+            return false;
+        }
+
+        return storyVisibilitiesRepository.existsByStoryIdAndUserId(storyId, loggedUser.getId());
+    }
+
 }
