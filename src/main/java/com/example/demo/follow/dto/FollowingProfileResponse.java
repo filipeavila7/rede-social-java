@@ -7,6 +7,8 @@ public record FollowingProfileResponse(
         String imageUrlProfile,
         String messageStatus,
         String userName,
-        boolean isClosedFriend
+        boolean isClosedFriend,
+        boolean hasStory,
+        boolean hasUnviewedStory
 ) {
 }

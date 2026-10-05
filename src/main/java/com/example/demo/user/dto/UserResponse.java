@@ -6,7 +6,9 @@ public record UserResponse(
 
         String profileImageUrl,
         String userName,
-        boolean isClosedFriends
+        boolean isClosedFriends,
+        boolean hasStory,
+        boolean hasUnviewedStory
 
 ) {
 }

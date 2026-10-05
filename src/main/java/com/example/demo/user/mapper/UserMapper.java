@@ -20,7 +20,9 @@ public class UserMapper {
                 u.getName(),
                 fileUrlUtils.toPublicUrl(u.getProfile().getImageUrlProfile()),
                 u.getUserName(),
-                globalHelperService.isUserInCloseFriends(u.getId())
+                globalHelperService.isUserInCloseFriends(u.getId()),
+                globalHelperService.hasVisibleStory(u.getId()),
+                globalHelperService.hasUnviewedStory(u.getId())
         );
     }
 

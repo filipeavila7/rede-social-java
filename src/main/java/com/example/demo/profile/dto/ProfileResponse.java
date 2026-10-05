@@ -16,5 +16,7 @@ public record ProfileResponse(
         long postCount,
         boolean amIfollowing,
         FollowRequestStatus followRequestStatus,
-        boolean isPrivateProfile
+        boolean isPrivateProfile,
+        boolean hasStory,
+        boolean hasUnviewedStory
 ) {}

@@ -24,6 +24,8 @@ public class FollowMapper {
         );
     }
 
+    // TODO - ficar de olho nesses 2 metodos
+
     public FollowingProfileResponse toFollowingProfileResponse(Follow f) {
         User user = f.getFollowed();
 
@@ -33,7 +35,9 @@ public class FollowMapper {
                 fileUrlUtils.toPublicUrl(user.getProfile().getImageUrlProfile()),
                 globalHelperService.getActiveStatus(user.getProfile()),
                 user.getUserName(),
-                globalHelperService.isUserInCloseFriends(user.getId())
+                globalHelperService.isUserInCloseFriends(user.getId()),
+                globalHelperService.hasVisibleStory(user.getId()),
+                globalHelperService.hasUnviewedStory(user.getId())
         );
     }
 
@@ -46,7 +50,9 @@ public class FollowMapper {
                 fileUrlUtils.toPublicUrl(user.getProfile().getImageUrlProfile()),
                 globalHelperService.getActiveStatus(user.getProfile()),
                 user.getUserName(),
-                globalHelperService.isUserInCloseFriends(user.getId())
+                globalHelperService.isUserInCloseFriends(user.getId()),
+                globalHelperService.hasVisibleStory(user.getId()),
+                globalHelperService.hasUnviewedStory(user.getId())
         );
     }
 }

@@ -399,6 +399,9 @@ public class GlobalHelperService {
 
     // verifica se o usuario está nos melhores amigos
     public boolean isCloseFriends(Long userId, Long friendId){
+        if (friendId.equals(this.getLoggedUser().getId())){
+            return true;
+        }
         return closeFriendsRepository.existsByUserIdAndFriendId(userId, friendId);
     }
 
@@ -480,8 +483,83 @@ public class GlobalHelperService {
     }
 
     public boolean isUserInCloseFriends(Long friendId){
-        User loggedUser = this.getLoggedUser();
+        User loggedUser = this.getLoggedUserOrNull();
+        if (loggedUser == null) {
+            return false;
+        }
         return closeFriendsRepository.existsByUserIdAndFriendId(loggedUser.getId(), friendId);
+    }
+
+
+    // verifica se existe story valida disponível
+    public boolean hasVisibleStory(Long userId) {
+        User loggedUser = this.getLoggedUserOrNull();
+
+        if (loggedUser == null) {
+            return false;
+        }
+
+        // pega o user
+        User user = this.findUserById(userId);
+
+        // valida se o usuário pode acessar o perfil
+        validateCanViewPrivateProfile(userId);
+
+        // pega os stories do user
+        List<Story> stories = storyRepository.
+        findByUserUserNameAndExpiresAtAfterOrderByCreatedAtAsc(
+                        user.getUserName(),
+                        LocalDateTime.now()
+                );
+
+        // valida os story
+        return stories.stream()
+                .anyMatch(this::canViewStory);
+    }
+
+    public boolean hasUnviewedStory(Long userId) {
+        User loggedUser = this.getLoggedUserOrNull();
+
+        if (loggedUser == null) {
+            return false;
+        }
+
+        // pega o user
+        User user = this.findUserById(userId);
+
+        // valida se o usuário pode acessar o perfil
+        validateCanViewPrivateProfile(userId);
+
+        // pega os stories do user
+        List<Story> stories = storyRepository.
+                findByUserUserNameAndExpiresAtAfterOrderByCreatedAtAsc(
+                        user.getUserName(),
+                        LocalDateTime.now()
+                );
+
+        return stories.stream()
+                .anyMatch(story ->
+                        canViewStory(story)
+                                && !storyVisibilitiesRepository
+                                .existsByStoryIdAndUserId(
+                                        story.getId(),
+                                        loggedUser.getId()
+                                )
+                );
+    }
+
+    // validar story
+    public boolean canViewStory(Story story) {
+
+        if (story.getVisibility() == StoryVisibility.EVERYONE) {
+            return true;
+        }
+
+        if (story.getVisibility() == StoryVisibility.CLOSE_FRIENDS) {
+            return isUserInCloseFriends(story.getUser().getId());
+        }
+
+        return false;
     }
 
 }
