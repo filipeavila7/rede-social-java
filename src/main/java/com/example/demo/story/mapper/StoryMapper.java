@@ -28,6 +28,7 @@ public class StoryMapper {
                 userMapper.toUserResponse(s.getUser()),
                 s.getStoryType(),
                 s.getVisibility(),
+                s.getDescription(),
                 globalHelperService.countVisibilitiesByStoryId(s.getId()),
                 globalHelperService.isStoryLikedByMe(s.getId()),
                 globalHelperService.isStoryViwed(s.getId())

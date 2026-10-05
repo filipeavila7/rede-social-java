@@ -14,6 +14,7 @@ public record StoryResponse(
         UserResponse OwerUser,
         StoryType storyType,
         StoryVisibility storyVisibility,
+        String description,
         long totalVisibilities,
         boolean isLikedByMe,
         boolean viewed

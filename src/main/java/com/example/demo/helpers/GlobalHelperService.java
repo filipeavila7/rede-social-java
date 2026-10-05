@@ -398,11 +398,11 @@ public class GlobalHelperService {
 
 
     // verifica se o usuario está nos melhores amigos
-    public boolean isCloseFriends(Long userId, Long friendId){
-        if (friendId.equals(this.getLoggedUser().getId())){
-            return true;
-        }
-        return closeFriendsRepository.existsByUserIdAndFriendId(userId, friendId);
+    public boolean isCloseFriends(Long userId, Long friendId) {
+        return closeFriendsRepository.existsByUserIdAndFriendId(
+                userId,
+                friendId
+        );
     }
 
 

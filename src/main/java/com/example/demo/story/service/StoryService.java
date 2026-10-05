@@ -55,13 +55,15 @@ public class StoryService {
                         LocalDateTime.now()
                 );
 
-        // verifica uma única vez se o usuário logado é close friend
-        boolean isCloseFriend = globalHelperService.isCloseFriends(
-                user.getId(),
-                loggedUser.getId()
-        );
+        // verifica uma única vez se o usuário logado é close friend ou se é o dono
+        boolean isOwner = user.getId().equals(loggedUser.getId());
 
-        // filtra os stories que o usuário pode visualizar
+        boolean isCloseFriend = isOwner ||
+                globalHelperService.isCloseFriends(
+                        user.getId(),
+                        loggedUser.getId()
+                );
+
         List<StoryResponse> visibleStories = stories.stream()
                 .filter(story ->
                         story.getVisibility() != StoryVisibility.CLOSE_FRIENDS
