@@ -9,6 +9,7 @@ public record FollowingProfileResponse(
         String userName,
         boolean isClosedFriend,
         boolean hasStory,
-        boolean hasUnviewedStory
+        boolean hasUnviewedStory,
+        boolean hasUnviewedCloseFriendsStory
 ) {
 }

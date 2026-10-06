@@ -37,7 +37,8 @@ public class FollowMapper {
                 user.getUserName(),
                 globalHelperService.isUserInCloseFriends(user.getId()),
                 globalHelperService.hasVisibleStory(user.getId()),
-                globalHelperService.hasUnviewedStory(user.getId())
+                globalHelperService.hasUnviewedStory(user.getId()),
+                globalHelperService.hasUnviewedCloseFriendsStory(user.getId())
         );
     }
 
@@ -52,7 +53,8 @@ public class FollowMapper {
                 user.getUserName(),
                 globalHelperService.isUserInCloseFriends(user.getId()),
                 globalHelperService.hasVisibleStory(user.getId()),
-                globalHelperService.hasUnviewedStory(user.getId())
+                globalHelperService.hasUnviewedStory(user.getId()),
+                globalHelperService.hasUnviewedCloseFriendsStory(user.getId())
         );
     }
 }

@@ -28,7 +28,8 @@ public class ProfileMapper {
                 globalHelperService.getFollowRequestStatus(p.getUser().getId()),
                 p.isPrivateProfile(),
                 globalHelperService.hasVisibleStory(p.getUser().getId()),
-                globalHelperService.hasUnviewedStory(p.getUser().getId())
+                globalHelperService.hasUnviewedStory(p.getUser().getId()),
+                globalHelperService.hasUnviewedCloseFriendsStory(p.getUser().getId())
         );
     }
 }

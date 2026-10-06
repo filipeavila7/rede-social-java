@@ -491,7 +491,7 @@ public class GlobalHelperService {
     }
 
 
-    // verifica se existe story valida disponível
+    // verifica se existe story, valida disponível
     public boolean hasVisibleStory(Long userId) {
         User loggedUser = this.getLoggedUserOrNull();
 
@@ -517,6 +517,7 @@ public class GlobalHelperService {
                 .anyMatch(this::canViewStory);
     }
 
+    // verifica se tem story que o user ainda não viu
     public boolean hasUnviewedStory(Long userId) {
         User loggedUser = this.getLoggedUserOrNull();
 
@@ -540,6 +541,40 @@ public class GlobalHelperService {
         return stories.stream()
                 .anyMatch(story ->
                         canViewStory(story)
+                                && !storyVisibilitiesRepository
+                                .existsByStoryIdAndUserId(
+                                        story.getId(),
+                                        loggedUser.getId()
+                                )
+                );
+    }
+
+
+    // verifica se o story ainda não visto é de mehlores amigos (importante para o front decidir a cor)
+    public boolean hasUnviewedCloseFriendsStory(Long userId) {
+        User loggedUser = this.getLoggedUserOrNull();
+
+        if (loggedUser == null) {
+            return false;
+        }
+
+        User user = this.findUserById(userId);
+
+        validateCanViewPrivateProfile(userId);
+
+        List<Story> stories = storyRepository
+                .findByUserUserNameAndExpiresAtAfterOrderByCreatedAtAsc(
+                        user.getUserName(),
+                        LocalDateTime.now()
+                );
+
+        return stories.stream()
+                .anyMatch(story ->
+                        story.getVisibility() == StoryVisibility.CLOSE_FRIENDS
+                                && (
+                                story.getUser().getId().equals(loggedUser.getId())
+                                        || canViewStory(story)
+                        )
                                 && !storyVisibilitiesRepository
                                 .existsByStoryIdAndUserId(
                                         story.getId(),

@@ -18,5 +18,6 @@ public record ProfileResponse(
         FollowRequestStatus followRequestStatus,
         boolean isPrivateProfile,
         boolean hasStory,
-        boolean hasUnviewedStory
+        boolean hasUnviewedStory,
+        boolean hasUnviewedCloseFriendsStory
 ) {}
