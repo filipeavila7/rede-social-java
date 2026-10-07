@@ -76,6 +76,10 @@ public class StoryService {
         int start = (int) pageable.getOffset();
         int end = Math.min(start + pageable.getPageSize(), visibleStories.size());
 
+        System.out.println("Stories encontrados: " + stories.size());
+        System.out.println("É dono: " + isOwner);
+        System.out.println("É close friend: " + isCloseFriend);
+
         List<StoryResponse> pageContent =
                 start >= visibleStories.size()
                         ? List.of()
@@ -86,6 +90,8 @@ public class StoryService {
                 pageable,
                 visibleStories.size()
         );
+
+
     }
 
 

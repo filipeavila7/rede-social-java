@@ -3,6 +3,7 @@ package com.example.demo.notification.entity;
 import com.example.demo.comment.entity.Comment;
 import com.example.demo.followRequest.entity.FollowRequest;
 import com.example.demo.post.entity.Post;
+import com.example.demo.story.entity.Story;
 import com.example.demo.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -55,6 +56,10 @@ public class Notification {
 
     @ManyToOne
     private Comment comment;
+
+
+    @ManyToOne
+    private Story story;
 
 
 }

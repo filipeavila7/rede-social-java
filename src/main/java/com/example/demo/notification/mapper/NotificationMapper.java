@@ -17,6 +17,7 @@ public class NotificationMapper {
     private final PostMapper postMapper;
 
 
+    // notificaçõe para ir para webSocket
     public NotificationFollowRequestResponse
     toNotificationFollowRequestResponse(Notification notification) {
 
@@ -47,6 +48,21 @@ public class NotificationMapper {
                 n.getSender().getProfile().getImageUrlProfile() != null ?
                         fileUrlUtils.toPublicUrl(n.getSender().getProfile().getImageUrlProfile())  : null,
                 n.getPost() != null ?  n.getPost().getId() : null,
+                n.getContent(),
+                n.getCreatedAt()
+        );
+    }
+
+
+    public NotificationStoryResponse toNotificationStoryResponse(Notification n){
+        return new NotificationStoryResponse(
+                n.getType(),
+                n.getSender().getId(),
+                n.getSender().getName(),
+                n.getSender().getUserName(),
+                n.getSender().getProfile().getImageUrlProfile() != null ?
+                        fileUrlUtils.toPublicUrl(n.getSender().getProfile().getImageUrlProfile())  : null,
+                n.getStory() != null ?  n.getStory().getId() : null,
                 n.getContent(),
                 n.getCreatedAt()
         );
@@ -96,6 +112,8 @@ public class NotificationMapper {
         );
     }
 
+    // notificações do get de notificações
+    // TODO - COLOCAR STORY AQUIA
     // parar de salvar o nome do usario no content e deixar por conta do q vem no dto
     public NotificationGetResponse toNotificationGetResponse(Notification n){
         return new NotificationGetResponse(

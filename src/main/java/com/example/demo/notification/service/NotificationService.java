@@ -9,6 +9,7 @@ import com.example.demo.notification.entity.Notification;
 import com.example.demo.notification.entity.NotificationType;
 import com.example.demo.notification.mapper.NotificationMapper;
 import com.example.demo.post.entity.Post;
+import com.example.demo.story.entity.Story;
 import com.example.demo.websocket.WebSocketService;
 import com.example.demo.user.entity.User;
 import com.example.demo.notification.repository.NotificationRepository;
@@ -71,6 +72,31 @@ public class NotificationService {
 
         // relaciona com post
         notification.setPost(post);
+
+        // salva
+        notificationRepository.save(notification);
+
+        // enviar notificação via webSocket
+        webSocketService.sendPostNotificationToUser(receiver.getId(),
+                notificationMapper.toNotificationPostResponse(notification));
+    }
+
+
+    public void createStoryNotification(
+            User loggedUser, User receiver, Story story, NotificationType type, String content) {
+
+        // só notifica se não for o próprio post
+        if (story.getUser().getId().equals(loggedUser.getId())) {
+            return;
+        }
+
+        // cria a notificação
+        Notification notification = globalHelperService.buildNotification(
+                loggedUser, receiver, type, content
+        );
+
+        // relaciona com story
+        notification.setStory(story);
 
         // salva
         notificationRepository.save(notification);
