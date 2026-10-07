@@ -81,6 +81,10 @@ public class CommentService {
         User loggedUser = globalHelperService.getLoggedUser();
         Post post = globalHelperService.findPostById(postId);
 
+        //verifica se o perfil do dono do post é privado, se for, para comentar, o logado deve seguir o dono
+        globalHelperService.validateCanViewPrivateProfile(post.getUser().getId());
+
+        // cria o comentario
         Comment comment = new Comment();
         comment.setPost(post);
         comment.setUser(loggedUser);

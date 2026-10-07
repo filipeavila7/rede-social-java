@@ -47,8 +47,13 @@ public class LikeService {
         User loggedUser = globalHelperService.getLoggedUser();
         Post post = globalHelperService.findPostById(postId);
 
+        // verifica se ja existe like para não curtir duas vezes
         globalHelperService.verifyLikeInPost(loggedUser.getId(), postId);
 
+        // verifica se o perfil do dono do post é privado, se for, para curtir, o logado deve seguir o dono
+        globalHelperService.validateCanViewPrivateProfile(post.getUser().getId());
+
+        // cria a curtida
         Like like = new Like();
         like.setPost(post);
         like.setUser(loggedUser);

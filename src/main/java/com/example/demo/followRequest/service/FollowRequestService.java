@@ -8,6 +8,7 @@ import com.example.demo.followRequest.entity.FollowRequestStatus;
 import com.example.demo.followRequest.repository.FollowRequestRepository;
 import com.example.demo.helpers.GlobalHelperService;
 
+import com.example.demo.notification.entity.NotificationType;
 import com.example.demo.notification.service.NotificationService;
 import com.example.demo.user.entity.User;
 import jakarta.transaction.Transactional;
@@ -97,6 +98,24 @@ public class FollowRequestService {
 
         // mantém o request no banco para sabermos que foi aceito
         request.setStatus(FollowRequestStatus.ACCEPTED);
+
+        // notificação pra quem aceitou o pedido
+        notificationService.createFollowNotification(
+                request.getRequester(),
+                request.getTarget(),
+                NotificationType.FOLLOW,
+                " começou a seguir você"
+        );
+
+        // notificação pra quem teve o pedido aceito
+        notificationService.createFollowNotification(
+                request.getTarget(),
+                request.getRequester(),
+                NotificationType.FOLLOW,
+                " aceitou o seu pedido para seguir"
+        );
+
+
 
         followRequestRepository.save(request);
     }

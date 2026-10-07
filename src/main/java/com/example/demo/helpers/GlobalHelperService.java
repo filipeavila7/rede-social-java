@@ -328,7 +328,30 @@ public class GlobalHelperService {
         }
     }
 
+    // boleano para validar vizualização de profile
+    public boolean canViewPrivateProfile(Long profileUserId) {
 
+        Long loggedUserId = getLoggedUser().getId();
+
+        // É o próprio perfil
+        if (loggedUserId.equals(profileUserId)) {
+            return true;
+        }
+
+        User profileUser = userRepository.findById(profileUserId)
+                .orElseThrow(UserNotFoundException::new);
+
+        // Perfil público
+        if (!profileUser.getProfile().isPrivateProfile()) {
+            return true;
+        }
+
+        // Perfil privado → precisa seguir o dono
+        return followRepository.existsByFollowerIdAndFollowedId(
+                loggedUserId,
+                profileUserId
+        );
+    }
 
 
     // filtrar posts excluindo os privados
@@ -503,7 +526,9 @@ public class GlobalHelperService {
         User user = this.findUserById(userId);
 
         // valida se o usuário pode acessar o perfil
-        validateCanViewPrivateProfile(userId);
+        if (!canViewPrivateProfile(userId)) {
+            return false;
+        }
 
         // pega os stories do user
         List<Story> stories = storyRepository.
@@ -529,7 +554,9 @@ public class GlobalHelperService {
         User user = this.findUserById(userId);
 
         // valida se o usuário pode acessar o perfil
-        validateCanViewPrivateProfile(userId);
+        if (!canViewPrivateProfile(userId)) {
+            return false;
+        }
 
         // pega os stories do user
         List<Story> stories = storyRepository.
@@ -560,7 +587,9 @@ public class GlobalHelperService {
 
         User user = this.findUserById(userId);
 
-        validateCanViewPrivateProfile(userId);
+        if (!canViewPrivateProfile(userId)) {
+            return false;
+        }
 
         List<Story> stories = storyRepository
                 .findByUserUserNameAndExpiresAtAfterOrderByCreatedAtAsc(

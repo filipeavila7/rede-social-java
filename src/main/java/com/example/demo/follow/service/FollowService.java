@@ -65,12 +65,10 @@ public class FollowService {
             return followMapper.toFollowResponse(follow, true);
         }
 
-        // conteydo da notificação
-        String content =  " começou a seguir você";
 
         // cria a notificação
         notificationService.createFollowNotification(
-                loggedUser, followed, NotificationType.FOLLOW, content
+                loggedUser, followed, NotificationType.FOLLOW, " começou a seguir você"
         );
 
         return followMapper.toFollowResponse(followRepository.save(follow), false);
