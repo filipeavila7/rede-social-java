@@ -1,5 +1,6 @@
 package com.example.demo.story.controller;
 
+import com.example.demo.story.dto.MyStorySummaryResponse;
 import com.example.demo.story.dto.StoryRequest;
 import com.example.demo.story.dto.StoryResponse;
 import com.example.demo.story.dto.StoryTextRequest;
@@ -12,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/stories")
@@ -42,6 +45,11 @@ public class StoryController {
                 .body(image);
     }
 
+    @GetMapping("/me")
+    public List<MyStorySummaryResponse> getMyStories() {
+        return storyService.getMyStories();
+    }
+
     // criar story de imagem
     @PostMapping
     public ResponseEntity<StoryResponse> createStory(
@@ -58,6 +66,13 @@ public class StoryController {
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(storyService.createTextStory(request));
+    }
+
+    // deletar story
+    @DeleteMapping("/{storyId}")
+    public ResponseEntity<Void> deleteStory(@PathVariable Long storyId) {
+        storyService.deleteStoryById(storyId);
+        return ResponseEntity.noContent().build();
     }
 
 

@@ -26,8 +26,15 @@ public interface StoryRepository extends JpaRepository<Story, Long> {
             LocalDateTime now
     );
 
+    Optional<Story> findByIdAndUserId(Long storyId, Long userId);
+
     List<Story> findByUserUserNameAndExpiresAtAfterOrderByCreatedAtAsc(
             String userName,
+            LocalDateTime now
+    );
+
+    List<Story> findByUserIdAndExpiresAtAfterOrderByCreatedAtAsc(
+            Long userId,
             LocalDateTime now
     );
 

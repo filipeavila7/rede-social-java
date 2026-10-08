@@ -3,6 +3,7 @@ package com.example.demo.story.service;
 
 import com.example.demo.exeptions.api.AccessDeniedException;
 import com.example.demo.helpers.GlobalHelperService;
+import com.example.demo.story.dto.MyStorySummaryResponse;
 import com.example.demo.story.dto.StoryRequest;
 import com.example.demo.story.dto.StoryResponse;
 import com.example.demo.story.dto.StoryTextRequest;
@@ -76,9 +77,6 @@ public class StoryService {
         int start = (int) pageable.getOffset();
         int end = Math.min(start + pageable.getPageSize(), visibleStories.size());
 
-        System.out.println("Stories encontrados: " + stories.size());
-        System.out.println("É dono: " + isOwner);
-        System.out.println("É close friend: " + isCloseFriend);
 
         List<StoryResponse> pageContent =
                 start >= visibleStories.size()
@@ -95,6 +93,24 @@ public class StoryService {
     }
 
 
+    // pegar stories do user logado
+    public List<MyStorySummaryResponse> getMyStories() {
+
+        User loggedUser = globalHelperService.getLoggedUser();
+
+        List<Story> stories =
+                storyRepository
+                        .findByUserIdAndExpiresAtAfterOrderByCreatedAtAsc(
+                                loggedUser.getId(),
+                                LocalDateTime.now()
+                        );
+
+        return stories.stream()
+                .map(storyMapper::toMyStorySummaryResponse)
+                .toList();
+    }
+
+
     // criar story de imagem
     public StoryResponse createStory(StoryRequest request){
         Story story = storyMapper.createStory(request);
@@ -108,6 +124,16 @@ public class StoryService {
         Story story = storyMapper.createTextStory(request);
         return  storyMapper.toStoryResponse(storyRepository.save(story));
 
+    }
+
+
+    // exluir story
+    public void deleteStoryById(Long storyId){
+        Story story =storyRepository.findByIdAndUserId(
+                storyId, globalHelperService.getLoggedUser().getId())
+                .orElseThrow(() -> new RuntimeException("Story not found"));
+
+        storyRepository.delete(story);
     }
 
 

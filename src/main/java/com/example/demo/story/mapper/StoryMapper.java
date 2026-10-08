@@ -1,10 +1,7 @@
 package com.example.demo.story.mapper;
 
 import com.example.demo.helpers.GlobalHelperService;
-import com.example.demo.story.dto.StoryRequest;
-import com.example.demo.story.dto.StoryResponse;
-import com.example.demo.story.dto.StorySummaryResponse;
-import com.example.demo.story.dto.StoryTextRequest;
+import com.example.demo.story.dto.*;
 import com.example.demo.story.entity.Story;
 import com.example.demo.story.entity.StoryType;
 import com.example.demo.user.entity.User;
@@ -33,6 +30,18 @@ public class StoryMapper {
                 globalHelperService.countVisibilitiesByStoryId(s.getId()),
                 globalHelperService.isStoryLikedByMe(s.getId()),
                 globalHelperService.isStoryViwed(s.getId())
+        );
+    }
+
+    public MyStorySummaryResponse toMyStorySummaryResponse(Story story) {
+        return new MyStorySummaryResponse(
+                story.getId(),
+                "/stories/" + story.getId() + "/image",
+                story.getCreatedAt(),
+                story.getStoryType(),
+                story.getDescription(),
+                userMapper.toUserResponse(story.getUser()),
+                globalHelperService.countVisibilitiesByStoryId(story.getId())
         );
     }
 

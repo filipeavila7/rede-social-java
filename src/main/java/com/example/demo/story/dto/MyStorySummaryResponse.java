@@ -1,6 +1,7 @@
 package com.example.demo.story.dto;
 
 import com.example.demo.story.entity.StoryType;
+import com.example.demo.user.dto.UserResponse;
 
 import java.time.LocalDateTime;
 
@@ -10,5 +11,6 @@ public record MyStorySummaryResponse(
         LocalDateTime createdAt,
         StoryType storyType,
         String description,
+        UserResponse ownerUser,
         long totalVisibilities
 ) {}
