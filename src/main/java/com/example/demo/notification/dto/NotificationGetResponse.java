@@ -3,6 +3,7 @@ package com.example.demo.notification.dto;
 import com.example.demo.followRequest.entity.FollowRequestStatus;
 import com.example.demo.notification.entity.NotificationType;
 import com.example.demo.post.dto.PostSummaryResponse;
+import com.example.demo.story.dto.StorySummaryResponse;
 
 import java.time.LocalDateTime;
 
@@ -18,6 +19,7 @@ public record NotificationGetResponse(
         String senderPhoto,
         PostSummaryResponse post,
         Long followRequestId,
-        FollowRequestStatus followRequestStatus
+        FollowRequestStatus followRequestStatus,
+        StorySummaryResponse storySummaryResponse
 ) {
 }

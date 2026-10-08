@@ -5,6 +5,7 @@ import com.example.demo.followRequest.entity.FollowRequest;
 import com.example.demo.notification.dto.*;
 import com.example.demo.notification.entity.Notification;
 import com.example.demo.post.mapper.PostMapper;
+import com.example.demo.story.mapper.StoryMapper;
 import com.example.demo.user.entity.User;
 import com.example.demo.util.FileUrlUtils;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 public class NotificationMapper {
     private final FileUrlUtils fileUrlUtils;
     private final PostMapper postMapper;
+    private final StoryMapper storyMapper;
 
 
     // notificaçõe para ir para webSocket
@@ -112,6 +114,7 @@ public class NotificationMapper {
         );
     }
 
+
     // notificações do get de notificações
     // TODO - COLOCAR STORY AQUIA
     // parar de salvar o nome do usario no content e deixar por conta do q vem no dto
@@ -129,7 +132,8 @@ public class NotificationMapper {
                      fileUrlUtils.toPublicUrl( n.getSender().getProfile().getImageUrlProfile())  : null,
                 n.getPost() != null ? postMapper.toPostSumaryResponse(n.getPost()) : null,
                 n.getFollowRequest() != null ? n.getFollowRequest().getId() : null,
-                n.getFollowRequest() != null ? n.getFollowRequest().getStatus() : null
+                n.getFollowRequest() != null ? n.getFollowRequest().getStatus() : null,
+                n.getStory() != null ?  storyMapper.toStorySummaryResponse(n.getStory()) : null
 
         );
     }

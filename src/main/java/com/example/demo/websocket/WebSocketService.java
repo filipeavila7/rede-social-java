@@ -43,6 +43,13 @@ public class WebSocketService {
         );
     }
 
+    public void sendStoryNotificationToUser(Long userId, NotificationStoryResponse notification) {
+        messagingTemplate.convertAndSend(
+                "/topic/notifications/" + userId,
+                notification
+        );
+    }
+
 
     public void sendCommentNotificationToUser(Long userId, NotificationCommentResponse notification) {
         messagingTemplate.convertAndSend(

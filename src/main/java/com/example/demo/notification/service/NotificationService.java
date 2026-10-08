@@ -102,8 +102,8 @@ public class NotificationService {
         notificationRepository.save(notification);
 
         // enviar notificação via webSocket
-        webSocketService.sendPostNotificationToUser(receiver.getId(),
-                notificationMapper.toNotificationPostResponse(notification));
+        webSocketService.sendStoryNotificationToUser(receiver.getId(),
+                notificationMapper.toNotificationStoryResponse(notification));
     }
 
     // ciar notificação para resposta de comentarios

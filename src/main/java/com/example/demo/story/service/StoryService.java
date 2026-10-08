@@ -118,11 +118,17 @@ public class StoryService {
         Story story = storyRepository.findById(storyId)
                 .orElseThrow(() -> new RuntimeException("Story not found"));
 
+
         User user = story.getUser();
 
         // O dono sempre pode visualizar o próprio Story
         if (user.getId().equals(loggedUser.getId())) {
             return fileStorageService.loadPrivateStory(story.getImageUrl());
+        }
+
+        // Verifica se o Story ainda está disponível
+        if (story.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new AccessDeniedException();
         }
 
         // Se o perfil for privado, verifica se o usuário pode visualizar
