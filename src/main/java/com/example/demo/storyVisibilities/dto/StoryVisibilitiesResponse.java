@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 public record StoryVisibilitiesResponse(
         Long id,
         UserResponse user,
-        LocalDateTime seenAt
+        LocalDateTime seenAt,
+        boolean liked
 ) {
 }

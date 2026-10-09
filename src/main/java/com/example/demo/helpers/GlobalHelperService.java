@@ -505,6 +505,13 @@ public class GlobalHelperService {
         );
     }
 
+    // bolenao para saber se os usuarios que vizualizaram o story curtiram
+    public boolean isStoryLikedByUserIdAndStoryId(Long userId, Long storyId){
+        return likeStoryRepository.existsByStoryIdAndUserId(
+                storyId, userId
+        );
+    }
+
     public boolean isUserInCloseFriends(Long userId) {
         User loggedUser = this.getLoggedUserOrNull();
 

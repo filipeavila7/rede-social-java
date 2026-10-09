@@ -1,8 +1,6 @@
 package com.example.demo.message.service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -12,26 +10,20 @@ import com.example.demo.message.dto.ConversationUpdateResponse;
 import com.example.demo.message.dto.MessageRequest;
 import com.example.demo.message.dto.MessageResponse;
 import com.example.demo.message.mapper.MessageMapper;
-import com.example.demo.notification.dto.NotificationPostResponse;
 import com.example.demo.message.dto.UnreadCountResponse;
 import com.example.demo.conversation.entity.Conversation;
 import com.example.demo.message.entity.Message;
 import com.example.demo.notification.entity.NotificationType;
 import com.example.demo.notification.service.NotificationService;
-import com.example.demo.profile.entity.Profile;
 import com.example.demo.websocket.WebSocketService;
 import com.example.demo.user.entity.User;
 import com.example.demo.conversation.repository.ConversationRepository;
 import com.example.demo.message.repository.MessageRepository;
-import com.example.demo.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -90,12 +82,14 @@ public class MessageService {
         message.setConversation(conversation);
         message.setSender(sender);
 
+        // salva a mensagem
+        MessageResponse response = messageMapper.toMessageResponse(messageRepository.save(message));
+
         // ultima mensagem e hora da ultima mensagem
         conversation.setLastMessage(request.textMessage());
         conversation.setLastMessageAt(message.getCreatedAt());
 
-        // salva mensagem e conversation
-        MessageResponse response = messageMapper.toMessageResponse(messageRepository.save(message));
+        // salva conversation
         conversationRepository.save(conversation);
 
        // manda mensagem em tempo real
@@ -177,9 +171,8 @@ public class MessageService {
         );
     }
 
-    // =========================
+
     // GET MESSAGES
-    // =========================
     public Page<MessageResponse> getMessages(
             Long conversationId,
             Pageable pageable
@@ -206,12 +199,8 @@ public class MessageService {
 
     }
 
-    // =========================
+
     // UNREAD COUNT (BADGE)
-    // =========================
-    // =========================
-// UNREAD COUNT (BADGE)
-// =========================
     public List<UnreadCountResponse> getUnreadConversations() {
 
         User me = globalHelperService.getLoggedUser();
