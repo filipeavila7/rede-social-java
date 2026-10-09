@@ -41,7 +41,8 @@ public class StoryMapper {
                 story.getStoryType(),
                 story.getDescription(),
                 userMapper.toUserResponse(story.getUser()),
-                globalHelperService.countVisibilitiesByStoryId(story.getId())
+                globalHelperService.countVisibilitiesByStoryId(story.getId()),
+                story.getVisibility()
         );
     }
 
