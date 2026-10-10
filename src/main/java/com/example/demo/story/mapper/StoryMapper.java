@@ -29,7 +29,8 @@ public class StoryMapper {
                 s.getDescription(),
                 globalHelperService.countVisibilitiesByStoryId(s.getId()),
                 globalHelperService.isStoryLikedByMe(s.getId()),
-                globalHelperService.isStoryViwed(s.getId())
+                globalHelperService.isStoryViwed(s.getId()),
+                s.getBackgroundColor() != null ? s.getBackgroundColor() : null
         );
     }
 
@@ -42,7 +43,8 @@ public class StoryMapper {
                 story.getDescription(),
                 userMapper.toUserResponse(story.getUser()),
                 globalHelperService.countVisibilitiesByStoryId(story.getId()),
-                story.getVisibility()
+                story.getVisibility(),
+                story.getBackgroundColor() != null ? story.getBackgroundColor() : null
         );
     }
 
@@ -86,6 +88,7 @@ public class StoryMapper {
         story.setVisibility(request.visibility());
         story.setDescription(request.text());
         story.setStoryType(StoryType.TEXT);
+        story.setBackgroundColor(request.backgroundColor());
 
         return story;
     }

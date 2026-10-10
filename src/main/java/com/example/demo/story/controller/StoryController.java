@@ -34,6 +34,15 @@ public class StoryController {
         );
     }
 
+    // histórico de story
+    @GetMapping("/me/history")
+    public ResponseEntity<Page<StoryResponse>> getStoryHistory(
+            Pageable pageable
+    ){
+        return ResponseEntity.ok(storyService.getHitoryStories(pageable));
+    }
+
+
     @GetMapping("/{storyId}/image")
     public ResponseEntity<Resource> getStoryImage(
             @PathVariable Long storyId

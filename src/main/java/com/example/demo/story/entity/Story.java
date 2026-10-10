@@ -34,6 +34,10 @@ public class Story {
     @Column
     private String description;
 
+    // cor do fundo do story de texto
+    @Column(length = 7)
+    private String backgroundColor;
+
 
     @Column
     @Enumerated(EnumType.STRING)

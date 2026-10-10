@@ -14,5 +14,6 @@ public record MyStorySummaryResponse(
         String description,
         UserResponse ownerUser,
         long totalVisibilities,
-        StoryVisibility storyVisibility
+        StoryVisibility storyVisibility,
+        String backgroundColor
 ) {}

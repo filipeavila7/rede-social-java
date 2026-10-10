@@ -32,10 +32,8 @@ public class StoryService {
     private final FileStorageService fileStorageService;
 
 
-    // <img src={`/stories/${story.id}/image`} /> como o front mostrara imagens de story
-    // TODO - criar entidade de stories de registro e adcionar qualquer novo story la
-    // TODO - criar entidade e endpoint para vizualação de stories, salvando o usuario que viu e o id do story
-    // mostrar todos os stories de um usuario pelo userName
+
+    // mostrar todos os stories válidos de um usuario pelo userName
     public Page<StoryResponse> getUserStories(String userName, Pageable pageable) {
 
         // encontra o dono dos stories
@@ -90,6 +88,15 @@ public class StoryService {
         );
 
 
+    }
+
+
+    // histórico de story do usuario
+    public Page<StoryResponse> getHitoryStories(Pageable pageable){
+        User loggedUser = globalHelperService.getLoggedUser();
+
+        return storyRepository.findByUserIdOrderByCreatedAtDesc(loggedUser.getId(), pageable)
+                .map(storyMapper::toStoryResponse);
     }
 
 

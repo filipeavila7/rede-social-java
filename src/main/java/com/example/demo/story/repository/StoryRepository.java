@@ -21,6 +21,12 @@ public interface StoryRepository extends JpaRepository<Story, Long> {
             Pageable pageable
     );
 
+
+    Page<Story> findByUserIdOrderByCreatedAtDesc(
+            Long userId,
+            Pageable pageable
+    );
+
     Optional<Story> findByIdAndExpiresAtAfter(
             Long storyId,
             LocalDateTime now

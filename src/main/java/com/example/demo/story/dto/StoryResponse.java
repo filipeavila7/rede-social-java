@@ -17,6 +17,7 @@ public record StoryResponse(
         String description,
         long totalVisibilities,
         boolean isLikedByMe,
-        boolean viewed
+        boolean viewed,
+        String backgroundColor
 ) {
 }
